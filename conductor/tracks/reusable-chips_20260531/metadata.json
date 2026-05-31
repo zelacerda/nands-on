@@ -2,9 +2,12 @@
   "id": "reusable-chips_20260531",
   "title": "Chips Reutilizáveis",
   "type": "feature",
-  "status": "pending",
+  "status": "in_progress",
   "created": "2026-05-31T00:00:00Z",
   "updated": "2026-05-31T00:00:00Z",
+  "current_phase": 1,
+  "current_task": "1.1",
+  "commits": [],
   "phases": {
     "total": 3,
     "completed": 0

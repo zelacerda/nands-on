@@ -24,24 +24,25 @@ Generalizar o modelo e implementar a lógica pura de definição/captura/bibliot
 
 ### Tasks
 
-- [ ] Task 1.1: Estender `model.ts`: adicionar o tipo de nó `chip`, o tipo
+- [x] Task 1.1: Estender `model.ts`: adicionar o tipo de nó `chip`, o tipo
       `ChipDefinition` (`{ id, name, inputCount, outputCount, internal: CircuitState }`)
       e um campo opcional `defId` no `CircuitNode`.
-- [ ] Task 1.2: Introduzir `nodeSize(node)` (dimensão dinâmica para `chip` a partir do nº
+- [x] Task 1.2: Introduzir `nodeSize(node)` (dimensão dinâmica para `chip` a partir do nº
       de pinos) e `chipInstancePins(def)` (N entradas à esquerda, M saídas à direita,
       ordenadas de cima para baixo). Manter os tamanhos fixos das primitivas.
-- [ ] Task 1.3: Implementar `captureDefinition(state, name)`: a partir de um `CircuitState`,
+- [x] Task 1.3: Implementar `captureDefinition(state, name)`: a partir de um `CircuitState`,
       coletar nós `input`/`output` ordenados por `pos.y` e montar a `ChipDefinition`
       (preservando a topologia interna, incluindo nós `chip` aninhados).
-- [ ] Task 1.4: Implementar `ChipLibrary` em memória (`add`, `get`, `has`, `list`) com
+- [x] Task 1.4: Implementar `ChipLibrary` em memória (`add`, `get`, `has`, `list`) com
       **unicidade de nome** (rejeitar duplicado).
-- [ ] Task 1.5 (teste): Testes de `captureDefinition` (ordenação vertical dos pinos,
+- [x] Task 1.5 (teste): Testes de `captureDefinition` (ordenação vertical dos pinos,
       contagem in/out), `chipInstancePins`/`nodeSize` e unicidade da biblioteca.
 
 ### Verification
 
-- [ ] Testes da lógica de captura, derivação de pinos e biblioteca passando; typecheck,
-      lint e build verdes.
+- [x] Testes da lógica de captura, derivação de pinos e biblioteca passando; typecheck,
+      lint e build verdes. _(Inclui a migração de `NODE_SIZE[node.type]` → `nodeSize(node)`
+      em render/hittest, necessária para compilar — antecipa parte da Task 2.3.)_
 
 ## Phase 2: Renderização e Instanciação de Chips
 
