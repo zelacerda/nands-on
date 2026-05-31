@@ -22,6 +22,19 @@ export function captureDefinition(state: CircuitState, name: string): ChipDefini
   };
 }
 
+export type NameValidation = { ok: true; name: string } | { ok: false; reason: string };
+
+/**
+ * Valida o nome de um novo chip: não pode ser vazio (após trim) nem já existir
+ * na biblioteca. Em caso de sucesso devolve o nome normalizado (trimado).
+ */
+export function validateChipName(library: ChipLibrary, raw: string): NameValidation {
+  const name = raw.trim();
+  if (!name) return { ok: false, reason: 'Informe um nome para o componente.' };
+  if (library.has(name)) return { ok: false, reason: `Já existe um chip chamado "${name}".` };
+  return { ok: true, name };
+}
+
 /** Erro lançado ao tentar adicionar um chip com nome já existente. */
 export class DuplicateChipNameError extends Error {
   constructor(name: string) {
