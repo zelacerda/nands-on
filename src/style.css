@@ -65,3 +65,12 @@ body {
 #palette button:active {
   background: #2d333b;
 }
+
+#palette button#delete {
+  color: #f7768e;
+  border-color: #5a3b42;
+}
+
+#palette button#delete:hover {
+  background: #45323a;
+}
