@@ -91,3 +91,47 @@ export function drawCircuit(
     drawNode(ctx, cam, node);
   }
 }
+
+const COLOR_SELECT = '#7aa2f7';
+const COLOR_VALID = '#9ece6a';
+const COLOR_INVALID = '#f7768e';
+
+/** Realça um nó selecionado com um contorno. */
+export function drawNodeHighlight(
+  ctx: CanvasRenderingContext2D,
+  cam: Camera,
+  node: CircuitNode,
+): void {
+  const { w, h } = NODE_SIZE[node.type];
+  const origin = cam.worldToScreen(node.pos);
+  const pad = 3 * cam.zoom;
+  ctx.strokeStyle = COLOR_SELECT;
+  ctx.lineWidth = Math.max(1.5, 2 * cam.zoom);
+  roundedRect(ctx, origin.x - pad, origin.y - pad, w * cam.zoom + 2 * pad, h * cam.zoom + 2 * pad, 10 * cam.zoom);
+  ctx.stroke();
+}
+
+/** Realça um fio selecionado. */
+export function drawWireHighlight(ctx: CanvasRenderingContext2D, from: Vec2, to: Vec2): void {
+  ctx.strokeStyle = COLOR_SELECT;
+  ctx.lineWidth = 4;
+  drawWireSegment(ctx, from, to);
+}
+
+/**
+ * Desenha o "fio fantasma" durante o arrasto de criação de conexão.
+ * `valid` controla a cor (verde válido / vermelho inválido).
+ */
+export function drawGhostWire(
+  ctx: CanvasRenderingContext2D,
+  from: Vec2,
+  to: Vec2,
+  valid: boolean,
+): void {
+  ctx.save();
+  ctx.strokeStyle = valid ? COLOR_VALID : COLOR_INVALID;
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([6, 4]);
+  drawWireSegment(ctx, from, to);
+  ctx.restore();
+}
