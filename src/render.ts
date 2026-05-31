@@ -1,5 +1,5 @@
 import type { Camera, Vec2 } from './camera';
-import { NODE_SIZE, type CircuitNode, pinWorldPos } from './model';
+import { type CircuitNode, nodeSize, pinWorldPos } from './model';
 import type { CircuitStore } from './store';
 
 /** Raio do pino, em unidades de mundo. */
@@ -7,6 +7,7 @@ export const PIN_RADIUS = 5;
 
 const COLOR = {
   body: '#2d333b',
+  chipBody: '#363c4a',
   bodyStroke: '#4a525e',
   label: '#d8dee9',
   pinIn: '#7aa2f7',
@@ -27,14 +28,28 @@ function roundedRect(
   ctx.roundRect(x, y, w, h, radius);
 }
 
-/** Desenha um nó (porta ou pino de I/O) em coordenadas de tela. */
+/** Rótulo central exibido em cada tipo de nó. */
+function nodeLabel(node: CircuitNode): string {
+  switch (node.type) {
+    case 'nand':
+      return 'NAND';
+    case 'input':
+      return 'IN';
+    case 'output':
+      return 'OUT';
+    case 'chip':
+      return node.name ?? 'CHIP';
+  }
+}
+
+/** Desenha um nó (porta, pino de I/O ou chip) em coordenadas de tela. */
 export function drawNode(ctx: CanvasRenderingContext2D, cam: Camera, node: CircuitNode): void {
-  const { w, h } = NODE_SIZE[node.type];
+  const { w, h } = nodeSize(node);
   const origin = cam.worldToScreen(node.pos);
   const sw = w * cam.zoom;
   const sh = h * cam.zoom;
 
-  ctx.fillStyle = COLOR.body;
+  ctx.fillStyle = node.type === 'chip' ? COLOR.chipBody : COLOR.body;
   ctx.strokeStyle = COLOR.bodyStroke;
   ctx.lineWidth = Math.max(1, 1.5 * cam.zoom);
   roundedRect(ctx, origin.x, origin.y, sw, sh, 8 * cam.zoom);
@@ -42,7 +57,7 @@ export function drawNode(ctx: CanvasRenderingContext2D, cam: Camera, node: Circu
   ctx.stroke();
 
   // Rótulo central.
-  const label = node.type === 'nand' ? 'NAND' : node.type === 'input' ? 'IN' : 'OUT';
+  const label = nodeLabel(node);
   ctx.fillStyle = COLOR.label;
   ctx.font = `${Math.max(9, 12 * cam.zoom)}px system-ui, sans-serif`;
   ctx.textAlign = 'center';
@@ -102,7 +117,7 @@ export function drawNodeHighlight(
   cam: Camera,
   node: CircuitNode,
 ): void {
-  const { w, h } = NODE_SIZE[node.type];
+  const { w, h } = nodeSize(node);
   const origin = cam.worldToScreen(node.pos);
   const pad = 3 * cam.zoom;
   ctx.strokeStyle = COLOR_SELECT;

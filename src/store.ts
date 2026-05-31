@@ -1,11 +1,13 @@
 import type { Vec2 } from './camera';
 import {
+  type ChipDefinition,
   type CircuitNode,
   type CircuitState,
-  type NodeType,
   type Pin,
   type PinRef,
+  type PrimitiveType,
   type Wire,
+  chipInstancePins,
   createPins,
   pinWorldPos,
 } from './model';
@@ -24,8 +26,8 @@ export class CircuitStore {
     return `${prefix}${this.seq}`;
   }
 
-  /** Cria e adiciona um nó do tipo informado na posição (mundo) dada. */
-  addNode(type: NodeType, pos: Vec2): CircuitNode {
+  /** Cria e adiciona uma primitiva (NAND/I/O) na posição (mundo) dada. */
+  addNode(type: PrimitiveType, pos: Vec2): CircuitNode {
     const node: CircuitNode = {
       id: this.nextId('n'),
       type,
@@ -34,6 +36,33 @@ export class CircuitStore {
     };
     this.nodes.set(node.id, node);
     return node;
+  }
+
+  /** Cria e adiciona uma instância de chip a partir de uma definição. */
+  addChipInstance(def: ChipDefinition, pos: Vec2): CircuitNode {
+    const node: CircuitNode = {
+      id: this.nextId('n'),
+      type: 'chip',
+      pos: { ...pos },
+      pins: chipInstancePins(def),
+      defId: def.id,
+      name: def.name,
+    };
+    this.nodes.set(node.id, node);
+    return node;
+  }
+
+  /** Remove todos os nós e fios (usado após "Fazer" um chip). */
+  clear(): void {
+    this.nodes.clear();
+    this.wires.clear();
+  }
+
+  /** Quantidade de nós de um dado tipo (ex.: para condicionar o botão "Fazer"). */
+  countByType(type: CircuitNode['type']): number {
+    let n = 0;
+    for (const node of this.nodes.values()) if (node.type === type) n += 1;
+    return n;
   }
 
   /** Remove um nó e todos os fios conectados a ele. */

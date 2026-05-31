@@ -1,7 +1,7 @@
 import './style.css';
 import { Camera, type Vec2 } from './camera';
 import { drawGrid } from './grid';
-import { NODE_SIZE, type NodeType, type PinRef } from './model';
+import { NODE_SIZE, type PinRef, type PrimitiveType } from './model';
 import { CircuitStore } from './store';
 import {
   drawCircuit,
@@ -87,14 +87,14 @@ function deleteSelection(): void {
 
 // --- Paleta --------------------------------------------------------------
 
-function addNodeAtCenter(type: NodeType): void {
+function addNodeAtCenter(type: PrimitiveType): void {
   const center = camera.screenToWorld({ x: viewWidth / 2, y: viewHeight / 2 });
   const { w, h } = NODE_SIZE[type];
   store.addNode(type, { x: center.x - w / 2, y: center.y - h / 2 });
 }
 
 document.querySelectorAll<HTMLButtonElement>('#palette button[data-add]').forEach((btn) => {
-  btn.addEventListener('click', () => addNodeAtCenter(btn.dataset.add as NodeType));
+  btn.addEventListener('click', () => addNodeAtCenter(btn.dataset.add as PrimitiveType));
 });
 deleteBtn.addEventListener('click', deleteSelection);
 

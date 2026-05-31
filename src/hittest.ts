@@ -1,5 +1,5 @@
 import type { Vec2 } from './camera';
-import { NODE_SIZE, type PinRef, pinWorldPos } from './model';
+import { type PinRef, nodeSize, pinWorldPos } from './model';
 import { PIN_RADIUS } from './render';
 import type { CircuitStore } from './store';
 
@@ -45,7 +45,7 @@ export function hitNode(store: CircuitStore, p: Vec2): string | null {
   const nodes = store.listNodes();
   for (let i = nodes.length - 1; i >= 0; i--) {
     const node = nodes[i]!;
-    const { w, h } = NODE_SIZE[node.type];
+    const { w, h } = nodeSize(node);
     if (p.x >= node.pos.x && p.x <= node.pos.x + w && p.y >= node.pos.y && p.y <= node.pos.y + h) {
       return node.id;
     }
