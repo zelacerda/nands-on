@@ -1,0 +1,73 @@
+import { describe, expect, it } from 'vitest';
+import { createPins, NODE_SIZE, pinWorldPos } from './model';
+import { CircuitStore } from './store';
+
+describe('model', () => {
+  it('cria os pinos corretos por tipo de nó', () => {
+    expect(createPins('nand').map((p) => p.kind)).toEqual(['in', 'in', 'out']);
+    expect(createPins('input').map((p) => p.kind)).toEqual(['out']);
+    expect(createPins('output').map((p) => p.kind)).toEqual(['in']);
+  });
+
+  it('calcula a posição absoluta de um pino a partir do nó', () => {
+    const node = { id: 'n1', type: 'nand' as const, pos: { x: 100, y: 50 }, pins: createPins('nand') };
+    const out = node.pins.find((p) => p.id === 'out')!;
+    expect(pinWorldPos(node, out)).toEqual({
+      x: 100 + NODE_SIZE.nand.w,
+      y: 50 + NODE_SIZE.nand.h * 0.5,
+    });
+  });
+});
+
+describe('CircuitStore', () => {
+  it('adiciona nós com ids únicos', () => {
+    const store = new CircuitStore();
+    const a = store.addNode('nand', { x: 0, y: 0 });
+    const b = store.addNode('input', { x: 10, y: 10 });
+    expect(a.id).not.toBe(b.id);
+    expect(store.listNodes()).toHaveLength(2);
+  });
+
+  it('remove um nó e os fios conectados a ele', () => {
+    const store = new CircuitStore();
+    const input = store.addNode('input', { x: 0, y: 0 });
+    const nand = store.addNode('nand', { x: 100, y: 0 });
+    store.addWire({ nodeId: input.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in0' });
+    expect(store.listWires()).toHaveLength(1);
+
+    store.removeNode(nand.id);
+    expect(store.listNodes()).toHaveLength(1);
+    expect(store.listWires()).toHaveLength(0);
+  });
+
+  it('resolve a posição de mundo de um pino referenciado', () => {
+    const store = new CircuitStore();
+    const node = store.addNode('output', { x: 200, y: 80 });
+    const pos = store.pinPos({ nodeId: node.id, pinId: 'in' });
+    expect(pos).toEqual({ x: 200, y: 80 + NODE_SIZE.output.h * 0.5 });
+  });
+
+  it('pinPos retorna undefined para referência inexistente', () => {
+    const store = new CircuitStore();
+    expect(store.pinPos({ nodeId: 'nope', pinId: 'out' })).toBeUndefined();
+  });
+
+  it('detecta pino de entrada já ocupado', () => {
+    const store = new CircuitStore();
+    const input = store.addNode('input', { x: 0, y: 0 });
+    const nand = store.addNode('nand', { x: 100, y: 0 });
+    const inRef = { nodeId: nand.id, pinId: 'in0' };
+    expect(store.isInputOccupied(inRef)).toBe(false);
+    store.addWire({ nodeId: input.id, pinId: 'out' }, inRef);
+    expect(store.isInputOccupied(inRef)).toBe(true);
+  });
+
+  it('toJSON devolve um snapshot serializável', () => {
+    const store = new CircuitStore();
+    store.addNode('nand', { x: 1, y: 2 });
+    const json = JSON.parse(JSON.stringify(store.toJSON()));
+    expect(json.nodes).toHaveLength(1);
+    expect(json.wires).toHaveLength(0);
+    expect(json.nodes[0].type).toBe('nand');
+  });
+});
