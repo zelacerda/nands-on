@@ -11,6 +11,7 @@ import {
 } from './render';
 import { hitNode, hitPin, hitWire } from './hittest';
 import { validateConnection } from './connection';
+import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#editor');
 if (!canvas) {
@@ -38,18 +39,27 @@ function resize(): void {
 
 // --- Estado de interação -------------------------------------------------
 
-type Mode = 'idle' | 'pan' | 'dragNode' | 'wire';
+type Mode = 'idle' | 'pan' | 'dragNode' | 'wire' | 'pinch';
 type Selection = { kind: 'node' | 'wire'; id: string } | null;
 
 let mode: Mode = 'idle';
 let selection: Selection = null;
 
-let lastPointer: Vec2 = { x: 0, y: 0 }; // tela
+/** Ponteiros ativos (id → posição de tela), para pan e pinça. */
+const pointers = new Map<number, Vec2>();
+
+let lastPointer: Vec2 = { x: 0, y: 0 }; // tela (ponteiro único)
 let dragNodeId: string | null = null;
 let dragOffset: Vec2 = { x: 0, y: 0 }; // mundo: ponteiro − pos do nó
 let wireStart: PinRef | null = null;
 let ghostEnd: Vec2 = { x: 0, y: 0 }; // mundo
 let ghostValid = false;
+let pinchPrev: PinchSample | null = null;
+
+/** Folga de acerto, em px de tela, maior para toque. */
+function hitPx(pointerType: string): number {
+  return pointerType === 'touch' ? 16 : 8;
+}
 
 /** Tolerância de acerto (mundo) a partir de uma folga em px de tela. */
 function worldTol(px: number): number {
@@ -88,15 +98,44 @@ document.querySelectorAll<HTMLButtonElement>('#palette button[data-add]').forEac
 });
 deleteBtn.addEventListener('click', deleteSelection);
 
+// --- Pinça (dois ponteiros) ----------------------------------------------
+
+function beginPinch(): void {
+  // Cancela qualquer arrasto/fio em andamento para não "pular" ao iniciar a pinça.
+  mode = 'pinch';
+  dragNodeId = null;
+  wireStart = null;
+  const [a, b] = [...pointers.values()];
+  if (a && b) pinchPrev = samplePinch(a, b);
+}
+
+function updatePinch(): void {
+  const [a, b] = [...pointers.values()];
+  if (!a || !b || !pinchPrev) return;
+  const curr = samplePinch(a, b);
+  const d = pinchDelta(pinchPrev, curr);
+  camera.zoomAt(d.anchor, d.factor);
+  camera.panBy(d.dx, d.dy);
+  pinchPrev = curr;
+}
+
 // --- Ponteiro: decide o modo a partir do que foi atingido ----------------
 
 canvas.addEventListener('pointerdown', (e) => {
   const screen = pointerScreen(e);
-  const world = camera.screenToWorld(screen);
-  lastPointer = screen;
+  pointers.set(e.pointerId, screen);
   canvas.setPointerCapture(e.pointerId);
 
-  const pin = hitPin(store, world, worldTol(8));
+  if (pointers.size >= 2) {
+    beginPinch();
+    return;
+  }
+
+  const world = camera.screenToWorld(screen);
+  lastPointer = screen;
+  const tol = worldTol(hitPx(e.pointerType));
+
+  const pin = hitPin(store, world, tol);
   if (pin) {
     mode = 'wire';
     wireStart = pin;
@@ -115,7 +154,7 @@ canvas.addEventListener('pointerdown', (e) => {
     return;
   }
 
-  const wireId = hitWire(store, world, worldTol(6));
+  const wireId = hitWire(store, world, worldTol(hitPx(e.pointerType)));
   if (wireId) {
     setSelection({ kind: 'wire', id: wireId });
     mode = 'idle';
@@ -126,9 +165,22 @@ canvas.addEventListener('pointerdown', (e) => {
   mode = 'pan';
 });
 
+/** Atualiza o cursor no hover (apenas mouse). */
+function updateHoverCursor(world: Vec2): void {
+  if (hitPin(store, world, worldTol(8))) canvas!.style.cursor = 'crosshair';
+  else if (hitNode(store, world)) canvas!.style.cursor = 'move';
+  else canvas!.style.cursor = 'grab';
+}
+
 canvas.addEventListener('pointermove', (e) => {
   const screen = pointerScreen(e);
+  if (pointers.has(e.pointerId)) pointers.set(e.pointerId, screen);
   const world = camera.screenToWorld(screen);
+
+  if (mode === 'pinch') {
+    updatePinch();
+    return;
+  }
 
   if (mode === 'pan') {
     camera.panBy(screen.x - lastPointer.x, screen.y - lastPointer.y);
@@ -141,29 +193,43 @@ canvas.addEventListener('pointermove', (e) => {
     }
   } else if (mode === 'wire' && wireStart) {
     ghostEnd = world;
-    const target = hitPin(store, world, worldTol(8));
+    const target = hitPin(store, world, worldTol(hitPx(e.pointerType)));
     ghostValid = target !== null && validateConnection(store, wireStart, target).ok;
+  } else if (mode === 'idle' && e.pointerType === 'mouse') {
+    updateHoverCursor(world);
   }
 });
 
 function endPointer(e: PointerEvent): void {
   if (mode === 'wire' && wireStart) {
     const world = camera.screenToWorld(pointerScreen(e));
-    const target = hitPin(store, world, worldTol(8));
+    const target = hitPin(store, world, worldTol(hitPx(e.pointerType)));
     if (target) {
       const res = validateConnection(store, wireStart, target);
       if (res.ok) store.addWire(res.from, res.to);
     }
   }
-  mode = 'idle';
-  dragNodeId = null;
-  wireStart = null;
+
+  pointers.delete(e.pointerId);
   if (canvas!.hasPointerCapture(e.pointerId)) {
     canvas!.releasePointerCapture(e.pointerId);
+  }
+
+  if (mode === 'pinch' && pointers.size < 2) {
+    // Sai da pinça; não retoma pan com o dedo restante para evitar saltos.
+    pinchPrev = null;
+    mode = 'idle';
+  } else if (mode !== 'pinch') {
+    mode = 'idle';
+    dragNodeId = null;
+    wireStart = null;
   }
 }
 canvas.addEventListener('pointerup', endPointer);
 canvas.addEventListener('pointercancel', endPointer);
+
+// Evita o menu de contexto (long-press) sobre o canvas em toque/desktop.
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
 canvas.addEventListener(
   'wheel',

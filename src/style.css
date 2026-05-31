@@ -17,6 +17,10 @@ body {
   overflow: hidden;
   background: var(--color-bg);
   font-family: system-ui, sans-serif;
+  /* Impede "puxar para atualizar" e seleção acidental durante gestos. */
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #editor {
@@ -25,6 +29,7 @@ body {
   height: 100vh;
   /* Impede scroll/zoom da página ao interagir no canvas (essencial p/ touch). */
   touch-action: none;
+  -webkit-touch-callout: none;
   cursor: grab;
 }
 
