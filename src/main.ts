@@ -1,6 +1,9 @@
 import './style.css';
 import { Camera } from './camera';
 import { drawGrid } from './grid';
+import { NODE_SIZE, type NodeType } from './model';
+import { CircuitStore } from './store';
+import { drawCircuit } from './render';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#editor');
 if (!canvas) {
@@ -12,6 +15,20 @@ if (!ctx) {
 }
 
 const camera = new Camera();
+const store = new CircuitStore();
+
+/** Adiciona um nó centralizado na viewport atual. */
+function addNodeAtCenter(type: NodeType): void {
+  const center = camera.screenToWorld({ x: viewWidth / 2, y: viewHeight / 2 });
+  const { w, h } = NODE_SIZE[type];
+  store.addNode(type, { x: center.x - w / 2, y: center.y - h / 2 });
+}
+
+document.querySelectorAll<HTMLButtonElement>('#palette button').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    addNodeAtCenter(btn.dataset.add as NodeType);
+  });
+});
 
 /** Dimensões da viewport em CSS px (atualizadas no resize). */
 let viewWidth = 0;
@@ -71,6 +88,7 @@ function render(): void {
   ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx!.clearRect(0, 0, viewWidth, viewHeight);
   drawGrid(ctx!, camera, viewWidth, viewHeight);
+  drawCircuit(ctx!, camera, store);
   requestAnimationFrame(render);
 }
 
