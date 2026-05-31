@@ -1,0 +1,19 @@
+{
+  "id": "visual-editor_20260531",
+  "title": "Editor Visual de Circuitos (Canvas)",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-05-31T00:00:00Z",
+  "updated": "2026-05-31T00:00:00Z",
+  "current_phase": 1,
+  "current_task": "1.1",
+  "phases": {
+    "total": 4,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 21,
+    "completed": 0
+  },
+  "commits": []
+}

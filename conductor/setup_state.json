@@ -1,0 +1,67 @@
+{
+  "status": "complete",
+  "project_type": "greenfield",
+  "current_section": "styleguides",
+  "current_question": 2,
+  "completed_sections": [
+    "product",
+    "guidelines",
+    "tech_stack",
+    "workflow",
+    "styleguides"
+  ],
+  "answers": {
+    "product": {
+      "name": "From NAND to CPU",
+      "description": "Aplicação web JavaScript/TypeScript inspirada na versão 0 do Digital-Logic-Sim (Sebastian Lague).",
+      "problem": "Simulador simples de portas lógicas e criação de componentes usando interface web e database local do browser, sem backend ou instalação.",
+      "users": "Usuários finais",
+      "goals": [
+        "Simplicidade didática",
+        "Funcionar 100% no browser",
+        "Criação de componentes",
+        "Performance fluida",
+        "Permitir execução em smartphones e tablets"
+      ]
+    },
+    "guidelines": {
+      "voice": "Conciso e direto",
+      "principles": [
+        "Performance primeiro",
+        "Confiabilidade",
+        "Simplicidade acima de recursos",
+        "Interface baseada em nós e conectores"
+      ]
+    },
+    "tech_stack": {
+      "language": "TypeScript",
+      "frontend": "Vanilla TS + Canvas",
+      "persistence": "IndexedDB + export/import JSON",
+      "backend": "Nenhum",
+      "deploy": "Não decidido ainda"
+    },
+    "workflow": {
+      "tdd": "Flexível",
+      "commits": "Conventional Commits",
+      "review": "Auto-review / opcional",
+      "checkpoints": "Apenas ao concluir o track"
+    },
+    "styleguides": {
+      "languages": ["typescript", "html-css", "general"],
+      "tooling": "ESLint/Prettier"
+    }
+  },
+  "files_created": [
+    "conductor/index.md",
+    "conductor/product.md",
+    "conductor/product-guidelines.md",
+    "conductor/tech-stack.md",
+    "conductor/workflow.md",
+    "conductor/tracks.md",
+    "conductor/code_styleguides/typescript.md",
+    "conductor/code_styleguides/html-css.md",
+    "conductor/code_styleguides/general.md"
+  ],
+  "started_at": "2026-05-31T00:00:00Z",
+  "last_updated": "2026-05-31T00:00:00Z"
+}
