@@ -2,23 +2,28 @@
   "id": "reusable-chips_20260531",
   "title": "Chips Reutilizáveis",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-05-31T00:00:00Z",
   "updated": "2026-05-31T00:00:00Z",
-  "current_phase": 2,
-  "current_task": "2.1",
+  "current_phase": 3,
+  "current_task": "3.5",
   "commits": [
     "0f0e304: feat: extend model with chip type, ChipDefinition and dynamic nodeSize",
     "3be1dc5: refactor: use nodeSize(node) and add chip store ops",
     "af7a584: feat: add chip definition capture and in-memory library",
-    "5fae905: test: add chip capture, pins and library tests"
+    "5fae905: test: add chip capture, pins and library tests",
+    "dfb8452: feat: add dynamic chip palette and instance insertion",
+    "f684a75: test: add chip instance and removal tests",
+    "<phase3>: feat: add chip name validation",
+    "<phase3>: test: add name validation and nesting capture tests",
+    "<phase3>: feat: add Make flow (button, naming dialog, capture and clear)"
   ],
   "phases": {
     "total": 3,
-    "completed": 1
+    "completed": 3
   },
   "tasks": {
     "total": 15,
-    "completed": 5
+    "completed": 15
   }
 }

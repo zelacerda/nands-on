@@ -1,7 +1,7 @@
 # Track: Chips Reutilizáveis
 
 **ID:** reusable-chips_20260531
-**Status:** Pending
+**Status:** Complete
 
 ## Documentos
 
@@ -10,8 +10,8 @@
 
 ## Progresso
 
-- Fases: 0/3 concluídas
-- Tarefas: 0/15 concluídas
+- Fases: 3/3 concluídas
+- Tarefas: 15/15 concluídas
 
 ## Links Rápidos
 

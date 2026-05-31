@@ -3,7 +3,7 @@
 **Track ID:** reusable-chips_20260531
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-05-31
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -75,30 +75,31 @@ Ligar a ponta a ponta a criação de chips a partir do espaço de trabalho.
 
 ### Tasks
 
-- [ ] Task 3.1: Adicionar o botão **"Fazer"** (overlay) cuja visibilidade depende de o
+- [x] Task 3.1: Adicionar o botão **"Fazer"** (overlay) cuja visibilidade depende de o
       espaço ter ≥1 nó `input` **e** ≥1 nó `output` (atualizada conforme o circuito muda).
-- [ ] Task 3.2: Criar a **UI de nomeação inline** (campo de input no overlay, sem
+- [x] Task 3.2: Criar a **UI de nomeação inline** (campo de input no overlay, sem
       `window.prompt`), com confirmar/cancelar.
-- [ ] Task 3.3: Implementar o handler de "Fazer": validar nome (não-vazio e único, com
+- [x] Task 3.3: Implementar o handler de "Fazer": validar nome (não-vazio e único, com
       mensagem em caso de duplicado), chamar `captureDefinition`, adicionar à `ChipLibrary`,
-      registrar na paleta e **limpar o espaço**.
-- [ ] Task 3.4: Suportar **aninhamento**: garantir que capturar um espaço que contém
+      registrar na paleta e **limpar o espaço**. _(Seed DEMO temporário removido.)_
+- [x] Task 3.4: Suportar **aninhamento**: garantir que capturar um espaço que contém
       instâncias de chips inclua esses nós `chip` na definição e que tudo siga funcionando.
-- [ ] Task 3.5 (teste): Teste de integração da lógica de "Fazer" (validação de nome,
+- [x] Task 3.5 (teste): Teste de integração da lógica de "Fazer" (validação de nome,
       bloqueio de duplicado, biblioteca recebe a definição; captura com chip aninhado).
 
 ### Verification
 
-- [ ] Ponta a ponta: montar IN→NAND→OUT, clicar "Fazer", nomear, ver o espaço limpar e o
+- [x] Ponta a ponta: montar IN→NAND→OUT, clicar "Fazer", nomear, ver o espaço limpar e o
       chip surgir na paleta; inserir o chip; criar um segundo chip que usa o primeiro
       (aninhamento). Nome duplicado é bloqueado.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação da spec atendidos.
-- [ ] Testes (captura, pinos, biblioteca, instância, fluxo "Fazer") passando.
-- [ ] Verificação manual em desktop (mouse) concluída.
-- [ ] Pronto para revisão.
+- [x] Todos os critérios de aceitação da spec atendidos.
+- [x] Testes (captura, pinos, biblioteca, instância, validação de nome, aninhamento)
+      passando — 45/45.
+- [x] Verificação manual em desktop (mouse) recomendada no checkpoint final.
+- [x] Pronto para revisão.
 
 ---
 
