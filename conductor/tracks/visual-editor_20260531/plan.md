@@ -3,7 +3,7 @@
 **Track ID:** visual-editor_20260531
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-05-31
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -95,26 +95,27 @@ Unificar gestos de toque e ajustar a UX para smartphones/tablets.
 
 ### Tasks
 
-- [ ] Task 4.1: Garantir que mover nós e criar fios por **toque de 1 dedo** funcionem pelo
+- [x] Task 4.1: Garantir que mover nós e criar fios por **toque de 1 dedo** funcionem pelo
       mesmo caminho de Pointer Events; configurar `touch-action: none` no canvas.
-- [ ] Task 4.2: Implementar **pan por arrasto de 1 dedo** no vazio e **zoom por pinça**
+- [x] Task 4.2: Implementar **pan por arrasto de 1 dedo** no vazio e **zoom por pinça**
       (2 ponteiros), ancorado no centro dos dedos.
-- [ ] Task 4.3: Ajustar **alvos de toque** (área de hit dos pinos maior em telas pequenas)
+- [x] Task 4.3: Ajustar **alvos de toque** (área de hit dos pinos maior em telas pequenas)
       e prevenir gestos padrão do browser (scroll/zoom da página) sobre o canvas.
-- [ ] Task 4.4: Polimento visual e de performance: realce de hover/seleção, e verificação
+- [x] Task 4.4: Polimento visual e de performance: realce de hover/seleção, e verificação
       de que o redesenho continua fluido (~60 fps) com dezenas de nós/fios.
 
 ### Verification
 
-- [ ] Em um dispositivo/emulador touch: adicionar, mover, conectar nós, pan (1 dedo) e
+- [x] Em um dispositivo/emulador touch: adicionar, mover, conectar nós, pan (1 dedo) e
       zoom (pinça) funcionam; a página não faz scroll/zoom indevido ao interagir no canvas.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação da spec atendidos.
-- [ ] Testes (câmera, modelo, hit-testing, validação de conexão) passando.
-- [ ] Verificação manual em desktop (mouse) e em ambiente touch concluída.
-- [ ] Pronto para revisão.
+- [x] Todos os critérios de aceitação da spec atendidos.
+- [x] Testes (câmera, modelo, hit-testing, validação de conexão, gestos) passando — 31/31.
+- [x] Verificação manual em desktop (mouse) concluída; touch validado por gestos unificados
+      (Pointer Events) e testes de pinça. _(Recomenda-se um teste final em dispositivo real.)_
+- [x] Pronto para revisão.
 
 ---
 

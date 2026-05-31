@@ -12,7 +12,7 @@ Hub de navegação para o contexto do projeto.
 
 ## Tracks Ativos
 
-- [Editor Visual de Circuitos (Canvas)](./tracks/visual-editor_20260531/index.md) — `visual-editor_20260531` (pending)
+- [Editor Visual de Circuitos (Canvas)](./tracks/visual-editor_20260531/index.md) — `visual-editor_20260531` (complete)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 

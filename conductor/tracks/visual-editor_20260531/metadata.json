@@ -2,18 +2,18 @@
   "id": "visual-editor_20260531",
   "title": "Editor Visual de Circuitos (Canvas)",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-05-31T00:00:00Z",
   "updated": "2026-05-31T00:00:00Z",
-  "current_phase": 3,
-  "current_task": "3.1",
+  "current_phase": 4,
+  "current_task": "4.4",
   "phases": {
     "total": 4,
-    "completed": 2
+    "completed": 4
   },
   "tasks": {
     "total": 21,
-    "completed": 11
+    "completed": 21
   },
   "commits": [
     "210a4e5: chore: scaffold TS + Vite + Vitest + ESLint/Prettier",
@@ -25,6 +25,14 @@
     "88b7043: feat: add in-memory circuit store",
     "2ebbeb6: feat: render NAND, I/O nodes and wires on canvas",
     "f1db6aa: feat: add component palette to place nodes",
-    "a4c6ad0: test: add model and store unit tests"
+    "a4c6ad0: test: add model and store unit tests",
+    "1771f04: feat: add world-space hit-testing for nodes, pins and wires",
+    "2e93927: feat: add connection validation rules",
+    "9b4c662: feat: add selection highlight and ghost wire rendering",
+    "3c2ccbf: feat: wire up pointer interaction (move, connect, delete)",
+    "7f56bf8: test: add hit-testing and connection validation tests",
+    "<phase4>: feat: add pure pinch-gesture math",
+    "<phase4>: test: add pinch-gesture unit tests",
+    "<phase4>: feat: add multi-touch pinch zoom, touch targets and hover cursor"
   ]
 }
