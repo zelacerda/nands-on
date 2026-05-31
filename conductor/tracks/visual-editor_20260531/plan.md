@@ -72,21 +72,21 @@ Edição via Pointer Events (caminho único para mouse e toque de 1 ponteiro).
 
 ### Tasks
 
-- [ ] Task 3.1: Implementar **hit-testing** em coordenadas de mundo: identificar se um
+- [x] Task 3.1: Implementar **hit-testing** em coordenadas de mundo: identificar se um
       ponto atinge um nó, um pino específico ou um fio.
-- [ ] Task 3.2: **Selecionar e mover** nós: arrastar um nó atualiza sua posição; clique no
+- [x] Task 3.2: **Selecionar e mover** nós: arrastar um nó atualiza sua posição; clique no
       vazio limpa a seleção; distinguir arrasto-de-nó de pan-da-tela.
-- [ ] Task 3.3: **Criar fios**: iniciar arrasto em um pino de saída e soltar sobre um pino
+- [x] Task 3.3: **Criar fios**: iniciar arrasto em um pino de saída e soltar sobre um pino
       de entrada cria o `Wire`; mostrar fio "fantasma" durante o arrasto.
-- [ ] Task 3.4: **Validar conexões**: rejeitar saída→saída, entrada→entrada e pino de
+- [x] Task 3.4: **Validar conexões**: rejeitar saída→saída, entrada→entrada e pino de
       entrada já ocupado; feedback visual (cor/realce) para conexão válida vs inválida.
-- [ ] Task 3.5: **Remover** nós e fios (ex.: selecionar + tecla Delete; e/ou botão/long-press
+- [x] Task 3.5: **Remover** nós e fios (ex.: selecionar + tecla Delete; e/ou botão/long-press
       para mobile).
-- [ ] Task 3.6 (teste): Testes de hit-testing e das regras de validação de conexão.
+- [x] Task 3.6 (teste): Testes de hit-testing e das regras de validação de conexão.
 
 ### Verification
 
-- [ ] Com mouse: adicionar nós, movê-los, ligar saída→entrada (com fio fantasma),
+- [x] Com mouse: adicionar nós, movê-los, ligar saída→entrada (com fio fantasma),
       conexões inválidas rejeitadas com feedback, e remover nós/fios — tudo funcionando.
 
 ## Phase 4: Suporte a Toque (mobile) e Polimento

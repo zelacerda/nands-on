@@ -5,21 +5,26 @@
   "status": "in_progress",
   "created": "2026-05-31T00:00:00Z",
   "updated": "2026-05-31T00:00:00Z",
-  "current_phase": 2,
-  "current_task": "2.1",
+  "current_phase": 3,
+  "current_task": "3.1",
   "phases": {
     "total": 4,
-    "completed": 1
+    "completed": 2
   },
   "tasks": {
     "total": 21,
-    "completed": 5
+    "completed": 11
   },
   "commits": [
     "210a4e5: chore: scaffold TS + Vite + Vitest + ESLint/Prettier",
     "ae31856: feat: add responsive fullscreen canvas shell",
     "65ab1b3: feat: add 2D camera with pan/zoom and screen<->world conversion",
     "0ce9ef5: feat: add render loop and world-space grid with pan/zoom input",
-    "b62f539: test: add camera math unit tests"
+    "b62f539: test: add camera math unit tests",
+    "67ba00f: feat: add circuit data model (Pin/Node/Wire)",
+    "88b7043: feat: add in-memory circuit store",
+    "2ebbeb6: feat: render NAND, I/O nodes and wires on canvas",
+    "f1db6aa: feat: add component palette to place nodes",
+    "a4c6ad0: test: add model and store unit tests"
   ]
 }
