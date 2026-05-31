@@ -1,0 +1,33 @@
+:root {
+  --color-bg: #1a1d23;
+  --color-grid: #272b33;
+  --color-grid-strong: #323742;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+  font-family: system-ui, sans-serif;
+}
+
+#editor {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  /* Impede scroll/zoom da página ao interagir no canvas (essencial p/ touch). */
+  touch-action: none;
+  cursor: grab;
+}
+
+#editor:active {
+  cursor: grabbing;
+}
