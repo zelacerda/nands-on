@@ -19,6 +19,7 @@ import {
 import { hitNode, hitPin, hitWire } from './hittest';
 import { validateConnection } from './connection';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
+import { centeredTopLeft, isDrag } from './palette';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#editor');
 if (!canvas) {
@@ -97,16 +98,50 @@ function deleteSelection(): void {
 const library = new ChipLibrary();
 const palette = document.querySelector<HTMLElement>('#palette')!;
 
-function addNodeAtCenter(type: PrimitiveType): void {
-  const center = camera.screenToWorld({ x: viewWidth / 2, y: viewHeight / 2 });
-  const { w, h } = NODE_SIZE[type];
-  store.addNode(type, { x: center.x - w / 2, y: center.y - h / 2 });
+/** Cria uma primitiva centrada no ponto de mundo `world`. */
+function addNodeAt(type: PrimitiveType, world: Vec2): void {
+  store.addNode(type, centeredTopLeft(world, NODE_SIZE[type]));
 }
 
-function addChipInstanceAtCenter(def: ChipDefinition): void {
-  const center = camera.screenToWorld({ x: viewWidth / 2, y: viewHeight / 2 });
-  const { w, h } = chipSize(def.inputCount, def.outputCount);
-  store.addChipInstance(def, { x: center.x - w / 2, y: center.y - h / 2 });
+/** Cria uma instância de chip centrada no ponto de mundo `world`. */
+function addChipInstanceAt(def: ChipDefinition, world: Vec2): void {
+  store.addChipInstance(def, centeredTopLeft(world, chipSize(def.inputCount, def.outputCount)));
+}
+
+/**
+ * Arrasto a partir de um botão da paleta para criar uma instância no ponto solto.
+ * Usa Pointer Events + captura para rastrear o gesto que começa no botão (HTML) e
+ * termina sobre o canvas. Clique simples (abaixo do limiar) não cria nada; soltar
+ * fora da área do editor (sobre a paleta ou fora da janela) também é no-op.
+ */
+type SpawnFn = (world: Vec2) => void;
+
+let paletteDrag: { pointerId: number; start: Vec2; spawn: SpawnFn } | null = null;
+
+function attachPaletteDrag(btn: HTMLElement, spawn: SpawnFn): void {
+  btn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    paletteDrag = { pointerId: e.pointerId, start: { x: e.clientX, y: e.clientY }, spawn };
+    btn.setPointerCapture(e.pointerId);
+  });
+  btn.addEventListener('pointerup', (e) => {
+    if (!paletteDrag || paletteDrag.pointerId !== e.pointerId) return;
+    const drag = paletteDrag;
+    paletteDrag = null;
+    if (btn.hasPointerCapture(e.pointerId)) btn.releasePointerCapture(e.pointerId);
+
+    const end = { x: e.clientX, y: e.clientY };
+    if (!isDrag(drag.start, end)) return; // clique simples: reservado para edição futura
+    // Só cria se o ponteiro foi solto sobre o canvas (não sobre a paleta nem fora dele).
+    if (document.elementFromPoint(end.x, end.y) !== canvas) return;
+    const rect = canvas!.getBoundingClientRect();
+    drag.spawn(camera.screenToWorld({ x: end.x - rect.left, y: end.y - rect.top }));
+  });
+  btn.addEventListener('pointercancel', (e) => {
+    if (paletteDrag?.pointerId !== e.pointerId) return;
+    if (btn.hasPointerCapture(e.pointerId)) btn.releasePointerCapture(e.pointerId);
+    paletteDrag = null;
+  });
 }
 
 /** Reconstrói os botões de chip na paleta a partir da biblioteca. */
@@ -117,13 +152,14 @@ function refreshPalette(): void {
     btn.type = 'button';
     btn.className = 'chip-btn';
     btn.textContent = def.name;
-    btn.addEventListener('click', () => addChipInstanceAtCenter(def));
+    attachPaletteDrag(btn, (world) => addChipInstanceAt(def, world));
     palette.insertBefore(btn, deleteBtn);
   }
 }
 
 document.querySelectorAll<HTMLButtonElement>('#palette button[data-add]').forEach((btn) => {
-  btn.addEventListener('click', () => addNodeAtCenter(btn.dataset.add as PrimitiveType));
+  const type = btn.dataset.add as PrimitiveType;
+  attachPaletteDrag(btn, (world) => addNodeAt(type, world));
 });
 deleteBtn.addEventListener('click', deleteSelection);
 

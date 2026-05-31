@@ -37,21 +37,21 @@ Substituir o clique-no-centro por arrastar-e-soltar, criando a instância no pon
 
 ### Tasks
 
-- [ ] Task 2.1: Generalizar a criação para aceitar um ponto de mundo: extrair de
+- [x] Task 2.1: Generalizar a criação para aceitar um ponto de mundo: extrair de
       `addNodeAtCenter`/`addChipInstanceAtCenter` funções que recebem a posição de drop
       (ex.: `addNodeAt(type, worldPoint)` / `addChipInstanceAt(def, worldPoint)`), centrando
       a instância pelo `chipSize`/`NODE_SIZE`.
-- [ ] Task 2.2: Implementar o gesto de arrasto a partir dos botões da paleta com Pointer
+- [x] Task 2.2: Implementar o gesto de arrasto a partir dos botões da paleta com Pointer
       Events: `pointerdown` no botão + `setPointerCapture`, rastrear `pointermove`, e em
       `pointerup` decidir entre **clique** (deslocamento < limiar → não faz nada) e
       **arrasto** (≥ limiar → criar instância).
-- [ ] Task 2.3: No `pointerup` de arrasto, converter a posição para coordenadas locais do
+- [x] Task 2.3: No `pointerup` de arrasto, converter a posição para coordenadas locais do
       canvas e então para mundo (`camera.screenToWorld`); criar a instância apenas se o drop
       cair **dentro** da área do editor (caso contrário, no-op).
-- [ ] Task 2.4: Aplicar o mesmo gesto aos botões de chips criados em `refreshPalette`
+- [x] Task 2.4: Aplicar o mesmo gesto aos botões de chips criados em `refreshPalette`
       (substituindo o `click → addChipInstanceAtCenter`), unificando a anexação do handler
       de arrasto para primitivas e chips.
-- [ ] Task 2.5: (lógica) Testar o limiar clique/arrasto e a conversão drop→mundo onde a
+- [x] Task 2.5: (lógica) Testar o limiar clique/arrasto e a conversão drop→mundo onde a
       lógica for extraível (ex.: função pura de classificação do gesto e/ou de cálculo do
       ponto centrado), seguindo a política de TDD flexível.
 
