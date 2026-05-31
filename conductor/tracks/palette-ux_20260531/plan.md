@@ -22,7 +22,7 @@ Mudanças isoladas e de baixo risco que já entregam parte dos critérios de ace
 
 - [x] Task 1.1: Reordenar os botões `data-add` em `index.html` para **Entrada, Saída,
       NAND** (mantendo `#delete` ao final e os chips inseridos antes dele).
-- [ ] Task 1.2: Em `src/render.ts`, tornar a cor do corpo função da **categoria** do nó:
+- [x] Task 1.2: Em `src/render.ts`, tornar a cor do corpo função da **categoria** do nó:
       `input`/`output` usam a cor de I/O (`COLOR.body`); `nand`/`chip` usam a cor de
       componente lógico (`COLOR.chipBody`). Ajustar a condição em `drawNode`.
 

@@ -1,19 +1,28 @@
 import type { Camera, Vec2 } from './camera';
-import { type CircuitNode, nodeSize, pinWorldPos } from './model';
+import { type CircuitNode, type NodeType, nodeSize, pinWorldPos } from './model';
 import type { CircuitStore } from './store';
 
 /** Raio do pino, em unidades de mundo. */
 export const PIN_RADIUS = 5;
 
 const COLOR = {
-  body: '#2d333b',
-  chipBody: '#363c4a',
+  ioBody: '#2d333b',
+  logicBody: '#363c4a',
   bodyStroke: '#4a525e',
   label: '#d8dee9',
   pinIn: '#7aa2f7',
   pinOut: '#e0af68',
   wire: '#9aa5b1',
 } as const;
+
+/**
+ * Componentes lógicos (NAND e instâncias de chip) compartilham uma cor de corpo,
+ * distinta da cor dos pinos de I/O (Entrada/Saída), para diferenciar visualmente
+ * o que processa sinal do que apenas o injeta/observa.
+ */
+function isLogicNode(type: NodeType): boolean {
+  return type === 'nand' || type === 'chip';
+}
 
 function roundedRect(
   ctx: CanvasRenderingContext2D,
@@ -49,7 +58,7 @@ export function drawNode(ctx: CanvasRenderingContext2D, cam: Camera, node: Circu
   const sw = w * cam.zoom;
   const sh = h * cam.zoom;
 
-  ctx.fillStyle = node.type === 'chip' ? COLOR.chipBody : COLOR.body;
+  ctx.fillStyle = isLogicNode(node.type) ? COLOR.logicBody : COLOR.ioBody;
   ctx.strokeStyle = COLOR.bodyStroke;
   ctx.lineWidth = Math.max(1, 1.5 * cam.zoom);
   roundedRect(ctx, origin.x, origin.y, sw, sh, 8 * cam.zoom);
