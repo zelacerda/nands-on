@@ -10,6 +10,7 @@ import {
   chipInstancePins,
   chipSize,
   createPins,
+  nodeSize,
 } from './model';
 import { CircuitStore } from './store';
 import { ChipLibrary, captureDefinition, validateChipName } from './chip';
@@ -246,6 +247,24 @@ function closeNameDialog(): void {
   nameDialog.hidden = true;
 }
 
+/** Centro (mundo) da bounding box de todos os nós do espaço, ou `null` se vazio. */
+function nodesCenter(): Vec2 | null {
+  const nodes = store.listNodes();
+  if (nodes.length === 0) return null;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const node of nodes) {
+    const { w, h } = nodeSize(node);
+    minX = Math.min(minX, node.pos.x);
+    minY = Math.min(minY, node.pos.y);
+    maxX = Math.max(maxX, node.pos.x + w);
+    maxY = Math.max(maxY, node.pos.y + h);
+  }
+  return { x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
+}
+
 function confirmMake(): void {
   const check = validateChipName(library, nameInput.value);
   if (!check.ok) {
@@ -253,10 +272,15 @@ function confirmMake(): void {
     nameError.hidden = false;
     return;
   }
-  // Captura o espaço como definição (preserva chips aninhados), registra e limpa.
-  library.add(captureDefinition(store.toJSON(), check.name));
+  // Captura o espaço como definição (preserva chips aninhados) e registra na biblioteca.
+  const center = nodesCenter();
+  const def = captureDefinition(store.toJSON(), check.name);
+  library.add(def);
   refreshPalette();
+  // Substitui o espaço por uma única instância do chip criado, centrada onde os
+  // componentes originais estavam.
   store.clear();
+  if (center) addChipInstanceAt(def, center);
   setSelection(null);
   closeNameDialog();
 }
