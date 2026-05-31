@@ -66,6 +66,32 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
   });
 });
 
+describe('instância de chip na store', () => {
+  it('cria um nó chip com defId, nome e pinos derivados da definição', () => {
+    const store = new CircuitStore();
+    const def = captureDefinition(sampleState(), 'E'); // 2 in, 1 out
+    const node = store.addChipInstance(def, { x: 10, y: 20 });
+    expect(node.type).toBe('chip');
+    expect(node.defId).toBe(def.id);
+    expect(node.name).toBe('E');
+    expect(node.pins.filter((p) => p.kind === 'in')).toHaveLength(2);
+    expect(node.pins.filter((p) => p.kind === 'out')).toHaveLength(1);
+  });
+
+  it('remover um chip também remove os fios conectados a ele', () => {
+    const store = new CircuitStore();
+    const def = captureDefinition(sampleState(), 'F'); // 2 in, 1 out
+    const input = store.addNode('input', { x: -100, y: 0 });
+    const chip = store.addChipInstance(def, { x: 0, y: 0 });
+    store.addWire({ nodeId: input.id, pinId: 'out' }, { nodeId: chip.id, pinId: 'in0' });
+    expect(store.listWires()).toHaveLength(1);
+
+    store.removeNode(chip.id);
+    expect(store.listNodes()).toHaveLength(1);
+    expect(store.listWires()).toHaveLength(0);
+  });
+});
+
 describe('ChipLibrary', () => {
   it('adiciona e recupera por nome', () => {
     const lib = new ChipLibrary();
