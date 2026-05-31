@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { chipInstancePins, chipSize, nodeSize, type CircuitState } from './model';
-import { ChipLibrary, captureDefinition, DuplicateChipNameError } from './chip';
+import {
+  ChipLibrary,
+  captureDefinition,
+  DuplicateChipNameError,
+  validateChipName,
+} from './chip';
 import { CircuitStore } from './store';
 
 /** Monta um CircuitState simples: 2 entradas, 1 saída e uma NAND. */
@@ -106,5 +111,44 @@ describe('ChipLibrary', () => {
     const lib = new ChipLibrary();
     lib.add(captureDefinition(sampleState(), 'OR'));
     expect(() => lib.add(captureDefinition(sampleState(), 'OR'))).toThrow(DuplicateChipNameError);
+  });
+});
+
+describe('validateChipName', () => {
+  it('rejeita nome vazio ou só espaços', () => {
+    const lib = new ChipLibrary();
+    expect(validateChipName(lib, '   ').ok).toBe(false);
+  });
+
+  it('rejeita nome já existente', () => {
+    const lib = new ChipLibrary();
+    lib.add(captureDefinition(sampleState(), 'XOR'));
+    expect(validateChipName(lib, 'XOR').ok).toBe(false);
+  });
+
+  it('aceita e normaliza (trim) um nome válido', () => {
+    const lib = new ChipLibrary();
+    const res = validateChipName(lib, '  AND  ');
+    expect(res).toEqual({ ok: true, name: 'AND' });
+  });
+});
+
+describe('aninhamento', () => {
+  it('captura inclui instâncias de chips presentes no espaço', () => {
+    const lib = new ChipLibrary();
+    const half = lib; // legibilidade
+    half.add(captureDefinition(sampleState(), 'HALF'));
+    const def = half.get('HALF')!;
+
+    // Monta um espaço que usa o chip HALF como peça, mais I/O próprios.
+    const store = new CircuitStore();
+    store.addNode('input', { x: 0, y: 0 });
+    store.addChipInstance(def, { x: 100, y: 0 });
+    store.addNode('output', { x: 260, y: 0 });
+
+    const outer = captureDefinition(store.toJSON(), 'FULL');
+    expect(outer.inputCount).toBe(1);
+    expect(outer.outputCount).toBe(1);
+    expect(outer.internal.nodes.some((n) => n.type === 'chip')).toBe(true);
   });
 });
