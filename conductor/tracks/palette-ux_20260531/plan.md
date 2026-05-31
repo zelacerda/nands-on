@@ -3,7 +3,7 @@
 **Track ID:** palette-ux_20260531
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-05-31
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -82,10 +82,10 @@ Garantir paridade mobile e robustez da interação.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação do spec atendidos
-- [ ] Testes da lógica passando (`npm test`); build/typecheck limpos
+- [x] Todos os critérios de aceitação do spec atendidos
+- [x] Testes da lógica passando (`npm test`); build/typecheck limpos
 - [ ] Verificação manual no encerramento do track (desktop + toque)
-- [ ] Pronto para revisão
+- [x] Pronto para revisão
 
 ---
 

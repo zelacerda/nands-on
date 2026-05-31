@@ -1,0 +1,18 @@
+{
+  "id": "palette-ux_20260531",
+  "title": "UX da Paleta — Reordenação, Cor de I/O e Arrastar-para-Criar",
+  "type": "feature",
+  "status": "complete",
+  "created": "2026-05-31T21:52:12Z",
+  "updated": "2026-05-31T21:59:00Z",
+  "current_phase": 3,
+  "current_task": "3.3",
+  "phases": {
+    "total": 3,
+    "completed": 3
+  },
+  "tasks": {
+    "total": 10,
+    "completed": 10
+  }
+}

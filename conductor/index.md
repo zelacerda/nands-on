@@ -14,6 +14,7 @@ Hub de navegação para o contexto do projeto.
 
 - [Editor Visual de Circuitos (Canvas)](./tracks/visual-editor_20260531/index.md) — `visual-editor_20260531` (complete)
 - [Chips Reutilizáveis](./tracks/reusable-chips_20260531/index.md) — `reusable-chips_20260531` (complete)
+- [UX da Paleta — Reordenação, Cor de I/O e Arrastar-para-Criar](./tracks/palette-ux_20260531/index.md) — `palette-ux_20260531` (complete)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
