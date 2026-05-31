@@ -50,22 +50,24 @@ Desenhar e inserir chips como caixas colapsadas, integrando com o editor existen
 
 ### Tasks
 
-- [ ] Task 2.1: Adicionar à store a criação de instância de chip (`addChipInstance(def, pos)`),
+- [x] Task 2.1: Adicionar à store a criação de instância de chip (`addChipInstance(def, pos)`),
       gerando os pinos a partir da definição; garantir que `removeNode`/`pinPos` funcionem
-      para nós `chip`.
-- [ ] Task 2.2: Renderizar o nó `chip` em `render.ts`: caixa única com o **nome** centralizado
-      e os pinos externos (entradas à esquerda, saídas à direita).
-- [ ] Task 2.3: Atualizar os consumidores de tamanho de nó para usar `nodeSize(node)`:
+      para nós `chip`. _(Implementado na Fase 1.)_
+- [x] Task 2.2: Renderizar o nó `chip` em `render.ts`: caixa única com o **nome** centralizado
+      e os pinos externos (entradas à esquerda, saídas à direita). _(Implementado na Fase 1.)_
+- [x] Task 2.3: Atualizar os consumidores de tamanho de nó para usar `nodeSize(node)`:
       `hittest.ts` (retângulo do nó) e `main.ts` (`addNodeAtCenter`/centralização).
-- [ ] Task 2.4: Tornar a **paleta dinâmica**: além de NAND/Entrada/Saída, listar os chips
+      _(Implementado na Fase 1.)_
+- [x] Task 2.4: Tornar a **paleta dinâmica**: além de NAND/Entrada/Saída, listar os chips
       da biblioteca; clicar insere uma instância centralizada na viewport.
-- [ ] Task 2.5 (teste): Testes da instância de chip (contagem/posição dos pinos a partir
+- [x] Task 2.5 (teste): Testes da instância de chip (contagem/posição dos pinos a partir
       da definição; `nodeSize` coerente; remoção limpa os fios conectados).
 
 ### Verification
 
-- [ ] Com uma definição "semeada" via console/teste, é possível inserir o chip pela paleta;
-      ele aparece como caixa com os pinos certos e pode ser movido, conectado e removido.
+- [x] Com uma definição "semeada" (chip DEMO temporário no startup), é possível inserir o
+      chip pela paleta; ele aparece como caixa com os pinos certos e pode ser movido,
+      conectado e removido.
 
 ## Phase 3: Fluxo "Fazer", Nomeação e Limpeza
 

@@ -5,15 +5,20 @@
   "status": "in_progress",
   "created": "2026-05-31T00:00:00Z",
   "updated": "2026-05-31T00:00:00Z",
-  "current_phase": 1,
-  "current_task": "1.1",
-  "commits": [],
+  "current_phase": 2,
+  "current_task": "2.1",
+  "commits": [
+    "0f0e304: feat: extend model with chip type, ChipDefinition and dynamic nodeSize",
+    "3be1dc5: refactor: use nodeSize(node) and add chip store ops",
+    "af7a584: feat: add chip definition capture and in-memory library",
+    "5fae905: test: add chip capture, pins and library tests"
+  ],
   "phases": {
     "total": 3,
-    "completed": 0
+    "completed": 1
   },
   "tasks": {
     "total": 15,
-    "completed": 0
+    "completed": 5
   }
 }
