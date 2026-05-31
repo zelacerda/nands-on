@@ -60,8 +60,6 @@ concluídos).
 
 - Fluxo de **edição** de componentes (futuro botão "Editar") — apenas se reserva o clique
   simples para ele, sem implementá-lo agora.
-- Pré-visualização ("ghost") do componente seguindo o ponteiro durante o arrasto, salvo se
-  trivial; não é requisito.
 - Mudanças nas dimensões, pinos ou comportamento de simulação dos componentes.
 - Persistência, export/import, ou qualquer alteração de armazenamento.
 
@@ -69,6 +67,11 @@ concluídos).
 
 - A cor passa a ser função da **categoria** do nó (I/O vs. lógico), não do tipo bruto.
   Sugestão: tratar `input`/`output` como I/O e `nand`/`chip` como lógicos em `drawNode`.
+  Componentes lógicos usam um **azul** visível (corpo `#3a4360`, contorno `#5a68a0`),
+  alinhado ao acento dos botões de chip; I/O mantém o cinza neutro.
+- Durante o arrasto, um **ghost** (nó transitório, ~55% de opacidade) do componente é
+  desenhado sob o ponteiro enquanto este está sobre o canvas, indicando onde a instância
+  será criada ao soltar.
 - O arrasto começa em elementos HTML (`<button>`) e termina sobre o `<canvas>`. Como o
   resto do editor usa Pointer Events, recomenda-se usar `pointerdown` no botão +
   `setPointerCapture` para rastrear o movimento até o `pointerup`, evitando a API nativa

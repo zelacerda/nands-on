@@ -7,8 +7,9 @@ export const PIN_RADIUS = 5;
 
 const COLOR = {
   ioBody: '#2d333b',
-  logicBody: '#363c4a',
-  bodyStroke: '#4a525e',
+  ioStroke: '#4a525e',
+  logicBody: '#3a4360',
+  logicStroke: '#5a68a0',
   label: '#d8dee9',
   pinIn: '#7aa2f7',
   pinOut: '#e0af68',
@@ -58,8 +59,9 @@ export function drawNode(ctx: CanvasRenderingContext2D, cam: Camera, node: Circu
   const sw = w * cam.zoom;
   const sh = h * cam.zoom;
 
-  ctx.fillStyle = isLogicNode(node.type) ? COLOR.logicBody : COLOR.ioBody;
-  ctx.strokeStyle = COLOR.bodyStroke;
+  const logic = isLogicNode(node.type);
+  ctx.fillStyle = logic ? COLOR.logicBody : COLOR.ioBody;
+  ctx.strokeStyle = logic ? COLOR.logicStroke : COLOR.ioStroke;
   ctx.lineWidth = Math.max(1, 1.5 * cam.zoom);
   roundedRect(ctx, origin.x, origin.y, sw, sh, 8 * cam.zoom);
   ctx.fill();

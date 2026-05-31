@@ -4,15 +4,19 @@ import { drawGrid } from './grid';
 import {
   NODE_SIZE,
   type ChipDefinition,
+  type CircuitNode,
   type PinRef,
   type PrimitiveType,
+  chipInstancePins,
   chipSize,
+  createPins,
 } from './model';
 import { CircuitStore } from './store';
 import { ChipLibrary, captureDefinition, validateChipName } from './chip';
 import {
   drawCircuit,
   drawGhostWire,
+  drawNode,
   drawNodeHighlight,
   drawWireHighlight,
 } from './render';
@@ -108,35 +112,89 @@ function addChipInstanceAt(def: ChipDefinition, world: Vec2): void {
   store.addChipInstance(def, centeredTopLeft(world, chipSize(def.inputCount, def.outputCount)));
 }
 
+/** Componente que um botão da paleta cria: uma primitiva ou uma instância de chip. */
+type PaletteItem =
+  | { kind: 'primitive'; type: PrimitiveType }
+  | { kind: 'chip'; def: ChipDefinition };
+
+/** Cria no `store` a instância correspondente ao item, centrada em `world`. */
+function spawnItem(item: PaletteItem, world: Vec2): void {
+  if (item.kind === 'primitive') addNodeAt(item.type, world);
+  else addChipInstanceAt(item.def, world);
+}
+
+/** Nó transitório (não persistido) usado apenas para a pré-visualização do arrasto. */
+function previewNode(item: PaletteItem, world: Vec2): CircuitNode {
+  if (item.kind === 'primitive') {
+    return {
+      id: '__preview__',
+      type: item.type,
+      pos: centeredTopLeft(world, NODE_SIZE[item.type]),
+      pins: createPins(item.type),
+    };
+  }
+  const { def } = item;
+  return {
+    id: '__preview__',
+    type: 'chip',
+    pos: centeredTopLeft(world, chipSize(def.inputCount, def.outputCount)),
+    pins: chipInstancePins(def),
+    defId: def.id,
+    name: def.name,
+  };
+}
+
+/** Converte coordenadas de cliente para mundo, ou `null` se o ponto não está sobre o canvas. */
+function clientToWorldOnCanvas(client: Vec2): Vec2 | null {
+  if (document.elementFromPoint(client.x, client.y) !== canvas) return null;
+  const rect = canvas!.getBoundingClientRect();
+  return camera.screenToWorld({ x: client.x - rect.left, y: client.y - rect.top });
+}
+
 /**
  * Arrasto a partir de um botão da paleta para criar uma instância no ponto solto.
  * Usa Pointer Events + captura para rastrear o gesto que começa no botão (HTML) e
- * termina sobre o canvas. Clique simples (abaixo do limiar) não cria nada; soltar
- * fora da área do editor (sobre a paleta ou fora da janela) também é no-op.
+ * termina sobre o canvas, exibindo um ghost do componente sob o ponteiro. Clique
+ * simples (abaixo do limiar) não cria nada; soltar fora do editor também é no-op.
  */
-type SpawnFn = (world: Vec2) => void;
+let paletteDrag: {
+  pointerId: number;
+  start: Vec2;
+  item: PaletteItem;
+  /** Ponto de mundo do ghost; `null` enquanto for clique ou estiver fora do canvas. */
+  previewWorld: Vec2 | null;
+} | null = null;
 
-let paletteDrag: { pointerId: number; start: Vec2; spawn: SpawnFn } | null = null;
-
-function attachPaletteDrag(btn: HTMLElement, spawn: SpawnFn): void {
+function attachPaletteDrag(btn: HTMLElement, item: PaletteItem): void {
   btn.addEventListener('pointerdown', (e) => {
     if (paletteDrag) return; // já há um arrasto em andamento; ignora ponteiros extras
     e.preventDefault();
-    paletteDrag = { pointerId: e.pointerId, start: { x: e.clientX, y: e.clientY }, spawn };
+    paletteDrag = {
+      pointerId: e.pointerId,
+      start: { x: e.clientX, y: e.clientY },
+      item,
+      previewWorld: null,
+    };
     btn.setPointerCapture(e.pointerId);
   });
+  btn.addEventListener('pointermove', (e) => {
+    if (paletteDrag?.pointerId !== e.pointerId) return;
+    const client = { x: e.clientX, y: e.clientY };
+    // O ghost só aparece quando o gesto já se qualifica como arrasto e está sobre o canvas.
+    paletteDrag.previewWorld = isDrag(paletteDrag.start, client)
+      ? clientToWorldOnCanvas(client)
+      : null;
+  });
   btn.addEventListener('pointerup', (e) => {
-    if (!paletteDrag || paletteDrag.pointerId !== e.pointerId) return;
+    if (paletteDrag?.pointerId !== e.pointerId) return;
     const drag = paletteDrag;
     paletteDrag = null;
     if (btn.hasPointerCapture(e.pointerId)) btn.releasePointerCapture(e.pointerId);
 
     const end = { x: e.clientX, y: e.clientY };
     if (!isDrag(drag.start, end)) return; // clique simples: reservado para edição futura
-    // Só cria se o ponteiro foi solto sobre o canvas (não sobre a paleta nem fora dele).
-    if (document.elementFromPoint(end.x, end.y) !== canvas) return;
-    const rect = canvas!.getBoundingClientRect();
-    drag.spawn(camera.screenToWorld({ x: end.x - rect.left, y: end.y - rect.top }));
+    const world = clientToWorldOnCanvas(end);
+    if (world) spawnItem(drag.item, world);
   });
   btn.addEventListener('pointercancel', (e) => {
     if (paletteDrag?.pointerId !== e.pointerId) return;
@@ -153,14 +211,13 @@ function refreshPalette(): void {
     btn.type = 'button';
     btn.className = 'chip-btn';
     btn.textContent = def.name;
-    attachPaletteDrag(btn, (world) => addChipInstanceAt(def, world));
+    attachPaletteDrag(btn, { kind: 'chip', def });
     palette.insertBefore(btn, deleteBtn);
   }
 }
 
 document.querySelectorAll<HTMLButtonElement>('#palette button[data-add]').forEach((btn) => {
-  const type = btn.dataset.add as PrimitiveType;
-  attachPaletteDrag(btn, (world) => addNodeAt(type, world));
+  attachPaletteDrag(btn, { kind: 'primitive', type: btn.dataset.add as PrimitiveType });
 });
 deleteBtn.addEventListener('click', deleteSelection);
 
@@ -395,6 +452,14 @@ function render(): void {
     const from = wire && store.pinPos(wire.from);
     const to = wire && store.pinPos(wire.to);
     if (from && to) drawWireHighlight(ctx!, camera.worldToScreen(from), camera.worldToScreen(to));
+  }
+
+  // Ghost do componente sendo arrastado da paleta para o canvas.
+  if (paletteDrag?.previewWorld) {
+    ctx!.save();
+    ctx!.globalAlpha = 0.55;
+    drawNode(ctx!, camera, previewNode(paletteDrag.item, paletteDrag.previewWorld));
+    ctx!.restore();
   }
 
   // Fio fantasma durante a criação de conexão.
