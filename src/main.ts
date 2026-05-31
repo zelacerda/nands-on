@@ -1,8 +1,15 @@
 import './style.css';
 import { Camera, type Vec2 } from './camera';
 import { drawGrid } from './grid';
-import { NODE_SIZE, type PinRef, type PrimitiveType } from './model';
+import {
+  NODE_SIZE,
+  type ChipDefinition,
+  type PinRef,
+  type PrimitiveType,
+  chipSize,
+} from './model';
 import { CircuitStore } from './store';
+import { ChipLibrary, captureDefinition } from './chip';
 import {
   drawCircuit,
   drawGhostWire,
@@ -87,16 +94,49 @@ function deleteSelection(): void {
 
 // --- Paleta --------------------------------------------------------------
 
+const library = new ChipLibrary();
+const palette = document.querySelector<HTMLElement>('#palette')!;
+
 function addNodeAtCenter(type: PrimitiveType): void {
   const center = camera.screenToWorld({ x: viewWidth / 2, y: viewHeight / 2 });
   const { w, h } = NODE_SIZE[type];
   store.addNode(type, { x: center.x - w / 2, y: center.y - h / 2 });
 }
 
+function addChipInstanceAtCenter(def: ChipDefinition): void {
+  const center = camera.screenToWorld({ x: viewWidth / 2, y: viewHeight / 2 });
+  const { w, h } = chipSize(def.inputCount, def.outputCount);
+  store.addChipInstance(def, { x: center.x - w / 2, y: center.y - h / 2 });
+}
+
+/** Reconstrói os botões de chip na paleta a partir da biblioteca. */
+function refreshPalette(): void {
+  palette.querySelectorAll('button.chip-btn').forEach((b) => b.remove());
+  for (const def of library.list()) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn';
+    btn.textContent = def.name;
+    btn.addEventListener('click', () => addChipInstanceAtCenter(def));
+    palette.insertBefore(btn, deleteBtn);
+  }
+}
+
 document.querySelectorAll<HTMLButtonElement>('#palette button[data-add]').forEach((btn) => {
   btn.addEventListener('click', () => addNodeAtCenter(btn.dataset.add as PrimitiveType));
 });
 deleteBtn.addEventListener('click', deleteSelection);
+
+// TEMP (remover na Task 3.3): semeia um chip de demonstração para validar a
+// paleta dinâmica e a instanciação enquanto o fluxo "Fazer" não existe.
+{
+  const demo = new CircuitStore();
+  demo.addNode('input', { x: 0, y: 0 });
+  demo.addNode('input', { x: 0, y: 50 });
+  demo.addNode('output', { x: 150, y: 25 });
+  library.add(captureDefinition(demo.toJSON(), 'DEMO'));
+  refreshPalette();
+}
 
 // --- Pinça (dois ponteiros) ----------------------------------------------
 
