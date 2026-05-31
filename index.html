@@ -15,6 +15,21 @@
       <button type="button" data-add="output">Saída</button>
       <button type="button" id="delete" hidden>Excluir</button>
     </nav>
+
+    <button type="button" id="make" hidden>Fazer</button>
+
+    <div id="name-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="name-title">
+      <div class="dialog-box">
+        <label id="name-title" for="chip-name">Nome do componente</label>
+        <input id="chip-name" type="text" autocomplete="off" spellcheck="false" />
+        <p id="name-error" class="error" hidden></p>
+        <div class="dialog-actions">
+          <button type="button" id="name-cancel">Cancelar</button>
+          <button type="button" id="name-confirm">Criar</button>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

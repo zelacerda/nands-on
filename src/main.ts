@@ -9,7 +9,7 @@ import {
   chipSize,
 } from './model';
 import { CircuitStore } from './store';
-import { ChipLibrary, captureDefinition } from './chip';
+import { ChipLibrary, captureDefinition, validateChipName } from './chip';
 import {
   drawCircuit,
   drawGhostWire,
@@ -127,16 +127,55 @@ document.querySelectorAll<HTMLButtonElement>('#palette button[data-add]').forEac
 });
 deleteBtn.addEventListener('click', deleteSelection);
 
-// TEMP (remover na Task 3.3): semeia um chip de demonstração para validar a
-// paleta dinâmica e a instanciação enquanto o fluxo "Fazer" não existe.
-{
-  const demo = new CircuitStore();
-  demo.addNode('input', { x: 0, y: 0 });
-  demo.addNode('input', { x: 0, y: 50 });
-  demo.addNode('output', { x: 150, y: 25 });
-  library.add(captureDefinition(demo.toJSON(), 'DEMO'));
-  refreshPalette();
+// --- Fluxo "Fazer": empacota o espaço em um chip nomeado -----------------
+
+const makeBtn = document.querySelector<HTMLButtonElement>('#make')!;
+const nameDialog = document.querySelector<HTMLDivElement>('#name-dialog')!;
+const nameInput = document.querySelector<HTMLInputElement>('#chip-name')!;
+const nameError = document.querySelector<HTMLParagraphElement>('#name-error')!;
+const nameConfirm = document.querySelector<HTMLButtonElement>('#name-confirm')!;
+const nameCancel = document.querySelector<HTMLButtonElement>('#name-cancel')!;
+
+/** "Fazer" só é possível com ao menos uma entrada e uma saída no espaço. */
+function canMake(): boolean {
+  return store.countByType('input') >= 1 && store.countByType('output') >= 1;
 }
+
+function openNameDialog(): void {
+  nameInput.value = '';
+  nameError.hidden = true;
+  nameDialog.hidden = false;
+  nameInput.focus();
+}
+
+function closeNameDialog(): void {
+  nameDialog.hidden = true;
+}
+
+function confirmMake(): void {
+  const check = validateChipName(library, nameInput.value);
+  if (!check.ok) {
+    nameError.textContent = check.reason;
+    nameError.hidden = false;
+    return;
+  }
+  // Captura o espaço como definição (preserva chips aninhados), registra e limpa.
+  library.add(captureDefinition(store.toJSON(), check.name));
+  refreshPalette();
+  store.clear();
+  setSelection(null);
+  closeNameDialog();
+}
+
+makeBtn.addEventListener('click', () => {
+  if (canMake()) openNameDialog();
+});
+nameConfirm.addEventListener('click', confirmMake);
+nameCancel.addEventListener('click', closeNameDialog);
+nameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') confirmMake();
+  else if (e.key === 'Escape') closeNameDialog();
+});
 
 // --- Pinça (dois ponteiros) ----------------------------------------------
 
@@ -293,6 +332,8 @@ window.addEventListener('keydown', (e) => {
 
 // --- Render loop ---------------------------------------------------------
 
+let lastCanMake: boolean | null = null;
+
 function render(): void {
   const dpr = window.devicePixelRatio || 1;
   ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -300,6 +341,13 @@ function render(): void {
 
   drawGrid(ctx!, camera, viewWidth, viewHeight);
   drawCircuit(ctx!, camera, store);
+
+  // Atualiza a visibilidade do botão "Fazer" apenas quando muda.
+  const able = canMake();
+  if (able !== lastCanMake) {
+    makeBtn.hidden = !able;
+    lastCanMake = able;
+  }
 
   // Realce da seleção.
   if (selection?.kind === 'node') {
