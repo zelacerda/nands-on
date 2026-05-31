@@ -46,24 +46,24 @@ Definir o grafo do circuito e desenhar NAND e pinos de I/O na tela.
 
 ### Tasks
 
-- [ ] Task 2.1: Definir tipos do modelo: `Pin` (id, tipo entrada/saída, offset relativo ao
+- [x] Task 2.1: Definir tipos do modelo: `Pin` (id, tipo entrada/saída, offset relativo ao
       nó), `Node` (id, tipo: `nand` | `input` | `output`, posição, pinos) e `Wire`
       (origem: pino de saída, destino: pino de entrada). Estrutura serializável.
-- [ ] Task 2.2: Criar uma **store em memória** do circuito (lista de nós e fios) com API
+- [x] Task 2.2: Criar uma **store em memória** do circuito (lista de nós e fios) com API
       para adicionar/remover nós e fios.
-- [ ] Task 2.3: Implementar o **desenho dos nós**: porta NAND (corpo + rótulo, 2 pinos de
+- [x] Task 2.3: Implementar o **desenho dos nós**: porta NAND (corpo + rótulo, 2 pinos de
       entrada à esquerda, 1 de saída à direita), pino de entrada (toggle) e pino de saída
       (lâmpada). Posições de pino derivadas do nó.
-- [ ] Task 2.4: Implementar o **desenho dos fios** ligando posições de pinos (linha/curva),
+- [x] Task 2.4: Implementar o **desenho dos fios** ligando posições de pinos (linha/curva),
       acompanhando os nós.
-- [ ] Task 2.5: Criar uma **paleta** simples (HTML overlay ou desenhada) com botões para
+- [x] Task 2.5: Criar uma **paleta** simples (HTML overlay ou desenhada) com botões para
       adicionar NAND, entrada e saída ao centro da viewport.
-- [ ] Task 2.6 (teste): Testes do modelo/store (adicionar/remover nós e fios; cálculo da
+- [x] Task 2.6 (teste): Testes do modelo/store (adicionar/remover nós e fios; cálculo da
       posição absoluta de um pino a partir do nó).
 
 ### Verification
 
-- [ ] É possível adicionar NAND e pinos de I/O pela paleta; eles aparecem desenhados
+- [x] É possível adicionar NAND e pinos de I/O pela paleta; eles aparecem desenhados
       corretamente, com fios fixos de exemplo seguindo os nós ao dar pan/zoom.
 
 ## Phase 3: Interação por Ponteiro (mover e conectar)
