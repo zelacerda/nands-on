@@ -34,7 +34,9 @@ npm run typecheck  # tsc --noEmit
 
 ## Como usar o editor
 
-- **Paleta** (canto superior esquerdo): adiciona `NAND`, `Entrada` e `Saída` ao centro da tela.
+- **Paleta** (canto superior esquerdo): **arraste** `Entrada`, `Saída`, `NAND` (ou um chip
+  criado) para o ponto do editor onde quiser soltá-lo. No canvas, `Entrada`/`Saída` têm uma
+  cor distinta dos componentes lógicos (`NAND` e chips), que compartilham a mesma cor.
 - **Mover**: arraste um nó.
 - **Conectar**: arraste de um pino de **saída** até um pino de **entrada**. O fio fantasma
   fica **verde** (conexão válida) ou **vermelho** (inválida — saída↔saída, entrada↔entrada
