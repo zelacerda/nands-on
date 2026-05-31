@@ -66,13 +66,13 @@ Garantir paridade mobile e robustez da interação.
 
 ### Tasks
 
-- [ ] Task 3.1: Validar o fluxo em **toque** (pointerType `touch`): captura, limiar
+- [x] Task 3.1: Validar o fluxo em **toque** (pointerType `touch`): captura, limiar
       adequado e ausência de scroll/seleção indesejada ao arrastar do botão (ajustar
       `touch-action`/`user-select` em `src/style.css` se necessário).
-- [ ] Task 3.2: Tratar cancelamento (`pointercancel`) e múltiplos ponteiros sem deixar
+- [x] Task 3.2: Tratar cancelamento (`pointercancel`) e múltiplos ponteiros sem deixar
       estado de arrasto preso; garantir que o gesto da paleta não conflita com pan/pinça do
       canvas.
-- [ ] Task 3.3: Limpeza final — remover código morto do antigo clique-no-centro e revisar o
+- [x] Task 3.3: Limpeza final — remover código morto do antigo clique-no-centro e revisar o
       próprio diff (auto-review).
 
 ### Verification

@@ -120,6 +120,7 @@ let paletteDrag: { pointerId: number; start: Vec2; spawn: SpawnFn } | null = nul
 
 function attachPaletteDrag(btn: HTMLElement, spawn: SpawnFn): void {
   btn.addEventListener('pointerdown', (e) => {
+    if (paletteDrag) return; // já há um arrasto em andamento; ignora ponteiros extras
     e.preventDefault();
     paletteDrag = { pointerId: e.pointerId, start: { x: e.clientX, y: e.clientY }, spawn };
     btn.setPointerCapture(e.pointerId);

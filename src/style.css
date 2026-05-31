@@ -61,6 +61,8 @@ body {
   /* Alvo de toque confortável em mobile. */
   min-width: 56px;
   min-height: 40px;
+  /* Permite arrastar o botão para o canvas sem o navegador interpretar como scroll. */
+  touch-action: none;
 }
 
 #palette button:hover {
