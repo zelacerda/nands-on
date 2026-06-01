@@ -1,6 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { CircuitStore } from './store';
-import { pinKey, simulate } from './simulator';
+import { captureDefinition } from './chip';
+import type { ChipDefinition } from './model';
+import { type ChipResolver, pinKey, simulate } from './simulator';
+
+/** Resolver que mapeia cada nó `chip` à topologia interna da sua definição. */
+function resolverFor(...defs: ChipDefinition[]): ChipResolver {
+  const byId = new Map(defs.map((d) => [d.id, d.internal]));
+  return (node) => (node.defId ? byId.get(node.defId) : undefined);
+}
+
+/** Definição de um chip NOT (1 entrada, 1 saída) feito a partir de uma NAND. */
+function notChip(): ChipDefinition {
+  const store = new CircuitStore();
+  const inp = store.addNode('input', { x: 0, y: 0 });
+  const nand = store.addNode('nand', { x: 100, y: 0 });
+  const out = store.addNode('output', { x: 220, y: 0 });
+  store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in0' });
+  store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in1' });
+  store.addWire({ nodeId: nand.id, pinId: 'out' }, { nodeId: out.id, pinId: 'in' });
+  return captureDefinition(store.toJSON(), 'NOT');
+}
 
 /** Lê o valor (lit) do pino de entrada de um nó `output`. */
 function outValue(store: CircuitStore, outNodeId: string): boolean {
@@ -89,5 +109,50 @@ describe('simulate — circuito plano', () => {
     expect(simulate(store.toJSON()).wireValues.get(wire.id)).toBe(true);
     store.setNodeValue(inp.id, false);
     expect(simulate(store.toJSON()).wireValues.get(wire.id)).toBe(false);
+  });
+});
+
+describe('simulate — chips', () => {
+  it('avalia um chip simples (NOT) a partir da topologia interna', () => {
+    const not = notChip();
+    const store = new CircuitStore();
+    const inp = store.addNode('input', { x: 0, y: 0 });
+    const chip = store.addChipInstance(not, { x: 100, y: 0 });
+    const out = store.addNode('output', { x: 240, y: 0 });
+    store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: chip.id, pinId: 'in0' });
+    store.addWire({ nodeId: chip.id, pinId: 'out0' }, { nodeId: out.id, pinId: 'in' });
+
+    const resolve = resolverFor(not);
+    store.setNodeValue(inp.id, true);
+    expect(simulate(store.toJSON(), resolve).pinValues.get(pinKey(out.id, 'in'))).toBe(false);
+    store.setNodeValue(inp.id, false);
+    expect(simulate(store.toJSON(), resolve).pinValues.get(pinKey(out.id, 'in'))).toBe(true);
+  });
+
+  it('avalia chip aninhado (NOT dentro de outro chip) = dupla negação', () => {
+    const not = notChip();
+    // Chip externo "BUFFER": input → NOT → NOT → output (identidade).
+    const inner = new CircuitStore();
+    const iIn = inner.addNode('input', { x: 0, y: 0 });
+    const n1 = inner.addChipInstance(not, { x: 80, y: 0 });
+    const n2 = inner.addChipInstance(not, { x: 200, y: 0 });
+    const iOut = inner.addNode('output', { x: 320, y: 0 });
+    inner.addWire({ nodeId: iIn.id, pinId: 'out' }, { nodeId: n1.id, pinId: 'in0' });
+    inner.addWire({ nodeId: n1.id, pinId: 'out0' }, { nodeId: n2.id, pinId: 'in0' });
+    inner.addWire({ nodeId: n2.id, pinId: 'out0' }, { nodeId: iOut.id, pinId: 'in' });
+    const buffer = captureDefinition(inner.toJSON(), 'BUFFER');
+
+    const store = new CircuitStore();
+    const inp = store.addNode('input', { x: 0, y: 0 });
+    const chip = store.addChipInstance(buffer, { x: 100, y: 0 });
+    const out = store.addNode('output', { x: 240, y: 0 });
+    store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: chip.id, pinId: 'in0' });
+    store.addWire({ nodeId: chip.id, pinId: 'out0' }, { nodeId: out.id, pinId: 'in' });
+
+    const resolve = resolverFor(not, buffer);
+    store.setNodeValue(inp.id, true);
+    expect(simulate(store.toJSON(), resolve).pinValues.get(pinKey(out.id, 'in'))).toBe(true);
+    store.setNodeValue(inp.id, false);
+    expect(simulate(store.toJSON(), resolve).pinValues.get(pinKey(out.id, 'in'))).toBe(false);
   });
 });

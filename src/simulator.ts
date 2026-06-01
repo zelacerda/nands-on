@@ -103,12 +103,43 @@ function computeNodeOutputs(
   }
 }
 
-/** Placeholder de avaliação de chip; implementado na Fase 3. */
+/**
+ * Avalia uma instância de chip expandindo sua topologia interna. Os pinos
+ * externos de entrada (`in0`, `in1`, …) alimentam, em ordem, os nós `input`
+ * internos (ordenados pela posição vertical, como na captura); os nós `output`
+ * internos (mesma ordenação) preenchem os pinos externos de saída (`out0`, …).
+ */
 function computeChipOutputs(
-  _node: CircuitNode,
-  _getPin: (nodeId: string, pinId: string) => boolean,
-  _setPin: (nodeId: string, pinId: string, v: boolean) => boolean,
-  _resolveChip?: ChipResolver,
+  node: CircuitNode,
+  getPin: (nodeId: string, pinId: string) => boolean,
+  setPin: (nodeId: string, pinId: string, v: boolean) => boolean,
+  resolveChip?: ChipResolver,
 ): boolean {
-  return false;
+  const internal = resolveChip?.(node);
+  if (!internal) return false;
+
+  const byY = (a: CircuitNode, b: CircuitNode) => a.pos.y - b.pos.y;
+  const inNodes = internal.nodes.filter((n) => n.type === 'input').sort(byY);
+  const outNodes = internal.nodes.filter((n) => n.type === 'output').sort(byY);
+
+  // Valores das entradas externas, na ordem dos pinos `in` do nó instância.
+  const externalIns = node.pins.filter((p) => p.kind === 'in');
+  const inputValues = new Map<string, boolean>();
+  inNodes.forEach((inNode, i) => {
+    const pin = externalIns[i];
+    inputValues.set(inNode.id, pin ? getPin(node.id, pin.id) : false);
+  });
+
+  const result = simulateWith(internal, (n) => inputValues.get(n.id) === true, resolveChip);
+
+  // Mapeia as saídas internas para os pinos externos `out` na mesma ordem.
+  const externalOuts = node.pins.filter((p) => p.kind === 'out');
+  let changed = false;
+  outNodes.forEach((outNode, i) => {
+    const pin = externalOuts[i];
+    if (!pin) return;
+    const v = result.pinValues.get(pinKey(outNode.id, 'in')) ?? false;
+    changed = setPin(node.id, pin.id, v) || changed;
+  });
+  return changed;
 }

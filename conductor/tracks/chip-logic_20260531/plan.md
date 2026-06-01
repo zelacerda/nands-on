@@ -65,17 +65,17 @@ interna. Fase guiada por testes.
 
 ### Tasks
 
-- [ ] Task 3.1: Escrever testes para chips: chip simples (ex.: NOT a partir de
+- [x] Task 3.1: Escrever testes para chips: chip simples (ex.: NOT a partir de
       NAND) produzindo a saída correta, e chip aninhado (chip dentro de chip).
-- [ ] Task 3.2: Implementar a avaliação de nó `chip`: mapear pinos externos de
+- [x] Task 3.2: Implementar a avaliação de nó `chip`: mapear pinos externos de
       entrada → inputs internos, avaliar `ChipDefinition.internal`
       recursivamente, mapear outputs internos → pinos externos de saída.
-- [ ] Task 3.3: Garantir resolução da `ChipDefinition` via `defId`/`ChipLibrary`
+- [x] Task 3.3: Garantir resolução da `ChipDefinition` via `defId`/`ChipLibrary`
       durante a avaliação recursiva.
 
 ### Verification
 
-- [ ] Testes de chips (incl. aninhamento) passam (`vitest run`).
+- [x] Testes de chips (incl. aninhamento) passam (`vitest run`).
 
 ## Phase 4: Interação — Toggle de Input
 
