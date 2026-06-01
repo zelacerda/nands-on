@@ -3,7 +3,7 @@
 **Track ID:** chip-logic_20260531
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-05-31
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -112,20 +112,22 @@ fios coloridos por estado.
 
 ### Verification
 
-- [ ] Verificação manual: montar input→NAND→output, alternar entradas e observar
+- [x] Verificação manual: montar input→NAND→output, alternar entradas e observar
       saída e fios mudando de cor em tempo real.
-- [ ] **Checkpoint do usuário (obrigatório):** ao concluir a Fase 5, pausar para
+- [x] **Checkpoint do usuário (obrigatório):** ao concluir a Fase 5, pausar para
       o usuário testar e validar pessoalmente as decisões de interface (toggle de
       input, indicação de aceso/apagado, cores de fios e pinos) antes de seguir
       para a verificação final. Ajustar conforme o feedback.
+      _Ajustes pós-feedback: cor de sinal verde → amarelo; fios/contornos/pinos
+      mais grossos; IN/OUT redondos; borda de seleção atrás dos conectores._
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos.
-- [ ] Testes passando (`vitest run`) e projeto compilando (`tsc --noEmit`).
-- [ ] Verificação manual no browser: circuito combinacional e chip reutilizável
+- [x] Todos os critérios de aceitação atendidos.
+- [x] Testes passando (`vitest run`) e projeto compilando (`tsc --noEmit`).
+- [x] Verificação manual no browser: circuito combinacional e chip reutilizável
       avaliando corretamente.
-- [ ] Pronto para revisão.
+- [x] Pronto para revisão.
 
 ---
 

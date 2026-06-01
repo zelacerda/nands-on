@@ -4,7 +4,7 @@ import type { CircuitStore } from './store';
 import { type SignalState, pinKey } from './simulator';
 
 /** Raio do pino, em unidades de mundo. */
-export const PIN_RADIUS = 5;
+export const PIN_RADIUS = 7;
 
 const COLOR = {
   ioBody: '#2d333b',
@@ -16,8 +16,8 @@ const COLOR = {
   pinOut: '#e0af68',
   wire: '#9aa5b1',
   /** Sinal ligado (1): destaca pinos, fios e o corpo de entradas/saídas acesas. */
-  signalOn: '#9ece6a',
-  signalOnStroke: '#b9f27c',
+  signalOn: '#ffd23f',
+  signalOnStroke: '#ffe27a',
   signalOnLabel: '#1b1f17',
 } as const;
 
@@ -85,8 +85,14 @@ export function drawNode(
     ctx.fillStyle = logic ? COLOR.logicBody : COLOR.ioBody;
     ctx.strokeStyle = logic ? COLOR.logicStroke : COLOR.ioStroke;
   }
-  ctx.lineWidth = Math.max(1, 1.5 * cam.zoom);
-  roundedRect(ctx, origin.x, origin.y, sw, sh, 8 * cam.zoom);
+  ctx.lineWidth = Math.max(2, 2.5 * cam.zoom);
+  // Entradas e saídas são redondas; portas e chips, retângulos arredondados.
+  if (!logic) {
+    ctx.beginPath();
+    ctx.arc(origin.x + sw / 2, origin.y + sh / 2, Math.min(sw, sh) / 2, 0, Math.PI * 2);
+  } else {
+    roundedRect(ctx, origin.x, origin.y, sw, sh, 8 * cam.zoom);
+  }
   ctx.fill();
   ctx.stroke();
 
@@ -125,7 +131,7 @@ export function drawWires(
   store: CircuitStore,
   signal?: SignalState,
 ): void {
-  ctx.lineWidth = Math.max(1.5, 2 * cam.zoom);
+  ctx.lineWidth = Math.max(2.5, 3.5 * cam.zoom);
   for (const wire of store.listWires()) {
     const from = store.pinPos(wire.from);
     const to = store.pinPos(wire.to);
@@ -161,16 +167,24 @@ export function drawNodeHighlight(
   const { w, h } = nodeSize(node);
   const origin = cam.worldToScreen(node.pos);
   const pad = 3 * cam.zoom;
+  const sw = w * cam.zoom;
+  const sh = h * cam.zoom;
   ctx.strokeStyle = COLOR_SELECT;
-  ctx.lineWidth = Math.max(1.5, 2 * cam.zoom);
-  roundedRect(ctx, origin.x - pad, origin.y - pad, w * cam.zoom + 2 * pad, h * cam.zoom + 2 * pad, 10 * cam.zoom);
+  ctx.lineWidth = Math.max(2.5, 3 * cam.zoom);
+  // O realce acompanha o formato do nó: círculo para I/O, retângulo para o resto.
+  if (!isLogicNode(node.type)) {
+    ctx.beginPath();
+    ctx.arc(origin.x + sw / 2, origin.y + sh / 2, Math.min(sw, sh) / 2 + pad, 0, Math.PI * 2);
+  } else {
+    roundedRect(ctx, origin.x - pad, origin.y - pad, sw + 2 * pad, sh + 2 * pad, 10 * cam.zoom);
+  }
   ctx.stroke();
 }
 
 /** Realça um fio selecionado. */
 export function drawWireHighlight(ctx: CanvasRenderingContext2D, from: Vec2, to: Vec2): void {
   ctx.strokeStyle = COLOR_SELECT;
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 6;
   drawWireSegment(ctx, from, to);
 }
 
@@ -186,7 +200,7 @@ export function drawGhostWire(
 ): void {
   ctx.save();
   ctx.strokeStyle = valid ? COLOR_VALID : COLOR_INVALID;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 3.5;
   ctx.setLineDash([6, 4]);
   drawWireSegment(ctx, from, to);
   ctx.restore();

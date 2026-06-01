@@ -2,17 +2,17 @@
   "id": "chip-logic_20260531",
   "title": "Lógica de Simulação dos Chips",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-05-31T00:00:00Z",
   "updated": "2026-05-31T00:00:00Z",
   "current_phase": 5,
   "current_task": "5.3",
   "phases": {
     "total": 5,
-    "completed": 0
+    "completed": 5
   },
   "tasks": {
     "total": 15,
-    "completed": 0
+    "completed": 15
   }
 }

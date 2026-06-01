@@ -477,6 +477,14 @@ function render(): void {
   ctx!.clearRect(0, 0, viewWidth, viewHeight);
 
   drawGrid(ctx!, camera, viewWidth, viewHeight);
+
+  // Realce do nó selecionado é desenhado antes do circuito, para que os
+  // conectores (pinos) e o corpo fiquem por cima da borda de seleção.
+  if (selection?.kind === 'node') {
+    const node = store.getNode(selection.id);
+    if (node) drawNodeHighlight(ctx!, camera, node);
+  }
+
   // Avalia o circuito a cada frame (combinacional) e desenha com o estado de sinal.
   const signal = simulate(store.toJSON(), resolveChip);
   drawCircuit(ctx!, camera, store, signal);
@@ -488,11 +496,8 @@ function render(): void {
     lastCanMake = able;
   }
 
-  // Realce da seleção.
-  if (selection?.kind === 'node') {
-    const node = store.getNode(selection.id);
-    if (node) drawNodeHighlight(ctx!, camera, node);
-  } else if (selection?.kind === 'wire') {
+  // Realce de fio selecionado fica por cima do circuito.
+  if (selection?.kind === 'wire') {
     const wire = store.listWires().find((w) => w.id === selection!.id);
     const from = wire && store.pinPos(wire.from);
     const to = wire && store.pinPos(wire.to);
