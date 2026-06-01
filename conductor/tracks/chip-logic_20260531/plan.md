@@ -44,19 +44,19 @@ como única primitiva. Fase guiada por testes.
 
 ### Tasks
 
-- [ ] Task 2.1: Escrever testes (`src/simulator.test.ts`) para a avaliação de um
+- [x] Task 2.1: Escrever testes (`src/simulator.test.ts`) para a avaliação de um
       circuito plano: input→output direto, NAND com tabela-verdade completa,
       input não conectado = `false`, e estabilização de cadeias de NANDs.
-- [ ] Task 2.2: Implementar `evaluate(state, inputValues)` em `src/simulator.ts`:
+- [x] Task 2.2: Implementar `evaluate(state, inputValues)` em `src/simulator.ts`:
       propagação iterativa (relaxation) até estabilizar, com limite máximo de
       iterações para evitar loop infinito.
-- [ ] Task 2.3: Implementar a lógica da NAND (`out = !(in0 && in1)`) e a
+- [x] Task 2.3: Implementar a lógica da NAND (`out = !(in0 && in1)`) e a
       transferência de valor pelos fios (`from.out → to.in`), populando
       `SignalState` (valores de fios e de pinos de input/output).
 
 ### Verification
 
-- [ ] Todos os testes de `simulator.test.ts` passam (`vitest run`).
+- [x] Todos os testes de `simulator.test.ts` passam (`vitest run`).
 
 ## Phase 3: Avaliação Recursiva de Chips
 
