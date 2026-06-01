@@ -29,6 +29,12 @@ export interface CircuitNode {
   defId?: string;
   /** Para nós `chip`: nome exibido na caixa. */
   name?: string;
+  /**
+   * Para nós `input`: estado booleano atual (ligado/desligado). Alternado pelo
+   * usuário e usado como fonte de sinal pela simulação. `undefined` equivale a
+   * desligado.
+   */
+  value?: boolean;
 }
 
 /** Referência a um pino específico de um nó. */

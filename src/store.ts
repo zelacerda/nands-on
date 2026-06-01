@@ -90,6 +90,23 @@ export class CircuitStore {
     return this.nodes.get(nodeId);
   }
 
+  /**
+   * Alterna o estado booleano de um nó `input`. No-op para outros tipos de nó.
+   * Retorna o novo valor, ou `undefined` se o nó não existir ou não for `input`.
+   */
+  toggleNodeValue(nodeId: string): boolean | undefined {
+    const node = this.nodes.get(nodeId);
+    if (!node || node.type !== 'input') return undefined;
+    node.value = !node.value;
+    return node.value;
+  }
+
+  /** Define o estado booleano de um nó `input`. No-op para outros tipos. */
+  setNodeValue(nodeId: string, value: boolean): void {
+    const node = this.nodes.get(nodeId);
+    if (node && node.type === 'input') node.value = value;
+  }
+
   getPin(ref: PinRef): Pin | undefined {
     return this.nodes.get(ref.nodeId)?.pins.find((p) => p.id === ref.pinId);
   }
