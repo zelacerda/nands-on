@@ -5,8 +5,8 @@
   "status": "in_progress",
   "created": "2026-05-31T00:00:00Z",
   "updated": "2026-05-31T00:00:00Z",
-  "current_phase": 3,
-  "current_task": "3.1",
+  "current_phase": 5,
+  "current_task": "5.3",
   "phases": {
     "total": 5,
     "completed": 0

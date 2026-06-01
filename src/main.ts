@@ -22,6 +22,7 @@ import {
   drawWireHighlight,
 } from './render';
 import { hitNode, hitPin, hitWire } from './hittest';
+import { type ChipResolver, simulate } from './simulator';
 import { validateConnection } from './connection';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
@@ -68,6 +69,12 @@ let wireStart: PinRef | null = null;
 let ghostEnd: Vec2 = { x: 0, y: 0 }; // mundo
 let ghostValid = false;
 let pinchPrev: PinchSample | null = null;
+/**
+ * Nó `input` que já estava selecionado ao iniciar este gesto. Se o ponteiro
+ * subir sem caracterizar arrasto, o clique alterna o estado do input em vez de
+ * apenas movê-lo/selecioná-lo.
+ */
+let toggleCandidateId: string | null = null;
 
 /** Folga de acerto, em px de tela, maior para toque. */
 function hitPx(pointerType: string): number {
@@ -102,6 +109,10 @@ function deleteSelection(): void {
 
 const library = new ChipLibrary();
 const palette = document.querySelector<HTMLElement>('#palette')!;
+
+/** Resolve a topologia interna de um nó `chip` para a simulação recursiva. */
+const resolveChip: ChipResolver = (node) =>
+  node.defId ? library.list().find((d) => d.id === node.defId)?.internal : undefined;
 
 /** Cria uma primitiva centrada no ponto de mundo `world`. */
 function addNodeAt(type: PrimitiveType, world: Vec2): void {
@@ -347,6 +358,10 @@ canvas.addEventListener('pointerdown', (e) => {
     dragNodeId = nodeId;
     const node = store.getNode(nodeId)!;
     dragOffset = { x: world.x - node.pos.x, y: world.y - node.pos.y };
+    // Clicar num input já selecionado (sem arrastar) alterna seu estado; clicar
+    // num input ainda não selecionado apenas o seleciona (comportamento atual).
+    const wasSelected = selection?.kind === 'node' && selection.id === nodeId;
+    toggleCandidateId = wasSelected && node.type === 'input' ? nodeId : null;
     setSelection({ kind: 'node', id: nodeId });
     return;
   }
@@ -405,6 +420,9 @@ function endPointer(e: PointerEvent): void {
       const res = validateConnection(store, wireStart, target);
       if (res.ok) store.addWire(res.from, res.to);
     }
+  } else if (mode === 'dragNode' && toggleCandidateId) {
+    // Soltar sem arrastar sobre um input já selecionado: alterna o estado.
+    if (!isDrag(lastPointer, pointerScreen(e))) store.toggleNodeValue(toggleCandidateId);
   }
 
   pointers.delete(e.pointerId);
@@ -420,6 +438,7 @@ function endPointer(e: PointerEvent): void {
     mode = 'idle';
     dragNodeId = null;
     wireStart = null;
+    toggleCandidateId = null;
   }
 }
 canvas.addEventListener('pointerup', endPointer);
@@ -458,7 +477,9 @@ function render(): void {
   ctx!.clearRect(0, 0, viewWidth, viewHeight);
 
   drawGrid(ctx!, camera, viewWidth, viewHeight);
-  drawCircuit(ctx!, camera, store);
+  // Avalia o circuito a cada frame (combinacional) e desenha com o estado de sinal.
+  const signal = simulate(store.toJSON(), resolveChip);
+  drawCircuit(ctx!, camera, store, signal);
 
   // Atualiza a visibilidade do botão "Fazer" apenas quando muda.
   const able = canMake();

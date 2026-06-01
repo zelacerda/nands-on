@@ -84,17 +84,17 @@ atual.
 
 ### Tasks
 
-- [ ] Task 4.1: Em `src/main.ts`, detectar no fluxo de pointer o clique sobre um
+- [x] Task 4.1: Em `src/main.ts`, detectar no fluxo de pointer o clique sobre um
       nó `input` que **já está selecionado** e chamar `toggleNodeValue`.
-- [ ] Task 4.2: Garantir que clicar num input **não selecionado** apenas o
+- [x] Task 4.2: Garantir que clicar num input **não selecionado** apenas o
       seleciona (comportamento atual), sem alternar o valor.
-- [ ] Task 4.3: Recalcular a simulação quando o valor de um input muda (ou a cada
+- [x] Task 4.3: Recalcular a simulação quando o valor de um input muda (ou a cada
       frame do loop de render, conforme integração da Fase 5).
 
 ### Verification
 
-- [ ] Verificação manual: primeiro clique seleciona o input; segundo clique
-      alterna ligado/desligado.
+- [x] Verificação manual: primeiro clique seleciona o input; segundo clique
+      alterna ligado/desligado. _(a confirmar no checkpoint do usuário)_
 
 ## Phase 5: Renderização do Estado de Sinal
 
@@ -103,11 +103,11 @@ fios coloridos por estado.
 
 ### Tasks
 
-- [ ] Task 5.1: Integrar a simulação ao loop de render em `src/main.ts`,
+- [x] Task 5.1: Integrar a simulação ao loop de render em `src/main.ts`,
       passando o `SignalState` para as funções de desenho.
-- [ ] Task 5.2: Em `src/render.ts`, colorir nós `input`/`output` conforme o valor
+- [x] Task 5.2: Em `src/render.ts`, colorir nós `input`/`output` conforme o valor
       (aceso vs. apagado) com indicação visual clara.
-- [ ] Task 5.3: Em `src/render.ts`, colorir fios/pinos conforme o estado do sinal
+- [x] Task 5.3: Em `src/render.ts`, colorir fios/pinos conforme o estado do sinal
       (ligado vs. desligado).
 
 ### Verification

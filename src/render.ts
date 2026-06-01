@@ -1,6 +1,7 @@
 import type { Camera, Vec2 } from './camera';
 import { type CircuitNode, type NodeType, nodeSize, pinWorldPos } from './model';
 import type { CircuitStore } from './store';
+import { type SignalState, pinKey } from './simulator';
 
 /** Raio do pino, em unidades de mundo. */
 export const PIN_RADIUS = 5;
@@ -14,7 +15,18 @@ const COLOR = {
   pinIn: '#7aa2f7',
   pinOut: '#e0af68',
   wire: '#9aa5b1',
+  /** Sinal ligado (1): destaca pinos, fios e o corpo de entradas/saídas acesas. */
+  signalOn: '#9ece6a',
+  signalOnStroke: '#b9f27c',
+  signalOnLabel: '#1b1f17',
 } as const;
+
+/** Verdadeiro se o nó deve aparecer "aceso" segundo o estado de sinal. */
+function nodeLit(node: CircuitNode, signal: SignalState): boolean {
+  if (node.type === 'input') return signal.pinValues.get(pinKey(node.id, 'out')) ?? false;
+  if (node.type === 'output') return signal.pinValues.get(pinKey(node.id, 'in')) ?? false;
+  return false;
+}
 
 /**
  * Componentes lógicos (NAND e instâncias de chip) compartilham uma cor de corpo,
@@ -53,34 +65,46 @@ function nodeLabel(node: CircuitNode): string {
 }
 
 /** Desenha um nó (porta, pino de I/O ou chip) em coordenadas de tela. */
-export function drawNode(ctx: CanvasRenderingContext2D, cam: Camera, node: CircuitNode): void {
+export function drawNode(
+  ctx: CanvasRenderingContext2D,
+  cam: Camera,
+  node: CircuitNode,
+  signal?: SignalState,
+): void {
   const { w, h } = nodeSize(node);
   const origin = cam.worldToScreen(node.pos);
   const sw = w * cam.zoom;
   const sh = h * cam.zoom;
 
   const logic = isLogicNode(node.type);
-  ctx.fillStyle = logic ? COLOR.logicBody : COLOR.ioBody;
-  ctx.strokeStyle = logic ? COLOR.logicStroke : COLOR.ioStroke;
+  const lit = signal ? nodeLit(node, signal) : false;
+  if (!logic && lit) {
+    ctx.fillStyle = COLOR.signalOn;
+    ctx.strokeStyle = COLOR.signalOnStroke;
+  } else {
+    ctx.fillStyle = logic ? COLOR.logicBody : COLOR.ioBody;
+    ctx.strokeStyle = logic ? COLOR.logicStroke : COLOR.ioStroke;
+  }
   ctx.lineWidth = Math.max(1, 1.5 * cam.zoom);
   roundedRect(ctx, origin.x, origin.y, sw, sh, 8 * cam.zoom);
   ctx.fill();
   ctx.stroke();
 
-  // Rótulo central.
+  // Rótulo central (escurecido quando o corpo está aceso, para contraste).
   const label = nodeLabel(node);
-  ctx.fillStyle = COLOR.label;
+  ctx.fillStyle = lit && !logic ? COLOR.signalOnLabel : COLOR.label;
   ctx.font = `${Math.max(9, 12 * cam.zoom)}px system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(label, origin.x + sw / 2, origin.y + sh / 2);
 
-  // Pinos.
+  // Pinos (verde quando carregam sinal ligado).
   for (const pin of node.pins) {
     const p = cam.worldToScreen(pinWorldPos(node, pin));
+    const on = signal?.pinValues.get(pinKey(node.id, pin.id)) ?? false;
     ctx.beginPath();
     ctx.arc(p.x, p.y, PIN_RADIUS * cam.zoom, 0, Math.PI * 2);
-    ctx.fillStyle = pin.kind === 'in' ? COLOR.pinIn : COLOR.pinOut;
+    ctx.fillStyle = on ? COLOR.signalOn : pin.kind === 'in' ? COLOR.pinIn : COLOR.pinOut;
     ctx.fill();
   }
 }
@@ -94,14 +118,19 @@ export function drawWireSegment(ctx: CanvasRenderingContext2D, from: Vec2, to: V
   ctx.stroke();
 }
 
-/** Desenha todos os fios do circuito. */
-export function drawWires(ctx: CanvasRenderingContext2D, cam: Camera, store: CircuitStore): void {
-  ctx.strokeStyle = COLOR.wire;
+/** Desenha todos os fios do circuito (verde quando transportam sinal ligado). */
+export function drawWires(
+  ctx: CanvasRenderingContext2D,
+  cam: Camera,
+  store: CircuitStore,
+  signal?: SignalState,
+): void {
   ctx.lineWidth = Math.max(1.5, 2 * cam.zoom);
   for (const wire of store.listWires()) {
     const from = store.pinPos(wire.from);
     const to = store.pinPos(wire.to);
     if (!from || !to) continue;
+    ctx.strokeStyle = signal?.wireValues.get(wire.id) ? COLOR.signalOn : COLOR.wire;
     drawWireSegment(ctx, cam.worldToScreen(from), cam.worldToScreen(to));
   }
 }
@@ -111,10 +140,11 @@ export function drawCircuit(
   ctx: CanvasRenderingContext2D,
   cam: Camera,
   store: CircuitStore,
+  signal?: SignalState,
 ): void {
-  drawWires(ctx, cam, store);
+  drawWires(ctx, cam, store, signal);
   for (const node of store.listNodes()) {
-    drawNode(ctx, cam, node);
+    drawNode(ctx, cam, node, signal);
   }
 }
 
