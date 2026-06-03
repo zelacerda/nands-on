@@ -230,26 +230,3 @@ body {
   width: 64px;
   text-align: center;
 }
-
-/* Barra superior contínua sobre o texto enquanto se edita (sinal negado). */
-#rename-input.overlined {
-  text-decoration: overline;
-}
-
-#rename-overline {
-  font:
-    600 15px system-ui,
-    sans-serif;
-  color: #d8dee9;
-  background: #353b45;
-  border: 1px solid #4a525e;
-  border-radius: 6px;
-  padding: 0 12px;
-  min-width: 40px;
-  min-height: 40px;
-  cursor: pointer;
-}
-
-#rename-overline:hover {
-  background: #3f4651;
-}

@@ -1,5 +1,4 @@
 import type { Vec2 } from './camera';
-import { OVERLINE } from './overline';
 
 /** Tipos primitivos com pinos e dimensões fixas. */
 export type PrimitiveType = 'nand' | 'input' | 'output';
@@ -119,14 +118,12 @@ export function pinLabel(node: CircuitNode, pin: Pin): string | undefined {
   return undefined;
 }
 
-/** Nº de caracteres visíveis (ignora a marca combinante de barra superior). */
+/** Nº de caracteres (pontos de código) de um rótulo. */
 function visibleLength(text: string): number {
-  let n = 0;
-  for (const ch of text) if (ch !== OVERLINE) n += 1;
-  return n;
+  return [...text].length;
 }
 
-/** Maior comprimento visível entre uma lista de rótulos. */
+/** Maior comprimento entre uma lista de rótulos. */
 function maxLabelLength(labels?: string[]): number {
   if (!labels) return 0;
   return labels.reduce((m, s) => Math.max(m, visibleLength(s)), 0);
@@ -164,7 +161,13 @@ export function nodeSize(node: CircuitNode): { w: number; h: number } {
   if (node.type === 'chip') {
     const inCount = node.pins.filter((p) => p.kind === 'in').length;
     const outCount = node.pins.filter((p) => p.kind === 'out').length;
-    return chipSize(inCount, outCount, node.name, nodePinLabels(node, 'in'), nodePinLabels(node, 'out'));
+    return chipSize(
+      inCount,
+      outCount,
+      node.name,
+      nodePinLabels(node, 'in'),
+      nodePinLabels(node, 'out'),
+    );
   }
   return NODE_SIZE[node.type];
 }
