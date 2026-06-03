@@ -17,6 +17,11 @@ export interface Pin {
   id: string;
   kind: PinKind;
   offset: Vec2;
+  /**
+   * Rótulo curto desenhado junto ao pino (ex.: nome de uma entrada/saída de um
+   * chip). Opcional; pinos sem rótulo não exibem texto.
+   */
+  label?: string;
 }
 
 /** Nó do circuito (porta, pino de I/O ou instância de chip). */
@@ -77,7 +82,33 @@ export interface ChipDefinition {
   name: string;
   inputCount: number;
   outputCount: number;
+  /**
+   * Rótulos dos pinos de entrada/saída, na ordem (de cima para baixo). Derivados
+   * dos nomes dos nós `input`/`output` no momento da captura. Posições sem nome
+   * ficam com string vazia.
+   */
+  inputLabels?: string[];
+  outputLabels?: string[];
   internal: CircuitState;
+}
+
+/** Rótulos padrão dos pinos do chip primitivo NAND: A (topo), B (base), Q (saída). */
+export const NAND_PIN_LABELS: Record<string, string> = {
+  in0: 'A',
+  in1: 'B',
+  out: 'Q',
+};
+
+/**
+ * Rótulo curto a desenhar junto a um pino. Para o NAND, são os rótulos padrão
+ * A/B/Q; para instâncias de chip, o rótulo capturado do pino. Demais nós (I/O)
+ * não exibem rótulo de pino (seu nome aparece no corpo). `undefined` quando não
+ * há rótulo a exibir.
+ */
+export function pinLabel(node: CircuitNode, pin: Pin): string | undefined {
+  if (node.type === 'nand') return NAND_PIN_LABELS[pin.id];
+  if (node.type === 'chip') return pin.label || undefined;
+  return undefined;
 }
 
 /** Dimensão de uma caixa de chip a partir do nº de pinos de entrada/saída. */
@@ -125,10 +156,20 @@ export function chipInstancePins(def: ChipDefinition): Pin[] {
   const { w, h } = chipSize(def.inputCount, def.outputCount);
   const pins: Pin[] = [];
   for (let i = 0; i < def.inputCount; i++) {
-    pins.push({ id: `in${i}`, kind: 'in', offset: { x: 0, y: (h * (i + 1)) / (def.inputCount + 1) } });
+    pins.push({
+      id: `in${i}`,
+      kind: 'in',
+      offset: { x: 0, y: (h * (i + 1)) / (def.inputCount + 1) },
+      label: def.inputLabels?.[i],
+    });
   }
   for (let i = 0; i < def.outputCount; i++) {
-    pins.push({ id: `out${i}`, kind: 'out', offset: { x: w, y: (h * (i + 1)) / (def.outputCount + 1) } });
+    pins.push({
+      id: `out${i}`,
+      kind: 'out',
+      offset: { x: w, y: (h * (i + 1)) / (def.outputCount + 1) },
+      label: def.outputLabels?.[i],
+    });
   }
   return pins;
 }

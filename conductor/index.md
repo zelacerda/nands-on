@@ -17,6 +17,7 @@ Hub de navegação para o contexto do projeto.
 - [UX da Paleta — Reordenação, Cor de I/O e Arrastar-para-Criar](./tracks/palette-ux_20260531/index.md) — `palette-ux_20260531` (complete)
 - [Lógica de Simulação dos Chips](./tracks/chip-logic_20260531/index.md) — `chip-logic_20260531` (complete)
 - [Simulação de Circuitos Sequenciais (Realimentação)](./tracks/sequential-sim_20260602/index.md) — `sequential-sim_20260602` (complete)
+- [Renomear Entradas/Saídas e Rótulos de Pinos](./tracks/rename-io_20260602/index.md) — `rename-io_20260602` (pending)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 

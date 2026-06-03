@@ -7,5 +7,6 @@
 | [x] | palette-ux_20260531 | UX da Paleta — Reordenação, Cor de I/O e Arrastar-para-Criar | 2026-05-31 | 2026-05-31 |
 | [x] | chip-logic_20260531 | Lógica de Simulação dos Chips | 2026-05-31 | 2026-05-31 |
 | [x] | sequential-sim_20260602 | Simulação de Circuitos Sequenciais (Realimentação) | 2026-06-02 | 2026-06-02 |
+| [~] | rename-io_20260602 | Renomear Entradas/Saídas e Rótulos de Pinos | 2026-06-02 | 2026-06-02 |
 
 <!-- Tracks registrados por /conductor:new-track -->

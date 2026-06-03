@@ -41,6 +41,40 @@ describe('captureDefinition', () => {
   });
 });
 
+describe('captureDefinition — rótulos dos pinos', () => {
+  /** Espaço com nomes nos nós I/O, fora de ordem vertical de propósito. */
+  function namedState(): CircuitState {
+    const store = new CircuitStore();
+    const b = store.addNode('input', { x: 0, y: 80 }); // mais abaixo
+    const a = store.addNode('input', { x: 0, y: 10 }); // mais acima
+    const q = store.addNode('output', { x: 240, y: 40 });
+    a.name = 'A';
+    b.name = 'B';
+    q.name = 'Q';
+    return store.toJSON();
+  }
+
+  it('captura os rótulos na ordem vertical (de cima para baixo)', () => {
+    const def = captureDefinition(namedState(), 'Chip');
+    expect(def.inputLabels).toEqual(['A', 'B']);
+    expect(def.outputLabels).toEqual(['Q']);
+  });
+
+  it('usa string vazia para nós I/O sem nome', () => {
+    const def = captureDefinition(sampleState(), 'Chip'); // nenhum nó tem nome
+    expect(def.inputLabels).toEqual(['', '']);
+    expect(def.outputLabels).toEqual(['']);
+  });
+
+  it('propaga os rótulos para os pinos da instância, na ordem dos pinos', () => {
+    const def = captureDefinition(namedState(), 'Chip');
+    const pins = chipInstancePins(def);
+    expect(pins.find((p) => p.id === 'in0')?.label).toBe('A');
+    expect(pins.find((p) => p.id === 'in1')?.label).toBe('B');
+    expect(pins.find((p) => p.id === 'out0')?.label).toBe('Q');
+  });
+});
+
 describe('chipInstancePins / chipSize / nodeSize', () => {
   it('gera N entradas à esquerda e M saídas à direita, ordenadas verticalmente', () => {
     const def = captureDefinition(sampleState(), 'C'); // 2 in, 1 out
