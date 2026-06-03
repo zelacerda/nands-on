@@ -1,5 +1,5 @@
 import type { Camera, Vec2 } from './camera';
-import { type CircuitNode, type NodeType, nodeSize, pinWorldPos } from './model';
+import { type CircuitNode, type NodeType, nodeSize, pinLabel, pinWorldPos } from './model';
 import type { CircuitStore } from './store';
 import { type SignalState, pinKey } from './simulator';
 
@@ -12,6 +12,7 @@ const COLOR = {
   logicBody: '#3a4360',
   logicStroke: '#5a68a0',
   label: '#d8dee9',
+  pinLabel: '#aeb6c2',
   pinIn: '#7aa2f7',
   pinOut: '#e0af68',
   wire: '#9aa5b1',
@@ -56,11 +57,36 @@ function nodeLabel(node: CircuitNode): string {
     case 'nand':
       return 'NAND';
     case 'input':
-      return 'IN';
+      return node.name ?? 'IN';
     case 'output':
-      return 'OUT';
+      return node.name ?? 'OUT';
     case 'chip':
       return node.name ?? 'CHIP';
+  }
+}
+
+/**
+ * Desenha os rótulos dos pinos (ex.: A/B/Q do NAND ou nomes das entradas/saídas
+ * de um chip) em fonte pequena, dentro do corpo, junto a cada pino. Entradas à
+ * esquerda alinham à esquerda; saídas à direita alinham à direita. O glifo de
+ * barra superior (U+0305) é renderizado nativamente como marca combinante.
+ */
+function drawPinLabels(ctx: CanvasRenderingContext2D, cam: Camera, node: CircuitNode): void {
+  const gap = (PIN_RADIUS + 3) * cam.zoom;
+  ctx.fillStyle = COLOR.pinLabel;
+  ctx.font = `${Math.max(7, 9 * cam.zoom)}px system-ui, sans-serif`;
+  ctx.textBaseline = 'middle';
+  for (const pin of node.pins) {
+    const label = pinLabel(node, pin);
+    if (!label) continue;
+    const p = cam.worldToScreen(pinWorldPos(node, pin));
+    if (pin.kind === 'in') {
+      ctx.textAlign = 'left';
+      ctx.fillText(label, p.x + gap, p.y);
+    } else {
+      ctx.textAlign = 'right';
+      ctx.fillText(label, p.x - gap, p.y);
+    }
   }
 }
 
@@ -113,6 +139,9 @@ export function drawNode(
     ctx.fillStyle = on ? COLOR.signalOn : pin.kind === 'in' ? COLOR.pinIn : COLOR.pinOut;
     ctx.fill();
   }
+
+  // Rótulos curtos junto aos pinos (A/B/Q do NAND, nomes de I/O dos chips).
+  drawPinLabels(ctx, cam, node);
 }
 
 /** Desenha uma linha de fio entre dois pontos de tela (curva de Bézier horizontal). */

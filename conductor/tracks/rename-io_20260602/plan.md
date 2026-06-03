@@ -38,16 +38,16 @@ Desenhar os nomes junto aos pinos no canvas.
 
 ### Tasks
 
-- [ ] Task 2.1: Em `render.ts`, desenhar rótulo em fonte pequena junto a cada pino de chips
+- [x] Task 2.1: Em `render.ts`, desenhar rótulo em fonte pequena junto a cada pino de chips
   compostos (dentro do retângulo), sem cobrir o nome central.
-- [ ] Task 2.2: Renderizar A/B/Q no NAND nas posições corretas dos pinos.
-- [ ] Task 2.3: Renderizar corretamente o overline (U+0305) no canvas (medição/posicionamento
+- [x] Task 2.2: Renderizar A/B/Q no NAND nas posições corretas dos pinos.
+- [x] Task 2.3: Renderizar corretamente o overline (U+0305) no canvas (medição/posicionamento
   do glifo combinante).
-- [ ] Task 2.4: Ajustar layout/largura mínima do chip se os rótulos exigirem mais espaço.
+- [x] Task 2.4: Ajustar layout/largura mínima do chip se os rótulos exigirem mais espaço.
 
 ### Verification
 
-- [ ] Validação manual do usuário no servidor: NAND mostra A/B/Q; um chip composto mostra os
+- [~] Validação manual do usuário no servidor: NAND mostra A/B/Q; um chip composto mostra os
   nomes dos pinos legíveis e bem posicionados.
 
 ## Phase 3: UI de Edição por Duplo Clique
