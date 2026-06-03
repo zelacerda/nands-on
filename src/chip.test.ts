@@ -97,6 +97,13 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
     expect(big).toBeGreaterThan(small);
   });
 
+  it('largura do chip cresce com nomes longos, mas respeita o mínimo', () => {
+    const short = chipSize(2, 1, 'AND').w;
+    const long = chipSize(2, 1, 'LOOOONG_AND').w;
+    expect(short).toBe(chipSize(2, 1).w); // nome curto não passa do mínimo
+    expect(long).toBeGreaterThan(short);
+  });
+
   it('nodeSize usa os pinos do nó de chip', () => {
     const store = new CircuitStore();
     const def = captureDefinition(sampleState(), 'D'); // 2 in, 1 out

@@ -72,6 +72,9 @@ export const NODE_SIZE: Record<PrimitiveType, { w: number; h: number }> = {
 export const CHIP_MIN_W = 90;
 export const CHIP_PIN_SPACING = 22;
 export const CHIP_PAD_Y = 16;
+/** Padding horizontal e largura média estimada por caractere do nome do chip. */
+export const CHIP_PAD_X = 14;
+export const CHIP_NAME_CHAR_W = 8;
 
 /**
  * Definição de um chip reutilizável: nome, número de pinos externos e a
@@ -111,11 +114,20 @@ export function pinLabel(node: CircuitNode, pin: Pin): string | undefined {
   return undefined;
 }
 
-/** Dimensão de uma caixa de chip a partir do nº de pinos de entrada/saída. */
-export function chipSize(inputCount: number, outputCount: number): { w: number; h: number } {
+/**
+ * Dimensão de uma caixa de chip a partir do nº de pinos de entrada/saída. A
+ * largura também acomoda o nome do chip (estimado por nº de caracteres), de
+ * modo que nomes longos não estourem o corpo.
+ */
+export function chipSize(
+  inputCount: number,
+  outputCount: number,
+  name?: string,
+): { w: number; h: number } {
   const rows = Math.max(inputCount, outputCount, 1);
   const h = Math.max(NODE_SIZE.nand.h, rows * CHIP_PIN_SPACING + CHIP_PAD_Y);
-  return { w: CHIP_MIN_W, h };
+  const nameW = name ? name.length * CHIP_NAME_CHAR_W + 2 * CHIP_PAD_X : 0;
+  return { w: Math.max(CHIP_MIN_W, nameW), h };
 }
 
 /** Dimensão de um nó qualquer (primitiva ou chip). */
@@ -123,7 +135,7 @@ export function nodeSize(node: CircuitNode): { w: number; h: number } {
   if (node.type === 'chip') {
     const inCount = node.pins.filter((p) => p.kind === 'in').length;
     const outCount = node.pins.filter((p) => p.kind === 'out').length;
-    return chipSize(inCount, outCount);
+    return chipSize(inCount, outCount, node.name);
   }
   return NODE_SIZE[node.type];
 }
@@ -153,7 +165,7 @@ export function createPins(type: PrimitiveType): Pin[] {
  * distribuídas verticalmente de forma uniforme.
  */
 export function chipInstancePins(def: ChipDefinition): Pin[] {
-  const { w, h } = chipSize(def.inputCount, def.outputCount);
+  const { w, h } = chipSize(def.inputCount, def.outputCount, def.name);
   const pins: Pin[] = [];
   for (let i = 0; i < def.inputCount; i++) {
     pins.push({

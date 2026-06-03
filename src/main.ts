@@ -128,7 +128,10 @@ function addNodeAt(type: PrimitiveType, world: Vec2): void {
 
 /** Cria uma instância de chip centrada no ponto de mundo `world`. */
 function addChipInstanceAt(def: ChipDefinition, world: Vec2): void {
-  store.addChipInstance(def, centeredTopLeft(world, chipSize(def.inputCount, def.outputCount)));
+  store.addChipInstance(
+    def,
+    centeredTopLeft(world, chipSize(def.inputCount, def.outputCount, def.name)),
+  );
 }
 
 /** Componente que um botão da paleta cria: uma primitiva ou uma instância de chip. */
@@ -156,7 +159,7 @@ function previewNode(item: PaletteItem, world: Vec2): CircuitNode {
   return {
     id: '__preview__',
     type: 'chip',
-    pos: centeredTopLeft(world, chipSize(def.inputCount, def.outputCount)),
+    pos: centeredTopLeft(world, chipSize(def.inputCount, def.outputCount, def.name)),
     pins: chipInstancePins(def),
     defId: def.id,
     name: def.name,
@@ -545,6 +548,10 @@ canvas.addEventListener(
 // --- Teclado: remover seleção --------------------------------------------
 
 window.addEventListener('keydown', (e) => {
+  // Enquanto se digita num campo de texto (renomear I/O, nomear chip), Backspace
+  // edita o texto — não deve excluir o nó/fio selecionado.
+  const target = e.target as HTMLElement | null;
+  if (target && (target.tagName === 'INPUT' || target.isContentEditable)) return;
   if ((e.key === 'Delete' || e.key === 'Backspace') && selection) {
     e.preventDefault();
     deleteSelection();
