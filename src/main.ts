@@ -130,7 +130,10 @@ function addNodeAt(type: PrimitiveType, world: Vec2): void {
 function addChipInstanceAt(def: ChipDefinition, world: Vec2): void {
   store.addChipInstance(
     def,
-    centeredTopLeft(world, chipSize(def.inputCount, def.outputCount, def.name)),
+    centeredTopLeft(
+      world,
+      chipSize(def.inputCount, def.outputCount, def.name, def.inputLabels, def.outputLabels),
+    ),
   );
 }
 
@@ -159,7 +162,10 @@ function previewNode(item: PaletteItem, world: Vec2): CircuitNode {
   return {
     id: '__preview__',
     type: 'chip',
-    pos: centeredTopLeft(world, chipSize(def.inputCount, def.outputCount, def.name)),
+    pos: centeredTopLeft(
+      world,
+      chipSize(def.inputCount, def.outputCount, def.name, def.inputLabels, def.outputLabels),
+    ),
     pins: chipInstancePins(def),
     defId: def.id,
     name: def.name,

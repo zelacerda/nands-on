@@ -81,25 +81,49 @@ function nodeLabel(node: CircuitNode): string {
   }
 }
 
+/** Fonte (px de tela) dos rótulos de pino. */
+function pinLabelFontPx(cam: Camera): number {
+  return Math.max(7, 9 * cam.zoom);
+}
+
+/**
+ * Espaço lateral (px de tela) que os rótulos dos pinos ocupam por lado: largura
+ * do maior rótulo + a folga até a borda. `0` quando não há nenhum rótulo. Usado
+ * para reservar a faixa lateral e evitar que o nome central a invada.
+ */
+function pinLabelReserve(ctx: CanvasRenderingContext2D, cam: Camera, node: CircuitNode): number {
+  const gap = (PIN_RADIUS + 3) * cam.zoom;
+  ctx.font = `${pinLabelFontPx(cam)}px system-ui, sans-serif`;
+  let maxW = 0;
+  for (const pin of node.pins) {
+    const label = pinLabel(node, pin);
+    if (label) maxW = Math.max(maxW, ctx.measureText(label).width);
+  }
+  return maxW > 0 ? maxW + gap + 4 * cam.zoom : 0;
+}
+
 /**
  * Desenha os rótulos dos pinos (ex.: A/B/Q do NAND ou nomes das entradas/saídas
  * de um chip) em fonte pequena, dentro do corpo, junto a cada pino. Entradas à
- * esquerda alinham à esquerda; saídas à direita alinham à direita. O glifo de
- * barra superior (U+0305) é renderizado nativamente como marca combinante.
+ * esquerda alinham à esquerda; saídas à direita alinham à direita. `reserve` é a
+ * largura disponível por lado (do {@link pinLabelReserve}). O glifo de barra
+ * superior (U+0305) é renderizado nativamente como marca combinante.
  */
-function drawPinLabels(ctx: CanvasRenderingContext2D, cam: Camera, node: CircuitNode): void {
+function drawPinLabels(
+  ctx: CanvasRenderingContext2D,
+  cam: Camera,
+  node: CircuitNode,
+  reserve: number,
+): void {
+  if (reserve <= 0) return;
   const gap = (PIN_RADIUS + 3) * cam.zoom;
-  const { w } = nodeSize(node);
-  // Espaço disponível: da borda (após o pino) até perto do centro, para não
-  // invadir o rótulo central.
-  const maxWidth = (w * cam.zoom) / 2 - gap - 4 * cam.zoom;
   ctx.fillStyle = COLOR.pinLabel;
-  ctx.font = `${Math.max(7, 9 * cam.zoom)}px system-ui, sans-serif`;
+  ctx.font = `${pinLabelFontPx(cam)}px system-ui, sans-serif`;
   ctx.textBaseline = 'middle';
   for (const pin of node.pins) {
     const label = pinLabel(node, pin);
     if (!label) continue;
-    const text = fitText(ctx, label, maxWidth);
+    const text = fitText(ctx, label, reserve);
     const p = cam.worldToScreen(pinWorldPos(node, pin));
     if (pin.kind === 'in') {
       ctx.textAlign = 'left';
@@ -143,13 +167,17 @@ export function drawNode(
   ctx.fill();
   ctx.stroke();
 
+  // Faixa lateral reservada aos rótulos dos pinos, para o nome central não invadir.
+  const reserve = pinLabelReserve(ctx, cam, node);
+
   // Rótulo central (escurecido quando o corpo está aceso, para contraste).
   const label = nodeLabel(node);
   ctx.fillStyle = lit && !logic ? COLOR.signalOnLabel : COLOR.label;
   ctx.font = `${Math.max(9, 12 * cam.zoom)}px system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(fitText(ctx, label, sw - 8 * cam.zoom), origin.x + sw / 2, origin.y + sh / 2);
+  const centerMax = sw - 2 * reserve - 4 * cam.zoom;
+  ctx.fillText(fitText(ctx, label, centerMax), origin.x + sw / 2, origin.y + sh / 2);
 
   // Pinos (verde quando carregam sinal ligado).
   for (const pin of node.pins) {
@@ -162,7 +190,7 @@ export function drawNode(
   }
 
   // Rótulos curtos junto aos pinos (A/B/Q do NAND, nomes de I/O dos chips).
-  drawPinLabels(ctx, cam, node);
+  drawPinLabels(ctx, cam, node, reserve);
 }
 
 /** Desenha uma linha de fio entre dois pontos de tela (curva de Bézier horizontal). */

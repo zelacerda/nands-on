@@ -104,6 +104,12 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
     expect(long).toBeGreaterThan(short);
   });
 
+  it('largura reserva espaço para os rótulos dos pinos ao lado do nome', () => {
+    const semRotulos = chipSize(1, 1, 'OR').w;
+    const comRotulos = chipSize(1, 1, 'OR', ['+5V'], ['OUT']).w;
+    expect(comRotulos).toBeGreaterThan(semRotulos);
+  });
+
   it('nodeSize usa os pinos do nó de chip', () => {
     const store = new CircuitStore();
     const def = captureDefinition(sampleState(), 'D'); // 2 in, 1 out

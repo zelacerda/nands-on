@@ -1,4 +1,5 @@
 import type { Vec2 } from './camera';
+import { OVERLINE } from './overline';
 
 /** Tipos primitivos com pinos e dimensões fixas. */
 export type PrimitiveType = 'nand' | 'input' | 'output';
@@ -63,7 +64,8 @@ export interface CircuitState {
 
 /** Dimensões fixas das primitivas, em unidades de mundo. */
 export const NODE_SIZE: Record<PrimitiveType, { w: number; h: number }> = {
-  nand: { w: 72, h: 56 },
+  // Largura folgada para os rótulos A/B/Q respirarem ao lado do "NAND".
+  nand: { w: 96, h: 56 },
   input: { w: 40, h: 40 },
   output: { w: 40, h: 40 },
 };
@@ -72,9 +74,12 @@ export const NODE_SIZE: Record<PrimitiveType, { w: number; h: number }> = {
 export const CHIP_MIN_W = 90;
 export const CHIP_PIN_SPACING = 22;
 export const CHIP_PAD_Y = 16;
-/** Padding horizontal e largura média estimada por caractere do nome do chip. */
+/** Padding horizontal e larguras médias estimadas por caractere (nome / rótulo de pino). */
 export const CHIP_PAD_X = 14;
 export const CHIP_NAME_CHAR_W = 8;
+export const CHIP_PIN_LABEL_CHAR_W = 7;
+/** Folga entre os rótulos laterais dos pinos e o nome central, por lado. */
+export const CHIP_LABEL_GAP = 12;
 
 /**
  * Definição de um chip reutilizável: nome, número de pinos externos e a
@@ -114,20 +119,44 @@ export function pinLabel(node: CircuitNode, pin: Pin): string | undefined {
   return undefined;
 }
 
+/** Nº de caracteres visíveis (ignora a marca combinante de barra superior). */
+function visibleLength(text: string): number {
+  let n = 0;
+  for (const ch of text) if (ch !== OVERLINE) n += 1;
+  return n;
+}
+
+/** Maior comprimento visível entre uma lista de rótulos. */
+function maxLabelLength(labels?: string[]): number {
+  if (!labels) return 0;
+  return labels.reduce((m, s) => Math.max(m, visibleLength(s)), 0);
+}
+
 /**
- * Dimensão de uma caixa de chip a partir do nº de pinos de entrada/saída. A
- * largura também acomoda o nome do chip (estimado por nº de caracteres), de
- * modo que nomes longos não estourem o corpo.
+ * Dimensão de uma caixa de chip. A largura acomoda, lado a lado, os rótulos dos
+ * pinos de entrada (à esquerda), o nome central e os rótulos dos pinos de saída
+ * (à direita) — estimados por nº de caracteres — para que nada se sobreponha.
  */
 export function chipSize(
   inputCount: number,
   outputCount: number,
   name?: string,
+  inLabels?: string[],
+  outLabels?: string[],
 ): { w: number; h: number } {
   const rows = Math.max(inputCount, outputCount, 1);
   const h = Math.max(NODE_SIZE.nand.h, rows * CHIP_PIN_SPACING + CHIP_PAD_Y);
-  const nameW = name ? name.length * CHIP_NAME_CHAR_W + 2 * CHIP_PAD_X : 0;
-  return { w: Math.max(CHIP_MIN_W, nameW), h };
+  const nameW = name ? visibleLength(name) * CHIP_NAME_CHAR_W : 0;
+  const leftW = maxLabelLength(inLabels) * CHIP_PIN_LABEL_CHAR_W;
+  const rightW = maxLabelLength(outLabels) * CHIP_PIN_LABEL_CHAR_W;
+  const sideGap = (leftW > 0 ? CHIP_LABEL_GAP : 0) + (rightW > 0 ? CHIP_LABEL_GAP : 0);
+  const content = 2 * CHIP_PAD_X + leftW + rightW + nameW + sideGap;
+  return { w: Math.max(CHIP_MIN_W, content), h };
+}
+
+/** Rótulos dos pinos de um nó de chip, por direção, na ordem dos pinos. */
+function nodePinLabels(node: CircuitNode, kind: PinKind): string[] {
+  return node.pins.filter((p) => p.kind === kind).map((p) => p.label ?? '');
 }
 
 /** Dimensão de um nó qualquer (primitiva ou chip). */
@@ -135,7 +164,7 @@ export function nodeSize(node: CircuitNode): { w: number; h: number } {
   if (node.type === 'chip') {
     const inCount = node.pins.filter((p) => p.kind === 'in').length;
     const outCount = node.pins.filter((p) => p.kind === 'out').length;
-    return chipSize(inCount, outCount, node.name);
+    return chipSize(inCount, outCount, node.name, nodePinLabels(node, 'in'), nodePinLabels(node, 'out'));
   }
   return NODE_SIZE[node.type];
 }
