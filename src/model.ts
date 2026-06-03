@@ -194,7 +194,15 @@ export function createPins(type: PrimitiveType): Pin[] {
  * distribuídas verticalmente de forma uniforme.
  */
 export function chipInstancePins(def: ChipDefinition): Pin[] {
-  const { w, h } = chipSize(def.inputCount, def.outputCount, def.name);
+  // Mesma assinatura usada por nodeSize, para que a borda direita (onde ficam os
+  // pinos de saída) coincida exatamente com a largura do corpo desenhado.
+  const { w, h } = chipSize(
+    def.inputCount,
+    def.outputCount,
+    def.name,
+    def.inputLabels,
+    def.outputLabels,
+  );
   const pins: Pin[] = [];
   for (let i = 0; i < def.inputCount; i++) {
     pins.push({

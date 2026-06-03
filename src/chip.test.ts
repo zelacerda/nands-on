@@ -110,6 +110,20 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
     expect(comRotulos).toBeGreaterThan(semRotulos);
   });
 
+  it('pino de saída fica exatamente na borda direita do corpo (nome longo)', () => {
+    const store = new CircuitStore();
+    const a = store.addNode('input', { x: 0, y: 0 });
+    const b = store.addNode('input', { x: 0, y: 40 });
+    store.addNode('output', { x: 200, y: 20 });
+    a.name = 'A';
+    b.name = 'B';
+    const def = captureDefinition(store.toJSON(), 'THIS IS VERY LARGE');
+    const node = new CircuitStore().addChipInstance(def, { x: 0, y: 0 });
+    const outPin = node.pins.find((p) => p.kind === 'out')!;
+    // A posição do pino (offset.x) deve casar com a largura do corpo renderizado.
+    expect(outPin.offset.x).toBe(nodeSize(node).w);
+  });
+
   it('nodeSize usa os pinos do nó de chip', () => {
     const store = new CircuitStore();
     const def = captureDefinition(sampleState(), 'D'); // 2 in, 1 out
