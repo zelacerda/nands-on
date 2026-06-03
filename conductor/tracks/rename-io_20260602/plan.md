@@ -3,7 +3,7 @@
 **Track ID:** rename-io_20260602
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-02
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -82,9 +82,9 @@ Editar o nome dos nós input/output via overlay.
 ### Final Verification
 
 - [x] Todos os critérios de aceitação atendidos (implementação).
-- [x] Testes passando (71 testes; typecheck, lint e build limpos).
-- [~] Verificação manual feita pelo usuário no servidor que já está de pé (mouse + toque).
-- [~] Pronto para revisão.
+- [x] Testes passando (68 testes; typecheck, lint e build limpos).
+- [x] Verificação manual feita pelo usuário no servidor que já está de pé (mouse + toque).
+- [x] Pronto para revisão.
 
 ---
 

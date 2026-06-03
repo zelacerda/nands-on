@@ -1,7 +1,7 @@
 # Track: Renomear Entradas/Saídas e Rótulos de Pinos
 
 **ID:** rename-io_20260602
-**Status:** Pending
+**Status:** Complete
 
 ## Documents
 
@@ -10,8 +10,8 @@
 
 ## Progress
 
-- Phases: 0/4 complete
-- Tasks: 0/14 complete
+- Phases: 4/4 complete
+- Tasks: 14/14 complete
 
 ## Quick Links
 

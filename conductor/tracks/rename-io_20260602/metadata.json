@@ -2,9 +2,9 @@
   "id": "rename-io_20260602",
   "title": "Renomear Entradas/Saídas e Rótulos de Pinos",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-06-02T00:00:00Z",
-  "updated": "2026-06-02T00:00:00Z",
+  "updated": "2026-06-02T22:45:00Z",
   "current_phase": 4,
   "current_task": "4.2",
   "phases": {
