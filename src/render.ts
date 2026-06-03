@@ -173,11 +173,16 @@ export function drawNode(
   ctx.fill();
   ctx.stroke();
 
-  // Faixas laterais reservadas (por lado) aos rótulos dos pinos. Mesmo sem
-  // rótulo, mantém-se um mínimo para o nome central não encostar nos pinos.
+  // Faixas laterais reservadas (por lado) aos rótulos dos pinos. Só se aplica a
+  // nós lógicos (NAND/chip), que têm pinos nos dois lados; entradas/saídas são
+  // círculos com um único pino e o rótulo é apenas centrado, com leve folga.
   const minReserve = (PIN_RADIUS + 6) * cam.zoom;
-  const leftReserve = Math.max(minReserve, pinLabelReserve(ctx, cam, node, 'in'));
-  const rightReserve = Math.max(minReserve, pinLabelReserve(ctx, cam, node, 'out'));
+  const leftReserve = logic
+    ? Math.max(minReserve, pinLabelReserve(ctx, cam, node, 'in'))
+    : 4 * cam.zoom;
+  const rightReserve = logic
+    ? Math.max(minReserve, pinLabelReserve(ctx, cam, node, 'out'))
+    : 4 * cam.zoom;
 
   // Rótulo central, centrado na região livre entre as reservas (equilibrado
   // mesmo quando um lado tem rótulos mais largos que o outro).
