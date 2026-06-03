@@ -3,7 +3,7 @@
 **Track ID:** sequential-sim_20260602
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-02
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -86,22 +86,22 @@ Conectar o estado persistente ao loop de simulação ao vivo da interface.
       vivo / render) para reutilizar o estado entre frames, conforme o novo
       contrato da função.
 - [x] Task 4.2: `npm run typecheck` e `npm run lint` sem erros.
-- [~] Task 4.3: Verificação manual no browser — montar o SR Latch e validar
-      Set/Reset/Hold visualmente. (Pendente: validação visual pelo usuário; o
-      comportamento está coberto pelos testes automatizados.)
+- [x] Task 4.3: Verificação manual no browser — montar o SR Latch e validar
+      Set/Reset/Hold visualmente. (Validado pelo usuário: a realimentação
+      funciona. A "inversão" Q/Q̄ observada é da convenção do SR Latch NOR — S
+      alimenta o NOR do lado de Q̄ —, não um defeito do motor.)
 
 ### Verification
 
-- [~] SR Latch funciona ao vivo na interface, reproduzindo a tabela-verdade.
-      (Aguardando confirmação visual do usuário.)
+- [x] SR Latch funciona ao vivo na interface, reproduzindo a tabela-verdade.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos
-- [ ] Testes passando (`npm test`)
-- [ ] Typecheck e lint limpos
-- [ ] SR Latch validado manualmente no browser
-- [ ] Pronto para review
+- [x] Todos os critérios de aceitação atendidos
+- [x] Testes passando (`npm test`) — 62/62
+- [x] Typecheck e lint limpos
+- [x] SR Latch validado manualmente no browser
+- [x] Pronto para review
 
 ---
 
