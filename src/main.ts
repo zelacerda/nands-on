@@ -326,11 +326,20 @@ let renameNodeId: string | null = null;
 function openRenameOverlay(node: CircuitNode): void {
   renameNodeId = node.id;
   renameInput.value = node.name ?? '';
-  const { w } = nodeSize(node);
-  const top = camera.worldToScreen({ x: node.pos.x + w / 2, y: node.pos.y });
+  const { w, h } = nodeSize(node);
   const rect = canvas!.getBoundingClientRect();
-  renameOverlay.style.left = `${rect.left + top.x}px`;
-  renameOverlay.style.top = `${rect.top + top.y}px`;
+  // Por padrão flutua acima do nó; se houver pouco espaço no topo, cai abaixo
+  // para não sair da tela (útil em mobile com o teclado virtual).
+  const above = camera.worldToScreen({ x: node.pos.x + w / 2, y: node.pos.y });
+  const flipBelow = above.y < 72;
+  const anchor = flipBelow
+    ? camera.worldToScreen({ x: node.pos.x + w / 2, y: node.pos.y + h })
+    : above;
+  renameOverlay.style.left = `${rect.left + anchor.x}px`;
+  renameOverlay.style.top = `${rect.top + anchor.y}px`;
+  renameOverlay.style.transform = flipBelow
+    ? 'translate(-50%, 20%)'
+    : 'translate(-50%, -120%)';
   renameOverlay.hidden = false;
   renameInput.focus();
   renameInput.select();

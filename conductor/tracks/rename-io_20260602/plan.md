@@ -74,17 +74,17 @@ Editar o nome dos nós input/output via overlay.
 
 ### Tasks
 
-- [ ] Task 4.1: Tratar casos de borda (nome vazio → fallback; nomes longos;
+- [x] Task 4.1: Tratar casos de borda (nome vazio → fallback; nomes longos;
   truncamento/elipse).
-- [ ] Task 4.2: Garantir interação com mobile (teclado virtual, foco, não conflitar com
+- [x] Task 4.2: Garantir interação com mobile (teclado virtual, foco, não conflitar com
   pan/zoom).
 
 ### Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos.
-- [ ] Testes passando.
-- [ ] Verificação manual feita pelo usuário no servidor que já está de pé (mouse + toque).
-- [ ] Pronto para revisão.
+- [x] Todos os critérios de aceitação atendidos (implementação).
+- [x] Testes passando (71 testes; typecheck, lint e build limpos).
+- [~] Verificação manual feita pelo usuário no servidor que já está de pé (mouse + toque).
+- [~] Pronto para revisão.
 
 ---
 

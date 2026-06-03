@@ -38,6 +38,22 @@ function isLogicNode(type: NodeType): boolean {
   return type === 'nand' || type === 'chip';
 }
 
+/**
+ * Trunca `text` com reticências para caber em `maxWidth` (px de tela), medindo
+ * com a fonte já configurada no contexto. Remove de trás para frente por ponto
+ * de código (preservando o que couber).
+ */
+function fitText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+  if (maxWidth <= 0 || ctx.measureText(text).width <= maxWidth) return text;
+  const chars = [...text];
+  while (chars.length > 1) {
+    chars.pop();
+    const candidate = `${chars.join('')}…`;
+    if (ctx.measureText(candidate).width <= maxWidth) return candidate;
+  }
+  return '…';
+}
+
 function roundedRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -73,19 +89,24 @@ function nodeLabel(node: CircuitNode): string {
  */
 function drawPinLabels(ctx: CanvasRenderingContext2D, cam: Camera, node: CircuitNode): void {
   const gap = (PIN_RADIUS + 3) * cam.zoom;
+  const { w } = nodeSize(node);
+  // Espaço disponível: da borda (após o pino) até perto do centro, para não
+  // invadir o rótulo central.
+  const maxWidth = (w * cam.zoom) / 2 - gap - 4 * cam.zoom;
   ctx.fillStyle = COLOR.pinLabel;
   ctx.font = `${Math.max(7, 9 * cam.zoom)}px system-ui, sans-serif`;
   ctx.textBaseline = 'middle';
   for (const pin of node.pins) {
     const label = pinLabel(node, pin);
     if (!label) continue;
+    const text = fitText(ctx, label, maxWidth);
     const p = cam.worldToScreen(pinWorldPos(node, pin));
     if (pin.kind === 'in') {
       ctx.textAlign = 'left';
-      ctx.fillText(label, p.x + gap, p.y);
+      ctx.fillText(text, p.x + gap, p.y);
     } else {
       ctx.textAlign = 'right';
-      ctx.fillText(label, p.x - gap, p.y);
+      ctx.fillText(text, p.x - gap, p.y);
     }
   }
 }
@@ -128,7 +149,7 @@ export function drawNode(
   ctx.font = `${Math.max(9, 12 * cam.zoom)}px system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(label, origin.x + sw / 2, origin.y + sh / 2);
+  ctx.fillText(fitText(ctx, label, sw - 8 * cam.zoom), origin.x + sw / 2, origin.y + sh / 2);
 
   // Pinos (verde quando carregam sinal ligado).
   for (const pin of node.pins) {
