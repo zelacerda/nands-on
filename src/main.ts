@@ -22,7 +22,7 @@ import {
   drawWireHighlight,
 } from './render';
 import { hitNode, hitPin, hitWire } from './hittest';
-import { type ChipResolver, simulate } from './simulator';
+import { type ChipResolver, type SignalState, simulate } from './simulator';
 import { validateConnection } from './connection';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
@@ -471,6 +471,10 @@ window.addEventListener('keydown', (e) => {
 
 let lastCanMake: boolean | null = null;
 
+// Estado de sinal preservado entre frames — dá memória de runtime aos
+// circuitos sequenciais (ex.: SR Latch mantém o estado de hold).
+let signalState: SignalState | undefined;
+
 function render(): void {
   const dpr = window.devicePixelRatio || 1;
   ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -485,9 +489,10 @@ function render(): void {
     if (node) drawNodeHighlight(ctx!, camera, node);
   }
 
-  // Avalia o circuito a cada frame (combinacional) e desenha com o estado de sinal.
-  const signal = simulate(store.toJSON(), resolveChip);
-  drawCircuit(ctx!, camera, store, signal);
+  // Avalia o circuito a cada frame, reaproveitando o estado anterior para que
+  // circuitos sequenciais (com realimentação) preservem sua memória.
+  signalState = simulate(store.toJSON(), resolveChip, signalState);
+  drawCircuit(ctx!, camera, store, signalState);
 
   // Atualiza a visibilidade do botão "Fazer" apenas quando muda.
   const able = canMake();

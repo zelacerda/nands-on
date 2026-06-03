@@ -82,16 +82,18 @@ Conectar o estado persistente ao loop de simulação ao vivo da interface.
 
 ### Tasks
 
-- [ ] Task 4.1: Ajustar o ponto de chamada de `simulate` (loop de simulação ao
+- [x] Task 4.1: Ajustar o ponto de chamada de `simulate` (loop de simulação ao
       vivo / render) para reutilizar o estado entre frames, conforme o novo
       contrato da função.
-- [ ] Task 4.2: `npm run typecheck` e `npm run lint` sem erros.
-- [ ] Task 4.3: Verificação manual no browser — montar o SR Latch e validar
-      Set/Reset/Hold visualmente.
+- [x] Task 4.2: `npm run typecheck` e `npm run lint` sem erros.
+- [~] Task 4.3: Verificação manual no browser — montar o SR Latch e validar
+      Set/Reset/Hold visualmente. (Pendente: validação visual pelo usuário; o
+      comportamento está coberto pelos testes automatizados.)
 
 ### Verification
 
-- [ ] SR Latch funciona ao vivo na interface, reproduzindo a tabela-verdade.
+- [~] SR Latch funciona ao vivo na interface, reproduzindo a tabela-verdade.
+      (Aguardando confirmação visual do usuário.)
 
 ## Final Verification
 
