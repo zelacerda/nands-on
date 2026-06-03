@@ -51,7 +51,9 @@ body {
 }
 
 #palette button {
-  font: 600 13px system-ui, sans-serif;
+  font:
+    600 13px system-ui,
+    sans-serif;
   color: #d8dee9;
   background: #353b45;
   border: 1px solid #4a525e;
@@ -100,7 +102,9 @@ body {
   position: fixed;
   top: 12px;
   right: 12px;
-  font: 700 14px system-ui, sans-serif;
+  font:
+    700 14px system-ui,
+    sans-serif;
   color: #1a1d23;
   background: #9ece6a;
   border: none;
@@ -140,12 +144,16 @@ body {
 }
 
 .dialog-box label {
-  font: 600 13px system-ui, sans-serif;
+  font:
+    600 13px system-ui,
+    sans-serif;
   color: #d8dee9;
 }
 
 .dialog-box input {
-  font: 15px system-ui, sans-serif;
+  font:
+    15px system-ui,
+    sans-serif;
   color: #d8dee9;
   background: #1a1d23;
   border: 1px solid #4a525e;
@@ -155,7 +163,9 @@ body {
 
 .dialog-box .error {
   margin: 0;
-  font: 12px system-ui, sans-serif;
+  font:
+    12px system-ui,
+    sans-serif;
   color: #f7768e;
 }
 
@@ -166,7 +176,9 @@ body {
 }
 
 .dialog-actions button {
-  font: 600 13px system-ui, sans-serif;
+  font:
+    600 13px system-ui,
+    sans-serif;
   border-radius: 6px;
   padding: 8px 14px;
   min-height: 40px;
@@ -206,7 +218,9 @@ body {
 }
 
 #rename-input {
-  font: 16px system-ui, sans-serif;
+  font:
+    16px system-ui,
+    sans-serif;
   color: #d8dee9;
   background: #1a1d23;
   border: 1px solid #4a525e;
@@ -217,8 +231,15 @@ body {
   text-align: center;
 }
 
+/* Barra superior contínua sobre o texto enquanto se edita (sinal negado). */
+#rename-input.overlined {
+  text-decoration: overline;
+}
+
 #rename-overline {
-  font: 600 15px system-ui, sans-serif;
+  font:
+    600 15px system-ui,
+    sans-serif;
   color: #d8dee9;
   background: #353b45;
   border: 1px solid #4a525e;

@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { chipInstancePins, chipSize, nodeSize, type CircuitState } from './model';
-import {
-  ChipLibrary,
-  captureDefinition,
-  DuplicateChipNameError,
-  validateChipName,
-} from './chip';
+import { ChipLibrary, captureDefinition, DuplicateChipNameError, validateChipName } from './chip';
 import { CircuitStore } from './store';
 
 /** Monta um CircuitState simples: 2 entradas, 1 saída e uma NAND. */
@@ -60,10 +55,10 @@ describe('captureDefinition — rótulos dos pinos', () => {
     expect(def.outputLabels).toEqual(['Q']);
   });
 
-  it('usa string vazia para nós I/O sem nome', () => {
+  it('usa "IN"/"OUT" como padrão para nós I/O sem nome', () => {
     const def = captureDefinition(sampleState(), 'Chip'); // nenhum nó tem nome
-    expect(def.inputLabels).toEqual(['', '']);
-    expect(def.outputLabels).toEqual(['']);
+    expect(def.inputLabels).toEqual(['IN', 'IN']);
+    expect(def.outputLabels).toEqual(['OUT']);
   });
 
   it('propaga os rótulos para os pinos da instância, na ordem dos pinos', () => {
@@ -84,7 +79,7 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
     expect(ins).toHaveLength(2);
     expect(outs).toHaveLength(1);
 
-    const { w } = chipSize(2, 1);
+    const { w } = chipSize(2, 1, def.name, def.inputLabels, def.outputLabels);
     expect(ins.every((p) => p.offset.x === 0)).toBe(true);
     expect(outs.every((p) => p.offset.x === w)).toBe(true);
     // Entradas em ordem vertical crescente.
@@ -128,7 +123,7 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
     const store = new CircuitStore();
     const def = captureDefinition(sampleState(), 'D'); // 2 in, 1 out
     const node = store.addChipInstance(def, { x: 0, y: 0 });
-    expect(nodeSize(node)).toEqual(chipSize(2, 1));
+    expect(nodeSize(node)).toEqual(chipSize(2, 1, def.name, def.inputLabels, def.outputLabels));
   });
 });
 

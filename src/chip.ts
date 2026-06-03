@@ -19,9 +19,9 @@ export function captureDefinition(state: CircuitState, name: string): ChipDefini
     inputCount: inputs.length,
     outputCount: outputs.length,
     // Os nomes dos nós I/O viram os rótulos dos pinos do chip, na mesma ordem
-    // vertical. Nós sem nome ficam com string vazia (pino sem rótulo).
-    inputLabels: inputs.map((n) => n.name ?? ''),
-    outputLabels: outputs.map((n) => n.name ?? ''),
+    // vertical. Nós não renomeados caem para o padrão "IN"/"OUT".
+    inputLabels: inputs.map((n) => n.name ?? 'IN'),
+    outputLabels: outputs.map((n) => n.name ?? 'OUT'),
     internal: state,
   };
 }

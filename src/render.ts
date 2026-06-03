@@ -2,6 +2,7 @@ import type { Camera, Vec2 } from './camera';
 import { type CircuitNode, type NodeType, nodeSize, pinLabel, pinWorldPos } from './model';
 import type { CircuitStore } from './store';
 import { type SignalState, pinKey } from './simulator';
+import { hasOverline, removeOverline } from './overline';
 
 /** Raio do pino, em unidades de mundo. */
 export const PIN_RADIUS = 7;
@@ -67,6 +68,40 @@ function roundedRect(
   ctx.roundRect(x, y, w, h, radius);
 }
 
+/**
+ * Desenha um rótulo (já com a fonte/cor/baseline configuradas) tratando a barra
+ * superior como uma **linha contínua** sobre toda a palavra: as marcas U+0305 na
+ * string são removidas e, no lugar, traça-se um único segmento. Trunca para
+ * caber em `maxWidth`. `x` é interpretado conforme `align`.
+ */
+function drawLabel(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  align: 'left' | 'center' | 'right',
+  maxWidth: number,
+  fontPx: number,
+): void {
+  const overlined = hasOverline(text);
+  const base = fitText(ctx, removeOverline(text), maxWidth);
+  if (!base) return;
+  ctx.textAlign = align;
+  ctx.fillText(base, x, y);
+  if (!overlined) return;
+  const width = ctx.measureText(base).width;
+  const x1 = align === 'left' ? x : align === 'right' ? x - width : x - width / 2;
+  const barY = y - fontPx * 0.52;
+  ctx.save();
+  ctx.strokeStyle = ctx.fillStyle;
+  ctx.lineWidth = Math.max(1, fontPx * 0.09);
+  ctx.beginPath();
+  ctx.moveTo(x1, barY);
+  ctx.lineTo(x1 + width, barY);
+  ctx.stroke();
+  ctx.restore();
+}
+
 /** Rótulo central exibido em cada tipo de nó. */
 function nodeLabel(node: CircuitNode): string {
   switch (node.type) {
@@ -103,7 +138,7 @@ function pinLabelReserve(
   for (const pin of node.pins) {
     if (pin.kind !== kind) continue;
     const label = pinLabel(node, pin);
-    if (label) maxW = Math.max(maxW, ctx.measureText(label).width);
+    if (label) maxW = Math.max(maxW, ctx.measureText(removeOverline(label)).width);
   }
   return maxW > 0 ? maxW + gap + 4 * cam.zoom : 0;
 }
@@ -124,19 +159,18 @@ function drawPinLabels(
 ): void {
   if (inReserve <= 0 && outReserve <= 0) return;
   const gap = (PIN_RADIUS + 3) * cam.zoom;
+  const fontPx = pinLabelFontPx(cam);
   ctx.fillStyle = COLOR.pinLabel;
-  ctx.font = `${pinLabelFontPx(cam)}px system-ui, sans-serif`;
+  ctx.font = `${fontPx}px system-ui, sans-serif`;
   ctx.textBaseline = 'middle';
   for (const pin of node.pins) {
     const label = pinLabel(node, pin);
     if (!label) continue;
     const p = cam.worldToScreen(pinWorldPos(node, pin));
     if (pin.kind === 'in') {
-      ctx.textAlign = 'left';
-      ctx.fillText(fitText(ctx, label, inReserve), p.x + gap, p.y);
+      drawLabel(ctx, label, p.x + gap, p.y, 'left', inReserve, fontPx);
     } else {
-      ctx.textAlign = 'right';
-      ctx.fillText(fitText(ctx, label, outReserve), p.x - gap, p.y);
+      drawLabel(ctx, label, p.x - gap, p.y, 'right', outReserve, fontPx);
     }
   }
 }
@@ -187,13 +221,13 @@ export function drawNode(
   // Rótulo central, centrado na região livre entre as reservas (equilibrado
   // mesmo quando um lado tem rótulos mais largos que o outro).
   const label = nodeLabel(node);
+  const fontPx = Math.max(9, 12 * cam.zoom);
   ctx.fillStyle = lit && !logic ? COLOR.signalOnLabel : COLOR.label;
-  ctx.font = `${Math.max(9, 12 * cam.zoom)}px system-ui, sans-serif`;
-  ctx.textAlign = 'center';
+  ctx.font = `${fontPx}px system-ui, sans-serif`;
   ctx.textBaseline = 'middle';
   const centerX = origin.x + (leftReserve + (sw - rightReserve)) / 2;
   const centerMax = Math.max(0, sw - leftReserve - rightReserve);
-  ctx.fillText(fitText(ctx, label, centerMax), centerX, origin.y + sh / 2);
+  drawLabel(ctx, label, centerX, origin.y + sh / 2, 'center', centerMax, fontPx);
 
   // Pinos (verde quando carregam sinal ligado).
   for (const pin of node.pins) {

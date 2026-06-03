@@ -24,7 +24,7 @@ import {
 import { hitNode, hitPin, hitWire } from './hittest';
 import { type ChipResolver, type SignalState, simulate } from './simulator';
 import { validateConnection } from './connection';
-import { toggleOverline } from './overline';
+import { applyOverline, hasOverline, removeOverline } from './overline';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
 
@@ -330,11 +330,23 @@ const renameOverlineBtn = document.querySelector<HTMLButtonElement>('#rename-ove
 
 /** Id do nó em edição, ou `null` se o overlay está fechado. */
 let renameNodeId: string | null = null;
+/** Estado do botão de barra superior para a edição atual. */
+let renameOverlined = false;
+
+/** Reflete o estado de barra superior no campo (linha contínua via CSS). */
+function setRenameOverlined(on: boolean): void {
+  renameOverlined = on;
+  renameInput.classList.toggle('overlined', on);
+}
 
 /** Abre o overlay de renomear posicionado sobre o topo do nó I/O dado. */
 function openRenameOverlay(node: CircuitNode): void {
   renameNodeId = node.id;
-  renameInput.value = node.name ?? '';
+  // O nome é editado como texto puro; a barra superior é um estado à parte
+  // (mostrada com text-decoration) e só é codificada na string ao gravar.
+  const current = node.name ?? '';
+  setRenameOverlined(hasOverline(current));
+  renameInput.value = removeOverline(current);
   const { w, h } = nodeSize(node);
   const rect = canvas!.getBoundingClientRect();
   // Por padrão flutua acima do nó; se houver pouco espaço no topo, cai abaixo
@@ -346,9 +358,7 @@ function openRenameOverlay(node: CircuitNode): void {
     : above;
   renameOverlay.style.left = `${rect.left + anchor.x}px`;
   renameOverlay.style.top = `${rect.top + anchor.y}px`;
-  renameOverlay.style.transform = flipBelow
-    ? 'translate(-50%, 20%)'
-    : 'translate(-50%, -120%)';
+  renameOverlay.style.transform = flipBelow ? 'translate(-50%, 20%)' : 'translate(-50%, -120%)';
   renameOverlay.hidden = false;
   renameInput.focus();
   renameInput.select();
@@ -359,9 +369,12 @@ function closeRenameOverlay(): void {
   renameNodeId = null;
 }
 
-/** Grava o nome digitado no nó e fecha o overlay. */
+/** Grava o nome digitado no nó e fecha o overlay (codifica a barra superior). */
 function commitRename(): void {
-  if (renameNodeId) store.setNodeName(renameNodeId, renameInput.value);
+  if (renameNodeId) {
+    const value = renameOverlined ? applyOverline(renameInput.value) : renameInput.value;
+    store.setNodeName(renameNodeId, value);
+  }
   closeRenameOverlay();
 }
 
@@ -374,11 +387,11 @@ renameInput.addEventListener('keydown', (e) => {
 renameInput.addEventListener('blur', () => {
   if (!renameOverlay.hidden) commitRename();
 });
-// `pointerdown` com preventDefault aplica a barra sem roubar o foco do input
+// `pointerdown` com preventDefault alterna a barra sem roubar o foco do input
 // (evita disparar o blur e fechar o overlay no meio da edição).
 renameOverlineBtn.addEventListener('pointerdown', (e) => {
   e.preventDefault();
-  renameInput.value = toggleOverline(renameInput.value);
+  setRenameOverlined(!renameOverlined);
 });
 
 // --- Pinça (dois ponteiros) ----------------------------------------------
@@ -618,12 +631,7 @@ function render(): void {
   if (mode === 'wire' && wireStart) {
     const start = store.pinPos(wireStart);
     if (start) {
-      drawGhostWire(
-        ctx!,
-        camera.worldToScreen(start),
-        camera.worldToScreen(ghostEnd),
-        ghostValid,
-      );
+      drawGhostWire(ctx!, camera.worldToScreen(start), camera.worldToScreen(ghostEnd), ghostValid);
     }
   }
 
