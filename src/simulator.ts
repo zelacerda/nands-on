@@ -1,4 +1,4 @@
-import type { CircuitNode, CircuitState } from './model';
+import type { CircuitNode, CircuitState, Wire } from './model';
 
 /**
  * Resultado de uma avaliação do circuito. Os valores são indexados por chaves
@@ -21,14 +21,21 @@ export function pinKey(nodeId: string, pinId: string): string {
 export type ChipResolver = (node: CircuitNode) => CircuitState | undefined;
 
 /**
- * Avalia um circuito de forma combinacional. Os nós `input` fornecem seu
- * `value` como fonte; a NAND calcula `!(in0 && in1)`; os fios transportam o
- * valor do pino de saída para o de entrada. A propagação é iterativa
- * (relaxação) até estabilizar, com um teto de iterações que garante término
- * mesmo na presença de ciclos (fora de escopo, mas defensivo).
+ * Avalia um circuito. Os nós `input` fornecem seu `value` como fonte; a NAND
+ * calcula `!(in0 && in1)`; os fios transportam o valor do pino de saída para o
+ * de entrada. A propagação é iterativa (relaxação) até estabilizar.
+ *
+ * Suporta circuitos sequenciais com realimentação (ex.: SR Latch): o estado
+ * anterior (`prev`) é preservado entre avaliações, dando ao circuito uma
+ * memória de runtime. Para circuitos puramente combinacionais, `prev` é
+ * irrelevante — o resultado depende apenas das entradas.
  */
-export function simulate(state: CircuitState, resolveChip?: ChipResolver): SignalState {
-  return simulateWith(state, (node) => node.value === true, resolveChip);
+export function simulate(
+  state: CircuitState,
+  resolveChip?: ChipResolver,
+  prev?: SignalState,
+): SignalState {
+  return simulateWith(state, (node) => node.value === true, resolveChip, prev);
 }
 
 /**
@@ -39,10 +46,16 @@ function simulateWith(
   state: CircuitState,
   inputValueOf: (node: CircuitNode) => boolean,
   resolveChip?: ChipResolver,
+  prev?: SignalState,
 ): SignalState {
+  // Inicializa cada pino com seu valor anterior (memória), ou `false` quando o
+  // nó/pino é novo. É o que permite a um latch manter o estado entre frames.
   const pinValues = new Map<string, boolean>();
   for (const node of state.nodes) {
-    for (const pin of node.pins) pinValues.set(pinKey(node.id, pin.id), false);
+    for (const pin of node.pins) {
+      const key = pinKey(node.id, pin.id);
+      pinValues.set(key, prev?.pinValues.get(key) ?? false);
+    }
   }
 
   const getPin = (nodeId: string, pinId: string): boolean =>
@@ -54,20 +67,30 @@ function simulateWith(
     return changed;
   };
 
-  // Teto de iterações proporcional à profundidade máxima possível do circuito.
+  // Fios indexados pelo nó de origem, para propagar logo após computar o nó.
+  const wiresFrom = new Map<string, Wire[]>();
+  for (const wire of state.wires) {
+    const list = wiresFrom.get(wire.from.nodeId);
+    if (list) list.push(wire);
+    else wiresFrom.set(wire.from.nodeId, [wire]);
+  }
+
+  // Teto de iterações proporcional ao tamanho do circuito; garante término
+  // mesmo num estado metaestável (oscilação física, ex.: latch em S=R=1→0,0).
   const maxIter = state.nodes.length + 2;
   for (let iter = 0; iter < maxIter; iter++) {
     let changed = false;
 
-    // 1. Recalcula os pinos de saída de cada nó a partir das suas entradas.
+    // Avalia cada nó e propaga suas saídas imediatamente pelos fios que partem
+    // dele. Essa atualização entrelaçada (em vez de "todas as saídas, depois
+    // todos os fios") cria a assimetria que faz a realimentação convergir a um
+    // estado estável, em vez de oscilar.
     for (const node of state.nodes) {
       changed = computeNodeOutputs(node, getPin, setPin, inputValueOf, resolveChip) || changed;
-    }
-
-    // 2. Propaga: cada pino de entrada recebe o valor do pino de saída ligado.
-    for (const wire of state.wires) {
-      const v = getPin(wire.from.nodeId, wire.from.pinId);
-      changed = setPin(wire.to.nodeId, wire.to.pinId, v) || changed;
+      for (const wire of wiresFrom.get(node.id) ?? []) {
+        const v = getPin(wire.from.nodeId, wire.from.pinId);
+        changed = setPin(wire.to.nodeId, wire.to.pinId, v) || changed;
+      }
     }
 
     if (!changed) break;

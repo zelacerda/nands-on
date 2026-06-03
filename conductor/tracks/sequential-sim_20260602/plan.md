@@ -44,20 +44,20 @@ próximo estado a partir do anterior.
 
 ### Tasks
 
-- [ ] Task 2.1: Introduzir um estado de simulação persistente (ex.: a própria
+- [x] Task 2.1: Introduzir um estado de simulação persistente (ex.: a própria
       `SignalState` reutilizada) que `simulate` recebe e retorna, em vez de
       recriar todos os pinos em `false`.
-- [ ] Task 2.2: Alterar a avaliação para o modelo de atraso de propagação — o
+- [x] Task 2.2: Alterar a avaliação para o modelo de atraso de propagação — o
       próximo valor de cada saída/fio é computado a partir do estado do frame
       anterior, eliminando a oscilação por atualização paralela.
-- [ ] Task 2.3: Ajustar a inicialização de estado para novos nós/fios (entram
+- [x] Task 2.3: Ajustar a inicialização de estado para novos nós/fios (entram
       em `false`) preservando o estado dos já existentes entre avaliações.
-- [ ] Task 2.4: Remover/atualizar o `maxIter` e o comentário "ciclos fora de
+- [x] Task 2.4: Remover/atualizar o `maxIter` e o comentário "ciclos fora de
       escopo" (`simulator.ts:28,58`), já que realimentação passa a ser suportada.
 
 ### Verification
 
-- [ ] Testes do SR Latch (Phase 1) passam; testes combinacionais seguem verdes.
+- [x] Testes do SR Latch (Phase 1) passam; testes combinacionais seguem verdes.
 
 ## Phase 3: Recursão de chips com estado
 
