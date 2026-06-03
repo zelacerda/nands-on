@@ -10,6 +10,12 @@ export interface SignalState {
   pinValues: Map<string, boolean>;
   /** Valor booleano transportado por cada fio, por id de fio. */
   wireValues: Map<string, boolean>;
+  /**
+   * Estado interno de cada instância de chip, por id do nó instância. Preserva
+   * a memória de runtime de chips que contêm realimentação (ex.: um latch
+   * encapsulado), permitindo que o estado interno persista entre avaliações.
+   */
+  chipStates: Map<string, SignalState>;
 }
 
 /** Chave estável de um pino para indexar valores de sinal. */
@@ -75,6 +81,9 @@ function simulateWith(
     else wiresFrom.set(wire.from.nodeId, [wire]);
   }
 
+  // Estado interno acumulado de cada instância de chip neste frame.
+  const chipStates = new Map<string, SignalState>();
+
   // Teto de iterações proporcional ao tamanho do circuito; garante término
   // mesmo num estado metaestável (oscilação física, ex.: latch em S=R=1→0,0).
   const maxIter = state.nodes.length + 2;
@@ -86,7 +95,9 @@ function simulateWith(
     // todos os fios") cria a assimetria que faz a realimentação convergir a um
     // estado estável, em vez de oscilar.
     for (const node of state.nodes) {
-      changed = computeNodeOutputs(node, getPin, setPin, inputValueOf, resolveChip) || changed;
+      changed =
+        computeNodeOutputs(node, getPin, setPin, inputValueOf, resolveChip, prev, chipStates) ||
+        changed;
       for (const wire of wiresFrom.get(node.id) ?? []) {
         const v = getPin(wire.from.nodeId, wire.from.pinId);
         changed = setPin(wire.to.nodeId, wire.to.pinId, v) || changed;
@@ -101,7 +112,7 @@ function simulateWith(
     wireValues.set(wire.id, getPin(wire.from.nodeId, wire.from.pinId));
   }
 
-  return { pinValues, wireValues };
+  return { pinValues, wireValues, chipStates };
 }
 
 /** Escreve os pinos de saída de um nó a partir dos seus pinos de entrada. */
@@ -110,7 +121,9 @@ function computeNodeOutputs(
   getPin: (nodeId: string, pinId: string) => boolean,
   setPin: (nodeId: string, pinId: string, v: boolean) => boolean,
   inputValueOf: (node: CircuitNode) => boolean,
-  resolveChip?: ChipResolver,
+  resolveChip: ChipResolver | undefined,
+  prev: SignalState | undefined,
+  chipStates: Map<string, SignalState>,
 ): boolean {
   switch (node.type) {
     case 'input':
@@ -122,7 +135,7 @@ function computeNodeOutputs(
       return setPin(node.id, 'out', out);
     }
     case 'chip':
-      return computeChipOutputs(node, getPin, setPin, resolveChip);
+      return computeChipOutputs(node, getPin, setPin, resolveChip, prev, chipStates);
   }
 }
 
@@ -136,7 +149,9 @@ function computeChipOutputs(
   node: CircuitNode,
   getPin: (nodeId: string, pinId: string) => boolean,
   setPin: (nodeId: string, pinId: string, v: boolean) => boolean,
-  resolveChip?: ChipResolver,
+  resolveChip: ChipResolver | undefined,
+  prev: SignalState | undefined,
+  chipStates: Map<string, SignalState>,
 ): boolean {
   const internal = resolveChip?.(node);
   if (!internal) return false;
@@ -153,7 +168,16 @@ function computeChipOutputs(
     inputValues.set(inNode.id, pin ? getPin(node.id, pin.id) : false);
   });
 
-  const result = simulateWith(internal, (n) => inputValues.get(n.id) === true, resolveChip);
+  // Continua do estado interno já computado neste frame, ou — na primeira vez —
+  // do estado do frame anterior, preservando a memória de latches internos.
+  const innerPrev = chipStates.get(node.id) ?? prev?.chipStates.get(node.id);
+  const result = simulateWith(
+    internal,
+    (n) => inputValues.get(n.id) === true,
+    resolveChip,
+    innerPrev,
+  );
+  chipStates.set(node.id, result);
 
   // Mapeia as saídas internas para os pinos externos `out` na mesma ordem.
   const externalOuts = node.pins.filter((p) => p.kind === 'out');

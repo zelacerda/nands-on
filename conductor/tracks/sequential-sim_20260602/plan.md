@@ -66,15 +66,15 @@ memória entre frames.
 
 ### Tasks
 
-- [ ] Task 3.1: Em `computeChipOutputs`, preservar o estado interno de cada
+- [x] Task 3.1: Em `computeChipOutputs`, preservar o estado interno de cada
       instância de chip entre avaliações (chave por id do nó instância), em vez
       de simular o interior do zero a cada frame.
-- [ ] Task 3.2: Confirmar que o teste de realimentação em chip aninhado
+- [x] Task 3.2: Confirmar que o teste de realimentação em chip aninhado
       (Task 1.4) passa.
 
 ### Verification
 
-- [ ] `npm test` totalmente verde; chip aninhado com latch interno funciona.
+- [x] `npm test` totalmente verde; chip aninhado com latch interno funciona.
 
 ## Phase 4: Integração com o loop de render e verificação manual
 
