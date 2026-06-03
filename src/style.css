@@ -184,3 +184,49 @@ body {
   background: #9ece6a;
   border-color: transparent;
 }
+
+/* Overlay de renomear entrada/saída (flutua sobre o nó no canvas). */
+#rename-overlay {
+  position: fixed;
+  /* Posicionado em (left, top) sobre o centro do topo do nó; sobe para não
+     cobrir o componente nem ser tapado pelo dedo. */
+  transform: translate(-50%, -120%);
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: #272b33;
+  border: 1px solid #3a3f4a;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+#rename-overlay[hidden] {
+  display: none;
+}
+
+#rename-input {
+  font: 15px system-ui, sans-serif;
+  color: #d8dee9;
+  background: #1a1d23;
+  border: 1px solid #4a525e;
+  border-radius: 6px;
+  padding: 8px 10px;
+  width: 120px;
+}
+
+#rename-overline {
+  font: 600 15px system-ui, sans-serif;
+  color: #d8dee9;
+  background: #353b45;
+  border: 1px solid #4a525e;
+  border-radius: 6px;
+  padding: 0 12px;
+  min-width: 40px;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+#rename-overline:hover {
+  background: #3f4651;
+}

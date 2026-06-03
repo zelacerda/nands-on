@@ -56,18 +56,18 @@ Editar o nome dos nós input/output via overlay.
 
 ### Tasks
 
-- [ ] Task 3.1: Detectar duplo clique sobre nó `input`/`output` em `main.ts` (via `dblclick`
+- [x] Task 3.1: Detectar duplo clique sobre nó `input`/`output` em `main.ts` (via `dblclick`
   ou detecção de toque duplo), usando `hitNode`.
-- [ ] Task 3.2: Exibir overlay HTML `<input>` posicionado sobre o nó (screen coords da
+- [x] Task 3.2: Exibir overlay HTML `<input>` posicionado sobre o nó (screen coords da
   câmera), reaproveitando o padrão do diálogo "Fazer".
-- [ ] Task 3.3: Confirmar (Enter/blur) grava o nome no nó; Esc cancela. Funciona com mouse e
+- [x] Task 3.3: Confirmar (Enter/blur) grava o nome no nó; Esc cancela. Funciona com mouse e
   toque.
-- [ ] Task 3.4: Adicionar botão auxiliar de barra superior que aplica/remove U+0305 sobre o
+- [x] Task 3.4: Adicionar botão auxiliar de barra superior que aplica/remove U+0305 sobre o
   texto do campo.
 
 ### Verification
 
-- [ ] Validação manual do usuário no servidor: duplo clique renomeia o nó; o nome aparece no
+- [~] Validação manual do usuário no servidor: duplo clique renomeia o nó; o nome aparece no
   chip ao "Fazer"; botão de overline produz `Q̄`.
 
 ## Phase 4: Polish e Verificação Final

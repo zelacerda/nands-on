@@ -107,6 +107,17 @@ export class CircuitStore {
     if (node && node.type === 'input') node.value = value;
   }
 
+  /**
+   * Define o nome (rótulo) de um nó `input`/`output`. Nome vazio (após trim)
+   * remove o nome, voltando ao rótulo padrão. No-op para outros tipos de nó.
+   */
+  setNodeName(nodeId: string, name: string): void {
+    const node = this.nodes.get(nodeId);
+    if (node && (node.type === 'input' || node.type === 'output')) {
+      node.name = name.trim() || undefined;
+    }
+  }
+
   getPin(ref: PinRef): Pin | undefined {
     return this.nodes.get(ref.nodeId)?.pins.find((p) => p.id === ref.pinId);
   }

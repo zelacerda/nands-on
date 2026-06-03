@@ -24,6 +24,7 @@ import {
 import { hitNode, hitPin, hitWire } from './hittest';
 import { type ChipResolver, type SignalState, simulate } from './simulator';
 import { validateConnection } from './connection';
+import { toggleOverline } from './overline';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
 
@@ -75,6 +76,12 @@ let pinchPrev: PinchSample | null = null;
  * apenas movê-lo/selecioná-lo.
  */
 let toggleCandidateId: string | null = null;
+/** Último toque simples sobre um nó, para detectar duplo clique/toque. */
+let lastTap: { time: number; pos: Vec2; nodeId: string } | null = null;
+
+/** Janela (ms) e folga (px de tela) para caracterizar um toque/clique duplo. */
+const DOUBLE_TAP_MS = 350;
+const DOUBLE_TAP_DIST = 24;
 
 /** Folga de acerto, em px de tela, maior para toque. */
 function hitPx(pointerType: string): number {
@@ -306,6 +313,56 @@ nameInput.addEventListener('keydown', (e) => {
   else if (e.key === 'Escape') closeNameDialog();
 });
 
+// --- Renomear entrada/saída (duplo clique / toque duplo) -----------------
+
+const renameOverlay = document.querySelector<HTMLDivElement>('#rename-overlay')!;
+const renameInput = document.querySelector<HTMLInputElement>('#rename-input')!;
+const renameOverlineBtn = document.querySelector<HTMLButtonElement>('#rename-overline')!;
+
+/** Id do nó em edição, ou `null` se o overlay está fechado. */
+let renameNodeId: string | null = null;
+
+/** Abre o overlay de renomear posicionado sobre o topo do nó I/O dado. */
+function openRenameOverlay(node: CircuitNode): void {
+  renameNodeId = node.id;
+  renameInput.value = node.name ?? '';
+  const { w } = nodeSize(node);
+  const top = camera.worldToScreen({ x: node.pos.x + w / 2, y: node.pos.y });
+  const rect = canvas!.getBoundingClientRect();
+  renameOverlay.style.left = `${rect.left + top.x}px`;
+  renameOverlay.style.top = `${rect.top + top.y}px`;
+  renameOverlay.hidden = false;
+  renameInput.focus();
+  renameInput.select();
+}
+
+function closeRenameOverlay(): void {
+  renameOverlay.hidden = true;
+  renameNodeId = null;
+}
+
+/** Grava o nome digitado no nó e fecha o overlay. */
+function commitRename(): void {
+  if (renameNodeId) store.setNodeName(renameNodeId, renameInput.value);
+  closeRenameOverlay();
+}
+
+renameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') commitRename();
+  else if (e.key === 'Escape') closeRenameOverlay();
+});
+// Sair do campo (tocar fora, etc.) confirma o nome — exceto se já foi fechado
+// por Enter/Esc (overlay oculto).
+renameInput.addEventListener('blur', () => {
+  if (!renameOverlay.hidden) commitRename();
+});
+// `pointerdown` com preventDefault aplica a barra sem roubar o foco do input
+// (evita disparar o blur e fechar o overlay no meio da edição).
+renameOverlineBtn.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  renameInput.value = toggleOverline(renameInput.value);
+});
+
 // --- Pinça (dois ponteiros) ----------------------------------------------
 
 function beginPinch(): void {
@@ -420,9 +477,27 @@ function endPointer(e: PointerEvent): void {
       const res = validateConnection(store, wireStart, target);
       if (res.ok) store.addWire(res.from, res.to);
     }
-  } else if (mode === 'dragNode' && toggleCandidateId) {
-    // Soltar sem arrastar sobre um input já selecionado: alterna o estado.
-    if (!isDrag(lastPointer, pointerScreen(e))) store.toggleNodeValue(toggleCandidateId);
+  } else if (mode === 'dragNode' && dragNodeId) {
+    const up = pointerScreen(e);
+    // Só conta como toque (não arrasto) se o ponteiro mal se moveu.
+    if (!isDrag(lastPointer, up)) {
+      const now = performance.now();
+      const isDouble =
+        lastTap !== null &&
+        lastTap.nodeId === dragNodeId &&
+        now - lastTap.time <= DOUBLE_TAP_MS &&
+        Math.hypot(up.x - lastTap.pos.x, up.y - lastTap.pos.y) <= DOUBLE_TAP_DIST;
+      if (isDouble) {
+        // Duplo toque sobre entrada/saída: abre a edição de nome (sem alternar valor).
+        lastTap = null;
+        const node = store.getNode(dragNodeId);
+        if (node && (node.type === 'input' || node.type === 'output')) openRenameOverlay(node);
+      } else {
+        lastTap = { time: now, pos: up, nodeId: dragNodeId };
+        // Toque simples sobre um input já selecionado alterna o estado.
+        if (toggleCandidateId) store.toggleNodeValue(toggleCandidateId);
+      }
+    }
   }
 
   pointers.delete(e.pointerId);
