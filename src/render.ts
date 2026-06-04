@@ -24,7 +24,10 @@ const COLOR = {
 
 /** Verdadeiro se o nó deve aparecer "aceso" segundo o estado de sinal. */
 function nodeLit(node: CircuitNode, signal: SignalState): boolean {
-  if (node.type === 'input') return signal.pinValues.get(pinKey(node.id, 'out')) ?? false;
+  // Entrada e clock acendem pelo seu pino de saída; saída, pelo de entrada.
+  if (node.type === 'input' || node.type === 'clock') {
+    return signal.pinValues.get(pinKey(node.id, 'out')) ?? false;
+  }
   if (node.type === 'output') return signal.pinValues.get(pinKey(node.id, 'in')) ?? false;
   return false;
 }
@@ -94,6 +97,8 @@ function nodeLabel(node: CircuitNode): string {
       return node.name ?? 'IN';
     case 'output':
       return node.name ?? 'OUT';
+    case 'clock':
+      return 'CLK';
     case 'chip':
       return node.name ?? 'CHIP';
   }
