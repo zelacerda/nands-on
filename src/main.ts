@@ -82,7 +82,7 @@ let pinchPrev: PinchSample | null = null;
  */
 let toggleCandidateId: string | null = null;
 /** Último toque simples sobre um nó, para detectar duplo clique/toque. */
-let lastTap: { time: number; pos: Vec2; nodeId: string } | null = null;
+let lastTap: { time: number; pos: Vec2; nodeId: string; toggled: boolean } | null = null;
 
 /** Janela (ms) e folga (px de tela) para caracterizar um toque/clique duplo. */
 const DOUBLE_TAP_MS = 350;
@@ -509,7 +509,8 @@ function openRenameOverlay(node: CircuitNode): void {
   renameOverlay.style.top = `${rect.top + anchor.y}px`;
   renameOverlay.style.transform = flipBelow ? 'translate(-50%, 20%)' : 'translate(-50%, -120%)';
   renameOverlay.hidden = false;
-  renameInput.focus();
+  // `preventScroll` evita o salto da viewport ao focar perto do teclado virtual.
+  renameInput.focus({ preventScroll: true });
   renameInput.select();
 }
 
@@ -643,6 +644,12 @@ canvas.addEventListener('pointermove', (e) => {
 });
 
 function endPointer(e: PointerEvent): void {
+  // Libera a captura do ponteiro antes de qualquer foco programático: no touch, o
+  // teclado virtual só abre se o canvas não estiver mais capturando este ponteiro.
+  if (canvas!.hasPointerCapture(e.pointerId)) {
+    canvas!.releasePointerCapture(e.pointerId);
+  }
+
   if (mode === 'wire' && wireStart) {
     const world = camera.screenToWorld(pointerScreen(e));
     const target = hitPin(store, world, worldTol(hitPx(e.pointerType)));
@@ -661,22 +668,29 @@ function endPointer(e: PointerEvent): void {
         now - lastTap.time <= DOUBLE_TAP_MS &&
         Math.hypot(up.x - lastTap.pos.x, up.y - lastTap.pos.y) <= DOUBLE_TAP_DIST;
       if (isDouble) {
-        // Duplo toque sobre entrada/saída: abre a edição de nome (sem alternar valor).
+        // Duplo toque sobre entrada/saída: abre a edição in-place do rótulo. A
+        // intenção é editar, não alternar — então desfaz o toggle que o 1º toque
+        // tenha aplicado a um input já selecionado.
+        const wasToggled = lastTap?.toggled ?? false;
         lastTap = null;
         const node = store.getNode(dragNodeId);
-        if (node && (node.type === 'input' || node.type === 'output')) openRenameOverlay(node);
+        if (node && (node.type === 'input' || node.type === 'output')) {
+          if (wasToggled && node.type === 'input') store.toggleNodeValue(node.id);
+          openRenameOverlay(node);
+        }
       } else {
-        lastTap = { time: now, pos: up, nodeId: dragNodeId };
         // Toque simples sobre um input já selecionado alterna o estado.
-        if (toggleCandidateId) store.toggleNodeValue(toggleCandidateId);
+        let toggled = false;
+        if (toggleCandidateId) {
+          store.toggleNodeValue(toggleCandidateId);
+          toggled = true;
+        }
+        lastTap = { time: now, pos: up, nodeId: dragNodeId, toggled };
       }
     }
   }
 
   pointers.delete(e.pointerId);
-  if (canvas!.hasPointerCapture(e.pointerId)) {
-    canvas!.releasePointerCapture(e.pointerId);
-  }
 
   if (mode === 'pinch' && pointers.size < 2) {
     // Sai da pinça; não retoma pan com o dedo restante para evitar saltos.

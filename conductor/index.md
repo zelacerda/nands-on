@@ -20,6 +20,7 @@ Hub de navegação para o contexto do projeto.
 - [Renomear Entradas/Saídas e Rótulos de Pinos](./tracks/rename-io_20260602/index.md) — `rename-io_20260602` (complete)
 - [Persistência Local e Edição de Chips](./tracks/persist-edit-chips_20260604/index.md) — `persist-edit-chips_20260604` (complete)
 - [Tradução da Interface para Inglês (com base p/ i18n)](./tracks/translate-ui_20260604/index.md) — `translate-ui_20260604` (complete)
+- [Edição In-Place de Rótulos (I/O e Chips) e Correção no Touch](./tracks/touch-inline-edit_20260604/index.md) — `touch-inline-edit_20260604` (pending)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 

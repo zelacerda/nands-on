@@ -1,0 +1,18 @@
+{
+  "id": "touch-inline-edit_20260604",
+  "title": "Edição In-Place de Rótulos (I/O e Chips) e Correção no Touch",
+  "type": "bug",
+  "status": "in_progress",
+  "created": "2026-06-04T00:00:00Z",
+  "updated": "2026-06-04T15:00:00Z",
+  "current_phase": 1,
+  "current_task": "1.1",
+  "phases": {
+    "total": 4,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 12,
+    "completed": 0
+  }
+}
