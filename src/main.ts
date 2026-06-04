@@ -316,6 +316,7 @@ function refreshPalette(): void {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'chip-btn';
+    btn.dataset.chipId = def.id;
     btn.textContent = def.name;
     attachPaletteDrag(btn, { kind: 'chip', def }, () => onChipTap(def, btn));
     palette.insertBefore(btn, editChipBtn);
@@ -327,42 +328,13 @@ document.querySelectorAll<HTMLButtonElement>('#palette button[data-add]').forEac
 });
 deleteBtn.addEventListener('click', deleteSelection);
 
-// --- Fluxo "Fazer": empacota o espaço em um chip nomeado -----------------
+// --- Fluxo "Make": empacota o espaço em um chip e abre a edição do nome ------
 
 const makeBtn = document.querySelector<HTMLButtonElement>('#make')!;
-const nameDialog = document.querySelector<HTMLDivElement>('#name-dialog')!;
-const nameInput = document.querySelector<HTMLInputElement>('#chip-name')!;
-const nameError = document.querySelector<HTMLParagraphElement>('#name-error')!;
-const nameConfirm = document.querySelector<HTMLButtonElement>('#name-confirm')!;
-const nameCancel = document.querySelector<HTMLButtonElement>('#name-cancel')!;
 
-/** "Fazer" só é possível com ao menos uma entrada e uma saída no espaço. */
+/** "Make" só é possível com ao menos uma entrada e uma saída no espaço. */
 function canMake(): boolean {
   return store.countByType('input') >= 1 && store.countByType('output') >= 1;
-}
-
-/**
- * O diálogo de nome serve tanto para **criar** um chip (fluxo "Fazer") quanto
- * para **renomear** um chip existente (duplo clique na paleta). O modo decide o
- * texto pré-preenchido, o rótulo do botão e a ação ao confirmar.
- */
-type NameDialogMode = { kind: 'create' } | { kind: 'rename'; def: ChipDefinition };
-let nameDialogMode: NameDialogMode = { kind: 'create' };
-
-function openNameDialog(mode: NameDialogMode): void {
-  nameDialogMode = mode;
-  nameInput.value = mode.kind === 'rename' ? mode.def.name : '';
-  nameConfirm.textContent = t(
-    mode.kind === 'rename' ? 'nameDialog.confirmRename' : 'nameDialog.confirmCreate',
-  );
-  nameError.hidden = true;
-  nameDialog.hidden = false;
-  nameInput.focus();
-  nameInput.select();
-}
-
-function closeNameDialog(): void {
-  nameDialog.hidden = true;
 }
 
 /** Centro (mundo) da bounding box de todos os nós do espaço, ou `null` se vazio. */
@@ -396,29 +368,19 @@ function propagateChipName(defId: string, newName: string): void {
   }
 }
 
-function confirmName(): void {
-  const mode = nameDialogMode;
-  const excludeId = mode.kind === 'rename' ? mode.def.id : undefined;
-  const check = validateChipName(library, nameInput.value, excludeId);
-  if (!check.ok) {
-    nameError.textContent = check.reason;
-    nameError.hidden = false;
-    return;
-  }
+/** Primeiro nome padrão livre no formato `Chip N` (N ≥ 1). */
+function defaultChipName(): string {
+  let n = 1;
+  while (library.get(`Chip ${n}`)) n += 1;
+  return `Chip ${n}`;
+}
 
-  if (mode.kind === 'rename') {
-    // Atualiza os rótulos das instâncias antes de renomear, para que o save
-    // disparado por `rename` (onMutate) já persista as definições atualizadas.
-    propagateChipName(mode.def.id, check.name);
-    library.rename(mode.def.id, check.name);
-    refreshPalette();
-    closeNameDialog();
-    return;
-  }
-
-  // Captura o espaço como definição (preserva chips aninhados) e registra na biblioteca.
+makeBtn.addEventListener('click', () => {
+  if (!canMake()) return;
+  // Captura o espaço como definição (preserva chips aninhados) com um nome padrão
+  // e registra na biblioteca.
   const center = nodesCenter();
-  const def = captureDefinition(store.toJSON(), check.name);
+  const def = captureDefinition(store.toJSON(), defaultChipName());
   library.add(def);
   refreshPalette();
   // Substitui o espaço por uma única instância do chip criado, centrada onde os
@@ -426,17 +388,9 @@ function confirmName(): void {
   store.clear();
   if (center) addChipInstanceAt(def, center);
   setSelection(null);
-  closeNameDialog();
-}
-
-makeBtn.addEventListener('click', () => {
-  if (canMake()) openNameDialog({ kind: 'create' });
-});
-nameConfirm.addEventListener('click', confirmName);
-nameCancel.addEventListener('click', closeNameDialog);
-nameInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') confirmName();
-  else if (e.key === 'Escape') closeNameDialog();
+  // Abre a edição in-place do nome no botão recém-criado, para o usuário nomeá-lo.
+  const btn = palette.querySelector<HTMLButtonElement>(`button.chip-btn[data-chip-id="${def.id}"]`);
+  if (btn) openChipNameEdit(def, btn);
 });
 
 // --- Editar um chip existente --------------------------------------------

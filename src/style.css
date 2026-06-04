@@ -213,90 +213,11 @@ body {
   background: #45323a;
 }
 
-/* Diálogo de nomeação. */
-#name-dialog {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-#name-dialog[hidden] {
-  display: none;
-}
-
-.dialog-box {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 280px;
-  padding: 20px;
-  background: #272b33;
-  border: 1px solid #3a3f4a;
-  border-radius: 12px;
-}
-
-.dialog-box label {
-  font:
-    600 13px system-ui,
-    sans-serif;
-  color: #d8dee9;
-}
-
-.dialog-box input {
-  font:
-    15px system-ui,
-    sans-serif;
-  color: #d8dee9;
-  background: #1a1d23;
-  border: 1px solid #4a525e;
-  border-radius: 6px;
-  padding: 10px;
-}
-
-.dialog-box .error {
-  margin: 0;
-  font:
-    12px system-ui,
-    sans-serif;
-  color: #f7768e;
-}
-
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.dialog-actions button {
-  font:
-    600 13px system-ui,
-    sans-serif;
-  border-radius: 6px;
-  padding: 8px 14px;
-  min-height: 40px;
-  cursor: pointer;
-  border: 1px solid #4a525e;
-}
-
-#name-cancel {
-  color: #d8dee9;
-  background: #353b45;
-}
-
-#name-confirm {
-  color: #1a1d23;
-  background: #9ece6a;
-  border-color: transparent;
-}
-
-/* Overlay de renomear entrada/saída (flutua sobre o nó no canvas). */
+/* Editor in-place reutilizado por nós de I/O (no canvas) e chips (na paleta). */
 #rename-overlay {
   position: fixed;
-  /* Posicionado em (left, top) sobre o centro do topo do nó; sobe para não
-     cobrir o componente nem ser tapado pelo dedo. */
+  /* Posicionado em (left, top) e ancorado pelo `transform` definido em JS, conforme
+     o alvo (acima/abaixo do nó, ou abaixo do botão do chip). */
   transform: translate(-50%, -120%);
   display: flex;
   gap: 6px;

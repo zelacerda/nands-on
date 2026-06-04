@@ -31,12 +31,6 @@ export const STRINGS = {
   'editBar.cancel': 'Cancel',
   'editBar.editing': 'Editing: {name}',
 
-  // Diálogo de nome
-  'nameDialog.title': 'Component name',
-  'nameDialog.cancel': 'Cancel',
-  'nameDialog.confirmCreate': 'Create',
-  'nameDialog.confirmRename': 'Save',
-
   // Limpar banco local
   'clearDb': 'Clear DB',
   'clearDb.confirm': 'Clear the local database? All saved chips will be removed.',

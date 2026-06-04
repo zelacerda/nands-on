@@ -57,17 +57,17 @@ Criar chips já em modo de edição in-place e eliminar o `#name-dialog`.
 
 ### Tasks
 
-- [ ] Task 3.1: Gerador de nome padrão único (ex.: `Chip N`) respeitando nomes existentes.
-- [ ] Task 3.2: Fluxo "Make": capturar a definição, adicionar à biblioteca com o nome
+- [x] Task 3.1: Gerador de nome padrão único (ex.: `Chip N`) respeitando nomes existentes.
+- [x] Task 3.2: Fluxo "Make": capturar a definição, adicionar à biblioteca com o nome
       padrão e abrir a edição in-place no novo botão da paleta.
-- [ ] Task 3.3: Remover o `#name-dialog` do `index.html`, as funções
+- [x] Task 3.3: Remover o `#name-dialog` do `index.html`, as funções
       `openNameDialog`/`confirmName`/`closeNameDialog` e referências em `main.ts`.
-- [ ] Task 3.4: Remover as chaves `nameDialog.*` de `src/strings.ts` e os `data-i18n`
+- [x] Task 3.4: Remover as chaves `nameDialog.*` de `src/strings.ts` e os `data-i18n`
       correspondentes; ajustar/!remover o teste de validação de chaves se necessário.
 
 ### Verification
 
-- [ ] "Make" cria o chip e abre a edição in-place; o modal não existe mais; testes de
+- [x] "Make" cria o chip e abre a edição in-place; o modal não existe mais; testes de
       strings/HTML passando; `npm run build` limpo.
 
 ## Phase 4: Verificação final e ajustes
