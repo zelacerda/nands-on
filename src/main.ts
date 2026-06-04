@@ -765,8 +765,9 @@ function render(): void {
   }
 
   // Avalia o circuito a cada frame, reaproveitando o estado anterior para que
-  // circuitos sequenciais (com realimentação) preservem sua memória.
-  signalState = simulate(store.toJSON(), resolveChip, signalState);
+  // circuitos sequenciais (com realimentação) preservem sua memória. O instante
+  // atual alimenta os nós `clock`, que oscilam com o tempo.
+  signalState = simulate(store.toJSON(), resolveChip, signalState, performance.now());
   drawCircuit(ctx!, camera, store, signalState);
 
   // Atualiza a visibilidade do botão "Fazer" apenas quando muda. Durante a edição
