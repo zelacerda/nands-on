@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CircuitStore } from './store';
 import { captureDefinition } from './chip';
 import type { ChipDefinition } from './model';
-import { type ChipResolver, pinKey, simulate } from './simulator';
+import { CLOCK_PERIOD_MS, type ChipResolver, clockValue, pinKey, simulate } from './simulator';
 
 /** Resolver que mapeia cada nó `chip` à topologia interna da sua definição. */
 function resolverFor(...defs: ChipDefinition[]): ChipResolver {
@@ -330,5 +330,59 @@ describe('simulate — circuitos sequenciais (realimentação)', () => {
     expect(step(false, false)).toBe(true); // Hold ⇒ mantém Q=1 (memória interna do chip)
     expect(step(false, true)).toBe(false); // Reset ⇒ Q=0
     expect(step(false, false)).toBe(false); // Hold ⇒ mantém Q=0
+  });
+});
+
+describe('simulate — clock', () => {
+  const HALF = CLOCK_PERIOD_MS / 2;
+
+  it('clockValue liga na 1ª metade do período e desliga na 2ª, repetindo', () => {
+    expect(clockValue(0)).toBe(true);
+    expect(clockValue(HALF - 1)).toBe(true);
+    expect(clockValue(HALF)).toBe(false);
+    expect(clockValue(CLOCK_PERIOD_MS - 1)).toBe(false);
+    expect(clockValue(CLOCK_PERIOD_MS)).toBe(true); // novo ciclo
+  });
+
+  it('um nó clock oscila a saída conforme o instante `now`', () => {
+    const store = new CircuitStore();
+    const clk = store.addNode('clock', { x: 0, y: 0 });
+    const out = store.addNode('output', { x: 100, y: 0 });
+    store.addWire({ nodeId: clk.id, pinId: 'out' }, { nodeId: out.id, pinId: 'in' });
+
+    const at = (now: number) =>
+      simulate(store.toJSON(), undefined, undefined, now).pinValues.get(pinKey(out.id, 'in')) ??
+      false;
+
+    expect(at(0)).toBe(true);
+    expect(at(HALF - 1)).toBe(true);
+    expect(at(HALF)).toBe(false);
+    expect(at(CLOCK_PERIOD_MS - 1)).toBe(false);
+    expect(at(CLOCK_PERIOD_MS)).toBe(true);
+  });
+
+  it('um clock encapsulado dentro de um chip continua oscilando', () => {
+    // Chip sem entradas e com 1 saída, alimentada por um clock interno.
+    const inner = new CircuitStore();
+    const clk = inner.addNode('clock', { x: 0, y: 0 });
+    const o = inner.addNode('output', { x: 100, y: 0 });
+    inner.addWire({ nodeId: clk.id, pinId: 'out' }, { nodeId: o.id, pinId: 'in' });
+    const clockChip = captureDefinition(inner.toJSON(), 'CLK');
+    expect(clockChip.inputCount).toBe(0); // o clock não vira pino externo
+    expect(clockChip.outputCount).toBe(1);
+
+    const store = new CircuitStore();
+    const chip = store.addChipInstance(clockChip, { x: 0, y: 0 });
+    const out = store.addNode('output', { x: 200, y: 0 });
+    store.addWire({ nodeId: chip.id, pinId: 'out0' }, { nodeId: out.id, pinId: 'in' });
+
+    const resolve = resolverFor(clockChip);
+    const at = (now: number) =>
+      simulate(store.toJSON(), resolve, undefined, now).pinValues.get(pinKey(out.id, 'in')) ??
+      false;
+
+    expect(at(0)).toBe(true);
+    expect(at(HALF)).toBe(false);
+    expect(at(CLOCK_PERIOD_MS)).toBe(true);
   });
 });
