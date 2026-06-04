@@ -337,24 +337,6 @@ function canMake(): boolean {
   return store.countByType('input') >= 1 && store.countByType('output') >= 1;
 }
 
-/** Centro (mundo) da bounding box de todos os nós do espaço, ou `null` se vazio. */
-function nodesCenter(): Vec2 | null {
-  const nodes = store.listNodes();
-  if (nodes.length === 0) return null;
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const node of nodes) {
-    const { w, h } = nodeSize(node);
-    minX = Math.min(minX, node.pos.x);
-    minY = Math.min(minY, node.pos.y);
-    maxX = Math.max(maxX, node.pos.x + w);
-    maxY = Math.max(maxY, node.pos.y + h);
-  }
-  return { x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
-}
-
 /**
  * Propaga o novo nome de um chip para o rótulo exibido em todas as suas
  * instâncias — tanto no espaço atual quanto nas aninhadas em outras definições —
@@ -379,14 +361,12 @@ makeBtn.addEventListener('click', () => {
   if (!canMake()) return;
   // Captura o espaço como definição (preserva chips aninhados) com um nome padrão
   // e registra na biblioteca.
-  const center = nodesCenter();
   const def = captureDefinition(store.toJSON(), defaultChipName());
   library.add(def);
   refreshPalette();
-  // Substitui o espaço por uma única instância do chip criado, centrada onde os
-  // componentes originais estavam.
+  // Esvazia o espaço de trabalho: o conteúdo virou a definição do chip (na paleta).
+  // Nenhuma instância é recriada — o usuário arrasta o chip da paleta quando quiser.
   store.clear();
-  if (center) addChipInstanceAt(def, center);
   setSelection(null);
   // Abre a edição in-place do nome no botão recém-criado, para o usuário nomeá-lo.
   const btn = palette.querySelector<HTMLButtonElement>(`button.chip-btn[data-chip-id="${def.id}"]`);
