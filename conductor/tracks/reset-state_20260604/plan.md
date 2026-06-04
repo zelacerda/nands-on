@@ -3,7 +3,7 @@
 **Track ID:** reset-state_20260604
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-04
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -20,11 +20,11 @@ fazendo uma interrupção propagar até a saída — sem quebrar a memória dos 
 
 ### Tasks
 
-- [ ] Task 1.1: Em `simulator.test.ts`, escrever testes (vermelho): (a) ligar
+- [x] Task 1.1: Em `simulator.test.ts`, escrever testes (vermelho): (a) ligar
       input → output (acende), remover o fio e re-simular preservando `prev` ⇒ saída
       `false`; (b) pino de entrada de uma NAND sem fio lê `false`; (c) o SR Latch e o
       latch encapsulado continuam preservando estado (regressão).
-- [ ] Task 1.2: Em `simulateWith`, montar o conjunto de pinos de entrada conectados
+- [x] Task 1.2: Em `simulateWith`, montar o conjunto de pinos de entrada conectados
       (destinos de fio) e, na inicialização de `pinValues`, semear como `false` os
       pinos `kind === 'in'` **não** conectados; manter `prev` para os conectados e
       para os pinos de saída.
@@ -40,11 +40,11 @@ de trabalho vivo.
 
 ### Tasks
 
-- [ ] Task 2.1: Em `simulator.test.ts`/`chip.test.ts`, escrever testes (vermelho):
+- [x] Task 2.1: Em `simulator.test.ts`/`chip.test.ts`, escrever testes (vermelho):
       capturar um estado cujas entradas estão ON e/ou em modo clock ⇒ na definição,
       todo nó `input` tem `value`/`clock` indefinidos/`false`; e o estado de origem
       **não** é mutado.
-- [ ] Task 2.2: Em `captureDefinition` (`chip.ts`), clonar o estado recebido e zerar
+- [x] Task 2.2: Em `captureDefinition` (`chip.ts`), clonar o estado recebido e zerar
       `value` e `clock` de todos os nós `input` antes de derivar
       `inputCount`/`inputLabels` e de armazenar em `internal`.
 
@@ -54,11 +54,12 @@ de trabalho vivo.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos
-- [ ] Testes passando (`npm test`) e build sem erros (`npm run build`)
-- [ ] Conferência manual no app: (a) remover fio da saída a desliga; (b) reabrir um
-      chip salvo com entrada ON/CLK mostra entradas desligadas
-- [ ] Pronto para revisão
+- [x] Todos os critérios de aceitação atendidos (lógicos/de build)
+- [x] Testes passando (`npm test` — 97 testes) e build sem erros (`npm run build`)
+- [~] Conferência manual no app: (a) remover fio da saída a desliga; (b) reabrir um
+      chip salvo com entrada ON/CLK mostra entradas desligadas — recomendada via dev
+      server (`http://localhost:5174/`); extensão do browser indisponível na sessão
+- [x] Pronto para revisão
 
 ---
 
