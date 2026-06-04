@@ -1,7 +1,7 @@
 # Track: Walkthrough Interativo — Construir um NOT a partir do NAND
 
 **ID:** tutorial-not_20260604
-**Status:** Pending
+**Status:** Complete
 
 ## Documents
 
@@ -10,8 +10,8 @@
 
 ## Progress
 
-- Phases: 0/3 complete
-- Tasks: 0/9 complete
+- Phases: 3/3 complete
+- Tasks: 9/9 complete
 
 ## Quick Links
 

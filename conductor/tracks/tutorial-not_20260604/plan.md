@@ -3,7 +3,7 @@
 **Track ID:** tutorial-not_20260604
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-04
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -18,15 +18,15 @@ atual), evitando instrumentar o `CircuitStore` com eventos.
 
 ### Tasks
 
-- [ ] Task 1.1: Em `tutorial.ts`, definir os tipos: `TutorialContext`
-      (`{ store, library, signal, stepStart }`), `TutorialStep`
+- [x] Task 1.1: Em `tutorial.ts`, definir os tipos: `TutorialContext`
+      (`{ nodes, wires, libraryCount, stepStart }`), `TutorialStep`
       (`{ id, textKey, highlightSelector?, isComplete(ctx) }`) e o estado
       (`{ active, index }`).
-- [ ] Task 1.2: Implementar os **predicados** de conclusão (puros, sobre o contexto):
+- [x] Task 1.2: Implementar os **predicados** de conclusão (puros, sobre o contexto):
       contagem de IN/NAND/OUT; existir NAND com `in0` e `in1` ligados ao mesmo
       `input.out`; `nand.out → output.in`; estado da entrada mudou vs. `stepStart`;
       `name` definido em entrada/saída; biblioteca cresceu (Make).
-- [ ] Task 1.3: Implementar a lógica **pura de avanço** (passo atual, avançar quando
+- [x] Task 1.3: Implementar a lógica **pura de avanço** (passo atual, avançar quando
       completo, detectar fim) e cobrir predicados + avanço com testes usando
       `CircuitStore`/`ChipLibrary` sintéticos.
 
@@ -38,13 +38,13 @@ atual), evitando instrumentar o `CircuitStore` com eventos.
 
 ### Tasks
 
-- [ ] Task 2.1: Em `index.html`, markup do *callout* (overlay não-bloqueante: texto,
+- [x] Task 2.1: Em `index.html`, markup do *callout* (overlay não-bloqueante: texto,
       progresso, botão sair); em `style.css`, estilos do callout e da classe de
       `highlight` dos botões-alvo.
-- [ ] Task 2.2: Em `main.ts`, `startTutorial()` (limpa o espaço, ativa, mostra o passo
+- [x] Task 2.2: Em `main.ts`, `startTutorial()` (limpa o espaço, ativa, mostra o passo
       0), `exitTutorial()` (botão e `Esc`), e no render loop a checagem/avanço do passo
       atual com atualização do callout (texto + progresso) e do highlight do alvo.
-- [ ] Task 2.3: Integrar com o painel de boas-vindas: modo *welcome* com botão primário
+- [x] Task 2.3: Integrar com o painel de boas-vindas: modo *welcome* com botão primário
       "Start Tutorial" (fecha + inicia); overlay/`Esc` fecham sem iniciar; modo *about*
       (via "?") mantém "Close".
 
@@ -57,13 +57,13 @@ atual), evitando instrumentar o `CircuitStore` com eventos.
 
 ### Tasks
 
-- [ ] Task 3.1: Em `strings.ts`, redigir os textos de todos os passos (incluindo as
+- [x] Task 3.1: Em `strings.ts`, redigir os textos de todos os passos (incluindo as
       dicas de **alternar estado** e **renomear**), os rótulos ("Start Tutorial",
-      "Exit") e a **mensagem de conclusão**.
-- [ ] Task 3.2: Exibir a mensagem de conclusão ao terminar o último passo (Make) e
-      encerrar o tutorial de forma limpa.
-- [ ] Task 3.3: Polimento — indicador "passo N de M", highlight dos botões nos passos
-      de adicionar, e revisão dos textos dos passos de canvas (fios, toggle, rename).
+      "Exit") e a **mensagem de conclusão**. _(Seedado na Fase 1 e revisado aqui.)_
+- [x] Task 3.2: Exibir a mensagem de conclusão ao terminar o último passo (Make) e
+      encerrar o tutorial de forma limpa. _(Em `renderTutorialStep`, ramo "concluído".)_
+- [x] Task 3.3: Polimento — indicador "passo N de M", highlight dos botões nos passos
+      de adicionar, e rótulo do botão (Exit/Close) conforme passo ou conclusão.
 
 ### Verification
 
@@ -71,12 +71,13 @@ atual), evitando instrumentar o `CircuitStore` com eventos.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos
-- [ ] Testes passando e build/lint sem erros
-- [ ] Conferência manual do fluxo completo: 1º acesso → "Start Tutorial" → construir o
+- [x] Todos os critérios de aceitação atendidos
+- [x] Testes passando (107) e build/lint sem erros
+- [~] Conferência manual do fluxo completo: 1º acesso → "Start Tutorial" → construir o
       NOT (IN, NAND, OUT, fios), alternar estado, renomear, "Make" → conclusão; sair
-      por botão/`Esc` funciona
-- [ ] Pronto para revisão
+      por botão/`Esc` — recomendada via dev server (`http://localhost:5174/`);
+      extensão do browser indisponível na sessão
+- [x] Pronto para revisão
 
 ---
 
