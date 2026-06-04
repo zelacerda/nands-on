@@ -1,0 +1,18 @@
+{
+  "id": "reset-state_20260604",
+  "title": "Zerar Estados de Entrada ao Salvar Chip e Desligar Saídas Sem Conexão",
+  "type": "bug",
+  "status": "in_progress",
+  "created": "2026-06-04T19:10:16Z",
+  "updated": "2026-06-04T19:10:16Z",
+  "current_phase": 1,
+  "current_task": "1.1",
+  "phases": {
+    "total": 2,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 4,
+    "completed": 0
+  }
+}

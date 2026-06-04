@@ -12,5 +12,6 @@
 | [x] | translate-ui_20260604 | Tradução da Interface para Inglês (com base p/ i18n) | 2026-06-04 | 2026-06-04 |
 | [x] | touch-inline-edit_20260604 | Edição In-Place de Rótulos (I/O e Chips) e Correção no Touch | 2026-06-04 | 2026-06-04 |
 | [x] | clock-input_20260604 | Entrada de Clock (CLK) e Botões de I/O Circulares | 2026-06-04 | 2026-06-04 |
+| [~] | reset-state_20260604 | Zerar Estados de Entrada ao Salvar Chip e Desligar Saídas Sem Conexão | 2026-06-04 | 2026-06-04 |
 
 <!-- Tracks registrados por /conductor:new-track -->
