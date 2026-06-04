@@ -23,6 +23,21 @@ export function pinKey(nodeId: string, pinId: string): string {
   return `${nodeId}:${pinId}`;
 }
 
+/**
+ * Período do ciclo de clock, em ms. Fixo nesta versão (1s: 0,5s ligado, 0,5s
+ * desligado); ponto único a alterar quando o intervalo virar configurável.
+ */
+export const CLOCK_PERIOD_MS = 1000;
+
+/**
+ * Estado (ligado/desligado) de um clock no instante `now` (ms). Liga na primeira
+ * metade do período e desliga na segunda. A fase deriva do tempo absoluto, então
+ * todos os clocks ficam em sincronia.
+ */
+export function clockValue(now: number): boolean {
+  return Math.floor(now / (CLOCK_PERIOD_MS / 2)) % 2 === 0;
+}
+
 /** Resolve a topologia interna de um chip a partir do nó instância (via `defId`). */
 export type ChipResolver = (node: CircuitNode) => CircuitState | undefined;
 
@@ -35,13 +50,17 @@ export type ChipResolver = (node: CircuitNode) => CircuitState | undefined;
  * anterior (`prev`) é preservado entre avaliações, dando ao circuito uma
  * memória de runtime. Para circuitos puramente combinacionais, `prev` é
  * irrelevante — o resultado depende apenas das entradas.
+ *
+ * `now` (ms) é o instante da avaliação, usado pelos nós `clock` para oscilar com
+ * o tempo. Padrão `0` para chamadas combinacionais/sem clock (ex.: testes).
  */
 export function simulate(
   state: CircuitState,
   resolveChip?: ChipResolver,
   prev?: SignalState,
+  now = 0,
 ): SignalState {
-  return simulateWith(state, (node) => node.value === true, resolveChip, prev);
+  return simulateWith(state, (node) => node.value === true, resolveChip, prev, now);
 }
 
 /**
@@ -53,6 +72,7 @@ function simulateWith(
   inputValueOf: (node: CircuitNode) => boolean,
   resolveChip?: ChipResolver,
   prev?: SignalState,
+  now = 0,
 ): SignalState {
   // Inicializa cada pino com seu valor anterior (memória), ou `false` quando o
   // nó/pino é novo. É o que permite a um latch manter o estado entre frames.
@@ -96,8 +116,16 @@ function simulateWith(
     // estado estável, em vez de oscilar.
     for (const node of state.nodes) {
       changed =
-        computeNodeOutputs(node, getPin, setPin, inputValueOf, resolveChip, prev, chipStates) ||
-        changed;
+        computeNodeOutputs(
+          node,
+          getPin,
+          setPin,
+          inputValueOf,
+          resolveChip,
+          prev,
+          chipStates,
+          now,
+        ) || changed;
       for (const wire of wiresFrom.get(node.id) ?? []) {
         const v = getPin(wire.from.nodeId, wire.from.pinId);
         changed = setPin(wire.to.nodeId, wire.to.pinId, v) || changed;
@@ -124,10 +152,14 @@ function computeNodeOutputs(
   resolveChip: ChipResolver | undefined,
   prev: SignalState | undefined,
   chipStates: Map<string, SignalState>,
+  now: number,
 ): boolean {
   switch (node.type) {
     case 'input':
       return setPin(node.id, 'out', inputValueOf(node));
+    case 'clock':
+      // Fonte que oscila com o tempo, independente de fios de entrada.
+      return setPin(node.id, 'out', clockValue(now));
     case 'output':
       return false; // sem pinos de saída
     case 'nand': {
@@ -135,7 +167,7 @@ function computeNodeOutputs(
       return setPin(node.id, 'out', out);
     }
     case 'chip':
-      return computeChipOutputs(node, getPin, setPin, resolveChip, prev, chipStates);
+      return computeChipOutputs(node, getPin, setPin, resolveChip, prev, chipStates, now);
   }
 }
 
@@ -152,6 +184,7 @@ function computeChipOutputs(
   resolveChip: ChipResolver | undefined,
   prev: SignalState | undefined,
   chipStates: Map<string, SignalState>,
+  now: number,
 ): boolean {
   const internal = resolveChip?.(node);
   if (!internal) return false;
@@ -176,6 +209,7 @@ function computeChipOutputs(
     (n) => inputValues.get(n.id) === true,
     resolveChip,
     innerPrev,
+    now, // mesmo instante: clocks aninhados oscilam junto com o circuito externo
   );
   chipStates.set(node.id, result);
 
