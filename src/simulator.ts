@@ -74,13 +74,21 @@ function simulateWith(
   prev?: SignalState,
   now = 0,
 ): SignalState {
+  // Pinos de entrada que recebem um fio. Só estes preservam memória; um pino de
+  // entrada sem fio lê `false`, de modo que uma interrupção (fio removido) propague
+  // o desligamento até a saída. Os pinos realimentados de um latch continuam
+  // conectados, então sua memória — e a dos pinos de saída — é preservada.
+  const driven = new Set<string>();
+  for (const wire of state.wires) driven.add(pinKey(wire.to.nodeId, wire.to.pinId));
+
   // Inicializa cada pino com seu valor anterior (memória), ou `false` quando o
-  // nó/pino é novo. É o que permite a um latch manter o estado entre frames.
+  // nó/pino é novo (e também quando é um pino de entrada sem fio chegando).
   const pinValues = new Map<string, boolean>();
   for (const node of state.nodes) {
     for (const pin of node.pins) {
       const key = pinKey(node.id, pin.id);
-      pinValues.set(key, prev?.pinValues.get(key) ?? false);
+      const undriven = pin.kind === 'in' && !driven.has(key);
+      pinValues.set(key, undriven ? false : (prev?.pinValues.get(key) ?? false));
     }
   }
 
