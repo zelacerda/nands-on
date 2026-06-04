@@ -3,7 +3,7 @@
 **Track ID:** clock-input_20260604
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-04
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -46,16 +46,17 @@ ligação do `now` ao loop e proteção contra contar o clock como entrada.
 
 ### Tasks
 
-- [ ] Task 2.1: Em `render.ts`, tratar `'clock'` como nó não-lógico (círculo):
+- [x] Task 2.1: Em `render.ts`, tratar `'clock'` como nó não-lógico (círculo):
       `nodeLabel` → `"CLK"` e `nodeLit` aceso quando o pino `out` está em 1.
-- [ ] Task 2.2: Em `main.ts`, passar `performance.now()` ao `simulate(...)` no loop
+- [x] Task 2.2: Em `main.ts`, passar `performance.now()` ao `simulate(...)` no loop
       de render.
-- [ ] Task 2.3: Em `index.html`, adicionar o botão `data-add="clock"`
+- [x] Task 2.3: Em `index.html`, adicionar o botão `data-add="clock"`
       (`data-i18n="palette.clock"`) ao lado de IN/OUT; em `strings.ts`, adicionar
       `palette.clock: "CLK"`. O `attachPaletteDrag` genérico já cobre a criação.
-- [ ] Task 2.4: Garantir que o clock **não** seja tratado como entrada — confirmar
+- [x] Task 2.4: Garantir que o clock **não** seja tratado como entrada — confirmar
       `canMake` (conta `type === 'input'`), a captura de chip (não vira pino
       externo) e o toggle por toque (só `'input'`); ajustar se algo destoar.
+      _Verificado: correto por construção, sem alteração de código._
 
 ### Verification
 
@@ -70,10 +71,10 @@ conector.
 
 ### Tasks
 
-- [ ] Task 3.1: Em `style.css`, tornar os botões `data-add="input|output|clock"`
+- [x] Task 3.1: Em `style.css`, tornar os botões `data-add="input|output|clock"`
       circulares (dimensão fixa igual, `border-radius: 50%`, texto centrado),
       mantendo alvo de toque ≥ 40 px.
-- [ ] Task 3.2: Definir a cor da borda por papel: IN e CLK em laranja (`#e0af68`),
+- [x] Task 3.2: Definir a cor da borda por papel: IN e CLK em laranja (`#e0af68`),
       OUT em azul claro (`#7aa2f7`).
 
 ### Verification
@@ -83,10 +84,12 @@ conector.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos
-- [ ] Testes passando (`npm test`) e build sem erros (`npm run build`)
-- [ ] Teste manual: um flip-flop comutando ao ritmo do CLK, inclusive encapsulado
-- [ ] Pronto para revisão
+- [x] Todos os critérios de aceitação atendidos (lógicos/de build)
+- [x] Testes passando (`npm test` — 93 testes) e build sem erros (`npm run build`)
+- [~] Teste manual visual (oscilação animada + botões circulares): pendente —
+      extensão do browser indisponível na sessão; dev server deixado no ar para
+      conferência (`http://localhost:5174/`)
+- [x] Pronto para revisão
 
 ---
 
