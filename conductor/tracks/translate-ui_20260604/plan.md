@@ -77,7 +77,7 @@ Substituir as strings de UI geradas dinamicamente por referências ao módulo ce
 
 ### Tasks
 
-- [ ] Task 4.1: Rodar a suíte de testes e o `tsc`; corrigir eventuais quebras (ex.: testes
+- [x] Task 4.1: Rodar a suíte de testes e o `tsc`; corrigir eventuais quebras (ex.: testes
       que assertam texto em PT).
 - [ ] Task 4.2: Smoke test manual no browser — paleta, criar/editar/excluir chip, diálogo
       de nome, renomear I/O, Clear DB — confirmando textos em inglês e ausência de
@@ -85,7 +85,7 @@ Substituir as strings de UI geradas dinamicamente por referências ao módulo ce
 
 ### Verification
 
-- [ ] Fluxos principais validados em inglês sem regressões.
+- [~] Fluxos principais validados em inglês sem regressões.
 
 ## Final Verification
 
