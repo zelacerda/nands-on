@@ -34,11 +34,20 @@ export function primeSeqFromIds(ids: Iterable<string>): void {
  * gera um novo id sequencial.
  */
 export function captureDefinition(state: CircuitState, name: string, id?: string): ChipDefinition {
+  // Captura uma cópia independente do espaço (sem mutar o original) e grava as
+  // entradas **desligadas**: estado estático e modo clock zerados, para que um chip
+  // recém-criado não carregue os últimos estados das entradas. Como nenhum nó fica
+  // em modo clock, toda entrada vira um pino de entrada externo comum.
+  const internal = structuredClone(state);
+  for (const node of internal.nodes) {
+    if (node.type === 'input') {
+      node.value = false;
+      node.clock = false;
+    }
+  }
   const byY = (a: { pos: { y: number } }, b: { pos: { y: number } }) => a.pos.y - b.pos.y;
-  // Entradas em modo clock são fontes internas autônomas: ficam na topologia, mas
-  // não viram pinos de entrada externos do chip.
-  const inputs = state.nodes.filter((n) => n.type === 'input' && !n.clock).sort(byY);
-  const outputs = state.nodes.filter((n) => n.type === 'output').sort(byY);
+  const inputs = internal.nodes.filter((n) => n.type === 'input').sort(byY);
+  const outputs = internal.nodes.filter((n) => n.type === 'output').sort(byY);
   return {
     id: id ?? nextChipId(),
     name,
@@ -48,7 +57,7 @@ export function captureDefinition(state: CircuitState, name: string, id?: string
     // vertical. Nós não renomeados caem para o padrão "IN"/"OUT".
     inputLabels: inputs.map((n) => n.name ?? 'IN'),
     outputLabels: outputs.map((n) => n.name ?? 'OUT'),
-    internal: state,
+    internal,
   };
 }
 

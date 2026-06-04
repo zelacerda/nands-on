@@ -399,30 +399,37 @@ describe('simulate — clock', () => {
     expect(at(CLOCK_PERIOD_MS)).toBe(true);
   });
 
-  it('uma entrada em modo clock encapsulada num chip continua oscilando', () => {
-    // Chip sem entradas e com 1 saída, alimentada por um clock interno.
+  it('uma entrada em modo clock vira entrada comum desligada ao ser encapsulada', () => {
+    // Decisão de produto (track reset-state): ao capturar um chip, as entradas são
+    // gravadas desligadas e o modo clock é zerado. Um clock no espaço vira, no chip,
+    // um pino de entrada externo comum — deixa de oscilar como fonte interna.
     const inner = new CircuitStore();
     const clk = inner.addNode('input', { x: 0, y: 0 });
     inner.cycleInputState(clk.id); // OFF → ON
     inner.cycleInputState(clk.id); // ON → CLK
     const o = inner.addNode('output', { x: 100, y: 0 });
     inner.addWire({ nodeId: clk.id, pinId: 'out' }, { nodeId: o.id, pinId: 'in' });
-    const clockChip = captureDefinition(inner.toJSON(), 'CLK');
-    expect(clockChip.inputCount).toBe(0); // entrada em modo clock não vira pino externo
-    expect(clockChip.outputCount).toBe(1);
+    const chipDef = captureDefinition(inner.toJSON(), 'WAS_CLK');
 
+    // O clock virou um pino de entrada externo comum, desligado.
+    expect(chipDef.inputCount).toBe(1);
+    const inNode = chipDef.internal.nodes.find((n) => n.type === 'input');
+    expect(inNode?.clock ?? false).toBe(false);
+    expect(inNode?.value ?? false).toBe(false);
+
+    // Sem fio no pino externo, a saída do chip fica desligada — não oscila sozinha.
     const store = new CircuitStore();
-    const chip = store.addChipInstance(clockChip, { x: 0, y: 0 });
+    const chip = store.addChipInstance(chipDef, { x: 0, y: 0 });
     const out = store.addNode('output', { x: 200, y: 0 });
     store.addWire({ nodeId: chip.id, pinId: 'out0' }, { nodeId: out.id, pinId: 'in' });
 
-    const resolve = resolverFor(clockChip);
+    const resolve = resolverFor(chipDef);
     const at = (now: number) =>
       simulate(store.toJSON(), resolve, undefined, now).pinValues.get(pinKey(out.id, 'in')) ??
       false;
 
-    expect(at(0)).toBe(true);
+    expect(at(0)).toBe(false);
     expect(at(HALF)).toBe(false);
-    expect(at(CLOCK_PERIOD_MS)).toBe(true);
+    expect(at(CLOCK_PERIOD_MS)).toBe(false);
   });
 });
