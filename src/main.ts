@@ -470,6 +470,14 @@ function defaultIoLabel(node: CircuitNode): string {
   return node.type === 'output' ? 'OUT' : 'IN';
 }
 
+/** Largura mínima (em caracteres) do editor in-place, para caber rótulos curtos. */
+const INLINE_EDITOR_MIN_CHARS = 3;
+
+/** Dimensiona o campo conforme o conteúdo, mantendo-o centralizado sobre o alvo. */
+function autoSizeInlineEditor(): void {
+  renameInput.size = Math.max(renameInput.value.length, INLINE_EDITOR_MIN_CHARS);
+}
+
 /** Abre o editor in-place em (left, top) da tela, com o `transform` de ancoragem. */
 function openInlineEditor(opts: {
   value: string;
@@ -480,6 +488,7 @@ function openInlineEditor(opts: {
 }): void {
   inlineCommit = opts.onCommit;
   renameInput.value = opts.value;
+  autoSizeInlineEditor();
   renameOverlay.style.left = `${opts.left}px`;
   renameOverlay.style.top = `${opts.top}px`;
   renameOverlay.style.transform = opts.transform;
@@ -524,6 +533,7 @@ function openRenameOverlay(node: CircuitNode): void {
   });
 }
 
+renameInput.addEventListener('input', autoSizeInlineEditor);
 renameInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') commitInlineEditor();
   else if (e.key === 'Escape') closeInlineEditor();

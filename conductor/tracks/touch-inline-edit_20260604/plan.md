@@ -3,7 +3,7 @@
 **Track ID:** touch-inline-edit_20260604
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-04
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -74,21 +74,21 @@ Criar chips já em modo de edição in-place e eliminar o `#name-dialog`.
 
 ### Tasks
 
-- [ ] Task 4.1: Rodar `npm run build` (tsc + vite), `npm test` e `npm run lint`; corrigir
+- [x] Task 4.1: Rodar `npm run build` (tsc + vite), `npm test` e `npm run lint`; corrigir
       quebras (inclusive testes que referenciem o modal removido).
-- [ ] Task 4.2: Smoke test manual em **dispositivo/emulação de toque**: editar I/O (sem
+- [x] Task 4.2: Smoke test manual em **dispositivo/emulação de toque**: editar I/O (sem
       togglar), toggle por toque simples, renomear chip, criar via "Make".
 
 ### Verification
 
-- [ ] Fluxos validados no touch sem regressões.
+- [x] Fluxos validados no touch sem regressões.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceite da spec atendidos
-- [ ] `npm run build` limpo, testes e lint passando
-- [ ] Modal de nome removido; edição 100% in-place
-- [ ] Ready for review
+- [x] Todos os critérios de aceite da spec atendidos
+- [x] `npm run build` limpo, testes e lint passando
+- [x] Modal de nome removido; edição 100% in-place
+- [x] Ready for review
 
 ---
 

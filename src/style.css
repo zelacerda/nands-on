@@ -242,7 +242,8 @@ body {
   border: 1px solid #4a525e;
   border-radius: 6px;
   padding: 8px 10px;
-  /* Campo curto: sugere rótulos de 3–4 caracteres (ex.: +5V, CLK, A1). */
-  width: 64px;
+  /* Largura controlada pelo atributo `size` (ajustado em JS conforme o texto), de
+     modo que o campo cresça/encolha centralizado ao redor do alvo. */
+  width: auto;
   text-align: center;
 }
