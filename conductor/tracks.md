@@ -9,6 +9,6 @@
 | [x] | sequential-sim_20260602 | Simulação de Circuitos Sequenciais (Realimentação) | 2026-06-02 | 2026-06-02 |
 | [x] | rename-io_20260602 | Renomear Entradas/Saídas e Rótulos de Pinos | 2026-06-02 | 2026-06-02 |
 | [x] | persist-edit-chips_20260604 | Persistência Local e Edição de Chips | 2026-06-04 | 2026-06-04 |
-| [~] | translate-ui_20260604 | Tradução da Interface para Inglês (com base p/ i18n) | 2026-06-04 | 2026-06-04 |
+| [x] | translate-ui_20260604 | Tradução da Interface para Inglês (com base p/ i18n) | 2026-06-04 | 2026-06-04 |
 
 <!-- Tracks registrados por /conductor:new-track -->

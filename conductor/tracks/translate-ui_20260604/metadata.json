@@ -2,17 +2,22 @@
   "id": "translate-ui_20260604",
   "title": "Tradução da Interface para Inglês (com base p/ i18n)",
   "type": "chore",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-06-04T00:00:00Z",
-  "updated": "2026-06-04T12:00:00Z",
-  "current_phase": 1,
-  "current_task": "1.1",
+  "updated": "2026-06-04T14:30:00Z",
+  "current_phase": 4,
+  "current_task": "4.2",
   "phases": {
     "total": 4,
-    "completed": 0
+    "completed": 4
   },
   "tasks": {
     "total": 11,
-    "completed": 0
-  }
+    "completed": 11
+  },
+  "commits": [
+    "5fd62de: feat: adiciona módulo central de strings de UI em inglês (translate-ui_20260604)",
+    "12511f8: feat: traduz UI para inglês via módulo central de strings (translate-ui_20260604)",
+    "ac50823: test: valida chaves data-i18n do index.html contra STRINGS (translate-ui_20260604)"
+  ]
 }

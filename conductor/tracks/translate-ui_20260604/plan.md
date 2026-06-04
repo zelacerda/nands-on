@@ -3,7 +3,7 @@
 **Track ID:** translate-ui_20260604
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-04
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -79,20 +79,20 @@ Substituir as strings de UI geradas dinamicamente por referências ao módulo ce
 
 - [x] Task 4.1: Rodar a suíte de testes e o `tsc`; corrigir eventuais quebras (ex.: testes
       que assertam texto em PT).
-- [ ] Task 4.2: Smoke test manual no browser — paleta, criar/editar/excluir chip, diálogo
+- [x] Task 4.2: Smoke test manual no browser — paleta, criar/editar/excluir chip, diálogo
       de nome, renomear I/O, Clear DB — confirmando textos em inglês e ausência de
       regressões.
 
 ### Verification
 
-- [~] Fluxos principais validados em inglês sem regressões.
+- [x] Fluxos principais validados em inglês sem regressões.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceite da spec atendidos
-- [ ] Testes passando e `tsc` limpo
-- [ ] Sem strings de UI em PT remanescentes (dev-facing mantidas conforme escopo)
-- [ ] Ready for review
+- [x] Todos os critérios de aceite da spec atendidos
+- [x] Testes passando e `tsc` limpo
+- [x] Sem strings de UI em PT remanescentes (dev-facing mantidas conforme escopo)
+- [x] Ready for review
 
 ---
 

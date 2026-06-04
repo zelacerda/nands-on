@@ -1,7 +1,7 @@
 # Track: Tradução da Interface para Inglês (com base p/ i18n)
 
 **ID:** translate-ui_20260604
-**Status:** Pending
+**Status:** Complete
 
 ## Documents
 
@@ -10,8 +10,8 @@
 
 ## Progress
 
-- Phases: 0/4 complete
-- Tasks: 0/11 complete
+- Phases: 4/4 complete
+- Tasks: 11/11 complete
 
 ## Quick Links
 
