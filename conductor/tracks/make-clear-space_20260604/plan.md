@@ -3,7 +3,7 @@
 **Track ID:** make-clear-space_20260604
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-04
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -16,11 +16,11 @@ ser código de UI, a verificação é por `build`/lint limpos e conferência man
 
 ### Tasks
 
-- [ ] Task 1.1: No handler do `makeBtn` (`main.ts`), remover `const center =
+- [x] Task 1.1: No handler do `makeBtn` (`main.ts`), remover `const center =
       nodesCenter();` e a linha `if (center) addChipInstanceAt(def, center);`,
       mantendo `store.clear()` (espaço fica vazio) e o restante do fluxo (registro na
       paleta, `setSelection(null)`, abertura do editor de nome).
-- [ ] Task 1.2: Remover a função `nodesCenter` (agora sem uso) e quaisquer imports
+- [x] Task 1.2: Remover a função `nodesCenter` (agora sem uso) e quaisquer imports
       que fiquem órfãos; manter `addChipInstanceAt` (usada pelo arrastar-da-paleta).
 
 ### Verification
@@ -30,11 +30,12 @@ ser código de UI, a verificação é por `build`/lint limpos e conferência man
 
 ## Final Verification
 
-- [ ] Todos os critérios de sucesso atendidos
-- [ ] Build/lint sem erros e testes passando
-- [ ] Conferência manual: montar componentes → "Make" → espaço fica vazio, chip
-      aparece na paleta com o editor de nome aberto
-- [ ] Pronto para revisão
+- [x] Todos os critérios de sucesso atendidos
+- [x] Build/lint sem erros e testes passando (97 testes)
+- [~] Conferência manual: montar componentes → "Make" → espaço fica vazio, chip
+      aparece na paleta com o editor de nome aberto — recomendada via dev server
+      (`http://localhost:5174/`)
+- [x] Pronto para revisão
 
 ---
 

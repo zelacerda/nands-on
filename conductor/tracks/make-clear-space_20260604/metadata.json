@@ -2,17 +2,17 @@
   "id": "make-clear-space_20260604",
   "title": "Make Deixa o Espaço Vazio (Sem Instância Automática)",
   "type": "chore",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-06-04T19:39:17Z",
-  "updated": "2026-06-04T19:39:17Z",
+  "updated": "2026-06-04T19:41:00Z",
   "current_phase": 1,
-  "current_task": "1.1",
+  "current_task": "1.2",
   "phases": {
     "total": 1,
-    "completed": 0
+    "completed": 1
   },
   "tasks": {
     "total": 2,
-    "completed": 0
+    "completed": 2
   }
 }

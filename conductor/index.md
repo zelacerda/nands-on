@@ -23,7 +23,7 @@ Hub de navegação para o contexto do projeto.
 - [Edição In-Place de Rótulos (I/O e Chips) e Correção no Touch](./tracks/touch-inline-edit_20260604/index.md) — `touch-inline-edit_20260604` (complete)
 - [Entrada de Clock (CLK) e Botões de I/O Circulares](./tracks/clock-input_20260604/index.md) — `clock-input_20260604` (complete)
 - [Zerar Estados de Entrada ao Salvar Chip e Desligar Saídas Sem Conexão](./tracks/reset-state_20260604/index.md) — `reset-state_20260604` (complete)
-- [Make Deixa o Espaço Vazio (Sem Instância Automática)](./tracks/make-clear-space_20260604/index.md) — `make-clear-space_20260604` (pending)
+- [Make Deixa o Espaço Vazio (Sem Instância Automática)](./tracks/make-clear-space_20260604/index.md) — `make-clear-space_20260604` (complete)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
