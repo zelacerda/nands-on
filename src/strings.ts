@@ -54,6 +54,27 @@ export const STRINGS = {
   // Validação de nome de chip
   'validation.emptyName': 'Enter a name for the component.',
   'validation.duplicateName': 'A chip named "{name}" already exists.',
+
+  // Tutorial (walkthrough): controles e mensagens
+  'tutorial.start': 'Start Tutorial',
+  'tutorial.exit': 'Exit',
+  'tutorial.progress': 'Step {n} of {total}',
+  'tutorial.done':
+    'You built a NOT gate from a NAND — and packaged it as a chip. That is the whole idea of NANDS-ON: keep composing simple parts into bigger ones, all the way up to a CPU.',
+  'tutorial.doneTitle': 'Nicely done!',
+
+  // Tutorial: passos
+  'tutorial.step.addInput': 'Drag the round IN button onto the canvas to place an input.',
+  'tutorial.step.addNand': 'Now drag the NAND button onto the canvas — our only building block.',
+  'tutorial.step.addOutput': 'Drag the round OUT button onto the canvas to place an output.',
+  'tutorial.step.wireInput':
+    'Wire the input to BOTH inputs of the NAND: drag from the input pin to each NAND input pin. A NAND with both inputs tied together is a NOT!',
+  'tutorial.step.wireOutput': 'Now wire the NAND output pin to the output.',
+  'tutorial.step.toggle':
+    'Tap the input to select it, then tap again to toggle it on/off — watch the output flip. That is inversion!',
+  'tutorial.step.rename':
+    'Double-tap the input (or the output) to rename it — try naming the input "A".',
+  'tutorial.step.make': 'Finally, click "Make" to package your NOT into a reusable chip.',
 } as const;
 
 export type StringKey = keyof typeof STRINGS;
