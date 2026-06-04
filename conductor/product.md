@@ -1,9 +1,10 @@
-# Definição do Produto — From NAND to CPU
+# Definição do Produto — NANDS-ON
 
 ## Visão Geral
 
-**From NAND to CPU** é uma aplicação web em JavaScript/TypeScript para simulação de
-lógica digital, inspirada na [versão 0 do Digital-Logic-Sim](https://github.com/SebLague/Digital-Logic-Sim/tree/Version-0)
+**NANDS-ON — From NAND to CPU** (em [nands-on.com](https://nands-on.com)) é uma
+aplicação web em JavaScript/TypeScript para simulação de lógica digital, inspirada na
+[versão 0 do Digital-Logic-Sim](https://github.com/SebLague/Digital-Logic-Sim/tree/Version-0)
 de Sebastian Lague. A aplicação permite ao usuário montar circuitos a partir de portas
 lógicas elementares, encapsulá-los em componentes reutilizáveis e, progressivamente,
 construir blocos cada vez mais complexos — partindo da porta NAND até chegar a uma CPU.
