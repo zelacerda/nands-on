@@ -19,6 +19,7 @@ Hub de navegação para o contexto do projeto.
 - [Simulação de Circuitos Sequenciais (Realimentação)](./tracks/sequential-sim_20260602/index.md) — `sequential-sim_20260602` (complete)
 - [Renomear Entradas/Saídas e Rótulos de Pinos](./tracks/rename-io_20260602/index.md) — `rename-io_20260602` (complete)
 - [Persistência Local e Edição de Chips](./tracks/persist-edit-chips_20260604/index.md) — `persist-edit-chips_20260604` (complete)
+- [Tradução da Interface para Inglês (com base p/ i18n)](./tracks/translate-ui_20260604/index.md) — `translate-ui_20260604` (pending)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
