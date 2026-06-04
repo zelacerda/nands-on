@@ -30,6 +30,14 @@ import { validateConnection } from './connection';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
 import { isWelcomeDismissed, setWelcomeDismissed, shouldAutoShowWelcome } from './welcome';
+import {
+  NOT_TUTORIAL_STEPS,
+  type TutorialState,
+  type StepStartSnapshot,
+  advanceIfComplete,
+  captureStepStart,
+  currentStep,
+} from './tutorial';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#editor');
 if (!canvas) {
@@ -787,6 +795,9 @@ function render(): void {
     }
   }
 
+  // Tutorial: avalia o passo atual contra o estado e avança quando concluído.
+  updateTutorial();
+
   requestAnimationFrame(render);
 }
 
@@ -808,10 +819,15 @@ const aboutPanel = document.querySelector<HTMLDivElement>('#about-panel')!;
 const aboutClose = document.querySelector<HTMLButtonElement>('#about-close')!;
 const aboutDontShow = document.querySelector<HTMLInputElement>('#about-dont-show')!;
 
-function openAbout(): void {
-  // O checkbox reflete a preferência atual ao abrir (vale tanto para o "?" quanto
-  // para a abertura automática de boas-vindas).
+/** Modo do painel: "about" (aberto pelo "?") ou "welcome" (auto no 1º acesso). */
+let aboutMode: 'about' | 'welcome' = 'about';
+
+function openAbout(mode: 'about' | 'welcome' = 'about'): void {
+  aboutMode = mode;
+  // O checkbox reflete a preferência atual ao abrir.
   aboutDontShow.checked = isWelcomeDismissed();
+  // No 1º acesso, o botão primário convida a iniciar o tutorial; via "?", só fecha.
+  aboutClose.textContent = mode === 'welcome' ? t('tutorial.start') : t('about.close');
   aboutOverlay.hidden = false;
 }
 
@@ -822,19 +838,97 @@ function closeAbout(): void {
   aboutOverlay.hidden = true;
 }
 
-aboutBtn.addEventListener('click', openAbout);
-aboutClose.addEventListener('click', closeAbout);
-// Clique no fundo (fora do painel) fecha; clique dentro do painel não.
+aboutBtn.addEventListener('click', () => openAbout('about'));
+// O botão primário sempre fecha; em modo boas-vindas, também inicia o tutorial.
+aboutClose.addEventListener('click', () => {
+  const startTut = aboutMode === 'welcome';
+  closeAbout();
+  if (startTut) startTutorial();
+});
+// Clique no fundo (fora do painel) fecha sem iniciar o tutorial; dentro, não.
 aboutOverlay.addEventListener('click', (e) => {
   if (!aboutPanel.contains(e.target as Node)) closeAbout();
 });
-// Esc fecha enquanto o painel estiver aberto.
+// Esc fecha o painel (sem iniciar) ou, se o tutorial estiver ativo, sai dele.
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !aboutOverlay.hidden) closeAbout();
+  if (e.key !== 'Escape') return;
+  if (!aboutOverlay.hidden) closeAbout();
+  else if (tutorialState.active) exitTutorial();
 });
 
 // Primeiro acesso (sem a flag de dispensa): abre as boas-vindas automaticamente.
-if (shouldAutoShowWelcome(isWelcomeDismissed())) openAbout();
+if (shouldAutoShowWelcome(isWelcomeDismissed())) openAbout('welcome');
+
+// --- Tutorial (walkthrough) ----------------------------------------------
+
+const tutorialCallout = document.querySelector<HTMLDivElement>('#tutorial-callout')!;
+const tutorialProgress = document.querySelector<HTMLDivElement>('#tutorial-progress')!;
+const tutorialText = document.querySelector<HTMLParagraphElement>('#tutorial-text')!;
+const tutorialExit = document.querySelector<HTMLButtonElement>('#tutorial-exit')!;
+
+let tutorialState: TutorialState = { active: false, index: 0 };
+let tutorialStepStart: StepStartSnapshot = captureStepStart([], 0);
+
+/** Aplica (ou limpa) o destaque visual do alvo do passo atual. */
+function setTutorialHighlight(selector?: string): void {
+  document
+    .querySelectorAll('.tutorial-highlight')
+    .forEach((el) => el.classList.remove('tutorial-highlight'));
+  if (selector) document.querySelector(selector)?.classList.add('tutorial-highlight');
+}
+
+/** Atualiza o callout para refletir o passo atual (ou a tela de conclusão). */
+function renderTutorialStep(): void {
+  const step = currentStep(NOT_TUTORIAL_STEPS, tutorialState);
+  if (!step) {
+    // Concluído: mensagem final; o botão "Exit" passa a apenas fechar.
+    setTutorialHighlight(undefined);
+    tutorialProgress.textContent = t('tutorial.doneTitle');
+    tutorialText.textContent = t('tutorial.done');
+    return;
+  }
+  tutorialProgress.textContent = t('tutorial.progress', {
+    n: tutorialState.index + 1,
+    total: NOT_TUTORIAL_STEPS.length,
+  });
+  tutorialText.textContent = t(step.textKey);
+  setTutorialHighlight(step.highlightSelector);
+}
+
+function startTutorial(): void {
+  // Começa de um espaço limpo, para os predicados refletirem só o que o usuário
+  // fizer durante o tutorial.
+  store.clear();
+  setSelection(null);
+  tutorialState = { active: true, index: 0 };
+  tutorialStepStart = captureStepStart(store.listNodes(), library.list().length);
+  renderTutorialStep();
+  tutorialCallout.hidden = false;
+}
+
+function exitTutorial(): void {
+  tutorialState = { active: false, index: 0 };
+  setTutorialHighlight(undefined);
+  tutorialCallout.hidden = true;
+}
+
+/** Checagem por frame: avança o passo quando sua condição é satisfeita. */
+function updateTutorial(): void {
+  if (!tutorialState.active) return;
+  const before = tutorialState.index;
+  tutorialState = advanceIfComplete(NOT_TUTORIAL_STEPS, tutorialState, {
+    nodes: store.listNodes(),
+    wires: store.listWires(),
+    libraryCount: library.list().length,
+    stepStart: tutorialStepStart,
+  });
+  if (tutorialState.index !== before) {
+    tutorialStepStart = captureStepStart(store.listNodes(), library.list().length);
+    renderTutorialStep();
+  }
+}
+
+tutorialExit.addEventListener('click', exitTutorial);
 
 window.addEventListener('resize', resize);
 resize();
