@@ -2,22 +2,23 @@
   "id": "touch-inline-edit_20260604",
   "title": "Edição In-Place de Rótulos (I/O e Chips) e Correção no Touch",
   "type": "bug",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-06-04T00:00:00Z",
-  "updated": "2026-06-04T15:05:00Z",
+  "updated": "2026-06-04T15:12:00Z",
   "current_phase": 4,
   "current_task": "4.2",
   "phases": {
     "total": 4,
-    "completed": 3
+    "completed": 4
   },
   "tasks": {
     "total": 12,
-    "completed": 11
+    "completed": 12
   },
   "commits": [
     "eaeb031: fix: duplo-toque edita I/O sem togglar e libera captura p/ teclado no touch (touch-inline-edit_20260604)",
     "c24af74: feat: renomeia chip in-place na paleta via editor reutilizável (touch-inline-edit_20260604)",
-    "575c9d6: feat: Make cria chip in-place e remove o diálogo modal de nome (touch-inline-edit_20260604)"
+    "575c9d6: feat: Make cria chip in-place e remove o diálogo modal de nome (touch-inline-edit_20260604)",
+    "defbf40: feat: editor in-place auto-dimensionável e centralizado conforme o texto (touch-inline-edit_20260604)"
   ]
 }
