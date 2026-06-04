@@ -124,8 +124,8 @@ quando o número de I/O mudar.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos
-- [ ] Testes passando (persistência e reconciliação)
+- [x] Testes passando (persistência e reconciliação) — 85 testes; typecheck, lint e build OK
+- [ ] Todos os critérios de aceitação atendidos (confirmar comportamentos de UI no navegador)
 - [ ] Verificação manual no fechamento do track (conforme workflow.md)
 - [ ] Pronto para review
 
