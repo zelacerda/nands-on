@@ -2,9 +2,9 @@
   "id": "persist-edit-chips_20260604",
   "title": "Persistência Local e Edição de Chips",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-06-04T00:00:00Z",
-  "updated": "2026-06-04T00:00:00Z",
+  "updated": "2026-06-04T12:20:00Z",
   "current_phase": 5,
   "current_task": "5.3",
   "phases": {

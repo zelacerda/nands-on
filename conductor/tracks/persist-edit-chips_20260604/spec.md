@@ -29,24 +29,24 @@ sem perder trabalho e sem recriar componentes do zero.
 
 ## Acceptance Criteria
 
-- [ ] A biblioteca de chips é persistida em **IndexedDB** e restaurada ao recarregar a
+- [x] A biblioteca de chips é persistida em **IndexedDB** e restaurada ao recarregar a
       página (a paleta volta a exibir os chips criados anteriormente).
-- [ ] Clicar (toque/click simples) no botão de um chip na barra superior (paleta) revela
+- [x] Clicar (toque/click simples) no botão de um chip na barra superior (paleta) revela
       um botão **"Editar"** associado àquele chip.
-- [ ] Clicar em "Editar" abre o circuito interno do chip no espaço de trabalho para edição;
+- [x] Clicar em "Editar" abre o circuito interno do chip no espaço de trabalho para edição;
       o conteúdo que estava no espaço é preservado temporariamente e restaurado ao concluir
       a edição.
-- [ ] Ao salvar a edição, a definição do chip é atualizada **no lugar** (mesmo `id`/nome) e
+- [x] Ao salvar a edição, a definição do chip é atualizada **no lugar** (mesmo `id`/nome) e
       as mudanças se propagam para **todas as instâncias**, inclusive as aninhadas dentro de
       outras definições.
-- [ ] Quando o número de entradas/saídas do chip muda na edição, as instâncias são
+- [x] Quando o número de entradas/saídas do chip muda na edição, as instâncias são
       **reconciliadas por índice/id de pino**: fios de pinos que sobrevivem são mantidos,
       fios de pinos eliminados são removidos e pinos novos ficam sem conexão.
-- [ ] **Duplo clique** no botão do chip na barra superior permite **editar o nome** do chip
+- [x] **Duplo clique** no botão do chip na barra superior permite **editar o nome** do chip
       (validando vazio/duplicata, como no fluxo "Fazer").
-- [ ] Renomear um chip não quebra a referência das instâncias (a resolução é por `defId`,
+- [x] Renomear um chip não quebra a referência das instâncias (a resolução é por `defId`,
       não por nome).
-- [ ] Existe um botão para **limpar o banco** (IndexedDB), recarregando a aplicação em
+- [x] Existe um botão para **limpar o banco** (IndexedDB), recarregando a aplicação em
       estado vazio. Por enquanto ele fica **sempre visível, inclusive no deploy**, para
       facilitar testes em outros dispositivos (afordância temporária, a revisitar depois).
 

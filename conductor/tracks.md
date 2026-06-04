@@ -8,6 +8,6 @@
 | [x] | chip-logic_20260531 | Lógica de Simulação dos Chips | 2026-05-31 | 2026-05-31 |
 | [x] | sequential-sim_20260602 | Simulação de Circuitos Sequenciais (Realimentação) | 2026-06-02 | 2026-06-02 |
 | [x] | rename-io_20260602 | Renomear Entradas/Saídas e Rótulos de Pinos | 2026-06-02 | 2026-06-02 |
-| [~] | persist-edit-chips_20260604 | Persistência Local e Edição de Chips | 2026-06-04 | 2026-06-04 |
+| [x] | persist-edit-chips_20260604 | Persistência Local e Edição de Chips | 2026-06-04 | 2026-06-04 |
 
 <!-- Tracks registrados por /conductor:new-track -->

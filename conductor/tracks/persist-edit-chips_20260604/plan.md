@@ -3,7 +3,7 @@
 **Track ID:** persist-edit-chips_20260604
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-04
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -125,9 +125,9 @@ quando o número de I/O mudar.
 ## Final Verification
 
 - [x] Testes passando (persistência e reconciliação) — 85 testes; typecheck, lint e build OK
-- [ ] Todos os critérios de aceitação atendidos (confirmar comportamentos de UI no navegador)
-- [ ] Verificação manual no fechamento do track (conforme workflow.md)
-- [ ] Pronto para review
+- [x] Todos os critérios de aceitação atendidos (UI confirmada no navegador)
+- [x] Verificação manual no fechamento do track (conforme workflow.md)
+- [x] Pronto para review
 
 ---
 
