@@ -68,10 +68,10 @@ export const STRINGS = {
   'tutorial.step.addNand': 'Now drag the NAND button onto the canvas — our only building block.',
   'tutorial.step.addOutput': 'Drag the round OUT button onto the canvas to place an output.',
   'tutorial.step.wireInput':
-    'Wire the input to BOTH inputs of the NAND: drag from the input pin to each NAND input pin. A NAND with both inputs tied together is a NOT!',
+    'Wire the input to BOTH inputs of the NAND: drag from the input pin to each NAND input pin.',
   'tutorial.step.wireOutput': 'Now wire the NAND output pin to the output.',
   'tutorial.step.toggle':
-    'Tap the input to select it, then tap again to toggle it on/off — watch the output flip. That is inversion!',
+    'Tap the input to select it, then tap again to cycle its state: OFF → ON → CLK → OFF. Watch the output show the opposite — congrats, you just made a NOT gate!',
   'tutorial.step.rename':
     'Double-tap the input (or the output) to rename it — try naming the input "A".',
   'tutorial.step.make': 'Finally, click "Make" to package your NOT into a reusable chip.',
