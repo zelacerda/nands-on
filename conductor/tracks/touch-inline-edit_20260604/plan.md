@@ -40,15 +40,15 @@ Substituir o duplo-toque→modal por edição in-place do nome no próprio botã
 
 ### Tasks
 
-- [ ] Task 2.1: Tornar o texto do botão de chip editável in-place (input posicionado sobre
+- [x] Task 2.1: Tornar o texto do botão de chip editável in-place (input posicionado sobre
       o botão) ao duplo-toque, reaproveitando a detecção `lastChipTap`.
-- [ ] Task 2.2: Commit do rename via `validateChipName` + `library.rename`; nome
+- [x] Task 2.2: Commit do rename via `validateChipName` + `library.rename`; nome
       inválido/duplicado reverte (ou rejeita) sem quebrar o estado; feedback mínimo.
-- [ ] Task 2.3: Garantir foco/teclado confiáveis no touch (mesmo padrão da Fase 1).
+- [x] Task 2.3: Garantir foco/teclado confiáveis no touch (mesmo padrão da Fase 1).
 
 ### Verification
 
-- [ ] Renomear chip in-place funciona no desktop e no touch; duplicado/vazio é rejeitado
+- [x] Renomear chip in-place funciona no desktop e no touch; duplicado/vazio é rejeitado
       sem travar; `npm run build` limpo.
 
 ## Phase 3: "Make" in-place e remoção do modal

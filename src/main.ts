@@ -280,11 +280,32 @@ function onChipTap(def: ChipDefinition, btn: HTMLElement): void {
     lastChipTap !== null && lastChipTap.defId === def.id && now - lastChipTap.time <= DOUBLE_TAP_MS;
   if (isDouble) {
     lastChipTap = null;
-    openNameDialog({ kind: 'rename', def });
+    openChipNameEdit(def, btn);
     return;
   }
   lastChipTap = { defId: def.id, time: now };
   selectChip(def, btn);
+}
+
+/** Confirma a renomeação in-place de um chip; ignora nome vazio/duplicado. */
+function commitChipRename(def: ChipDefinition, raw: string): void {
+  const check = validateChipName(library, raw, def.id);
+  if (!check.ok) return; // nome inválido: mantém o nome atual, sem travar
+  propagateChipName(def.id, check.name);
+  library.rename(def.id, check.name);
+  refreshPalette();
+}
+
+/** Abre a edição in-place do nome de um chip, logo abaixo do seu botão na paleta. */
+function openChipNameEdit(def: ChipDefinition, btn: HTMLElement): void {
+  const rect = btn.getBoundingClientRect();
+  openInlineEditor({
+    value: def.name,
+    left: rect.left + rect.width / 2,
+    top: rect.bottom,
+    transform: 'translate(-50%, 8px)',
+    onCommit: (value) => commitChipRename(def, value),
+  });
 }
 
 /** Reconstrói os botões de chip na paleta a partir da biblioteca. */
@@ -482,20 +503,53 @@ cancelEditBtn.addEventListener('click', exitEdit);
 const renameOverlay = document.querySelector<HTMLDivElement>('#rename-overlay')!;
 const renameInput = document.querySelector<HTMLInputElement>('#rename-input')!;
 
-/** Id do nó em edição, ou `null` se o overlay está fechado. */
-let renameNodeId: string | null = null;
+/**
+ * Editor de texto in-place: um único overlay reutilizado para renomear tanto nós
+ * de I/O (no canvas) quanto chips (na paleta). `inlineCommit` guarda a ação a
+ * executar com o valor digitado ao confirmar; `null` enquanto o editor está
+ * fechado.
+ */
+let inlineCommit: ((value: string) => void) | null = null;
 
 /** Rótulo padrão de um nó I/O ainda não renomeado. */
 function defaultIoLabel(node: CircuitNode): string {
   return node.type === 'output' ? 'OUT' : 'IN';
 }
 
-/** Abre o overlay de renomear posicionado sobre o topo do nó I/O dado. */
+/** Abre o editor in-place em (left, top) da tela, com o `transform` de ancoragem. */
+function openInlineEditor(opts: {
+  value: string;
+  left: number;
+  top: number;
+  transform: string;
+  onCommit: (value: string) => void;
+}): void {
+  inlineCommit = opts.onCommit;
+  renameInput.value = opts.value;
+  renameOverlay.style.left = `${opts.left}px`;
+  renameOverlay.style.top = `${opts.top}px`;
+  renameOverlay.style.transform = opts.transform;
+  renameOverlay.hidden = false;
+  // `preventScroll` evita o salto da viewport ao focar perto do teclado virtual.
+  renameInput.focus({ preventScroll: true });
+  renameInput.select();
+}
+
+function closeInlineEditor(): void {
+  renameOverlay.hidden = true;
+  inlineCommit = null;
+}
+
+/** Confirma a edição: dispara `onCommit` com o valor atual e fecha o editor. */
+function commitInlineEditor(): void {
+  const commit = inlineCommit;
+  const value = renameInput.value;
+  closeInlineEditor();
+  commit?.(value);
+}
+
+/** Abre a edição in-place do rótulo de um nó I/O, sobre o próprio nó. */
 function openRenameOverlay(node: CircuitNode): void {
-  renameNodeId = node.id;
-  // Pré-preenche com o nome atual ou, se ainda não renomeado, com o padrão
-  // (IN/OUT) para deixar claro que é o rótulo a editar.
-  renameInput.value = node.name ?? defaultIoLabel(node);
   const { w, h } = nodeSize(node);
   const rect = canvas!.getBoundingClientRect();
   // Por padrão flutua acima do nó; se houver pouco espaço no topo, cai abaixo
@@ -505,34 +559,25 @@ function openRenameOverlay(node: CircuitNode): void {
   const anchor = flipBelow
     ? camera.worldToScreen({ x: node.pos.x + w / 2, y: node.pos.y + h })
     : above;
-  renameOverlay.style.left = `${rect.left + anchor.x}px`;
-  renameOverlay.style.top = `${rect.top + anchor.y}px`;
-  renameOverlay.style.transform = flipBelow ? 'translate(-50%, 20%)' : 'translate(-50%, -120%)';
-  renameOverlay.hidden = false;
-  // `preventScroll` evita o salto da viewport ao focar perto do teclado virtual.
-  renameInput.focus({ preventScroll: true });
-  renameInput.select();
-}
-
-function closeRenameOverlay(): void {
-  renameOverlay.hidden = true;
-  renameNodeId = null;
-}
-
-/** Grava o nome digitado no nó e fecha o overlay. */
-function commitRename(): void {
-  if (renameNodeId) store.setNodeName(renameNodeId, renameInput.value);
-  closeRenameOverlay();
+  // Pré-preenche com o nome atual ou, se ainda não renomeado, com o padrão
+  // (IN/OUT) para deixar claro que é o rótulo a editar.
+  openInlineEditor({
+    value: node.name ?? defaultIoLabel(node),
+    left: rect.left + anchor.x,
+    top: rect.top + anchor.y,
+    transform: flipBelow ? 'translate(-50%, 20%)' : 'translate(-50%, -120%)',
+    onCommit: (value) => store.setNodeName(node.id, value),
+  });
 }
 
 renameInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') commitRename();
-  else if (e.key === 'Escape') closeRenameOverlay();
+  if (e.key === 'Enter') commitInlineEditor();
+  else if (e.key === 'Escape') closeInlineEditor();
 });
 // Sair do campo (tocar fora, etc.) confirma o nome — exceto se já foi fechado
 // por Enter/Esc (overlay oculto).
 renameInput.addEventListener('blur', () => {
-  if (!renameOverlay.hidden) commitRename();
+  if (!renameOverlay.hidden) commitInlineEditor();
 });
 
 // --- Pinça (dois ponteiros) ----------------------------------------------
