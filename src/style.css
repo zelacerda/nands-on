@@ -75,6 +75,30 @@ body {
   background: #2d333b;
 }
 
+/* Botões de I/O (IN/CLK/OUT): círculos, espelhando a forma desses nós no canvas.
+   A cor da borda reflete o conector exposto — laranja para os que têm pino de
+   saída (IN, CLK) e azul claro para o que tem pino de entrada (OUT) — tornando
+   intuitivo o que injeta e o que observa sinal. */
+#palette button[data-add='input'],
+#palette button[data-add='clock'],
+#palette button[data-add='output'] {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+#palette button[data-add='input'],
+#palette button[data-add='clock'] {
+  border-color: #e0af68;
+}
+
+#palette button[data-add='output'] {
+  border-color: #7aa2f7;
+}
+
 /* Botões de componentes lógicos (NAND e chips criados): azul, distinto do I/O. */
 #palette button.logic-btn,
 #palette button.chip-btn {
