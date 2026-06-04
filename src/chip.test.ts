@@ -5,6 +5,7 @@ import {
   captureDefinition,
   DuplicateChipNameError,
   primeSeqFromIds,
+  reconcileInstances,
   validateChipName,
 } from './chip';
 import { CircuitStore } from './store';
@@ -278,6 +279,80 @@ describe('ChipLibrary — edição e carga', () => {
     expect(calls).toBe(3);
     lib.load([captureDefinition(sampleState(), 'C')]);
     expect(calls).toBe(3); // load não conta como mutação a persistir
+  });
+});
+
+describe('reconcileInstances', () => {
+  /** Definição com `ins` entradas e `outs` saídas, sob um id fixo. */
+  function defWithIO(ins: number, outs: number, id: string) {
+    const store = new CircuitStore();
+    for (let i = 0; i < ins; i++) store.addNode('input', { x: 0, y: i * 40 });
+    for (let i = 0; i < outs; i++) store.addNode('output', { x: 200, y: i * 40 });
+    return captureDefinition(store.toJSON(), `C_${id}`, id);
+  }
+
+  /** Espaço com uma instância de `def`: 2 entradas externas em in0/in1 e out0→saída. */
+  function stateWithInstance(def: ReturnType<typeof defWithIO>): CircuitState {
+    const store = new CircuitStore();
+    const a = store.addNode('input', { x: -100, y: 0 });
+    const b = store.addNode('input', { x: -100, y: 50 });
+    const chip = store.addChipInstance(def, { x: 0, y: 0 });
+    const out = store.addNode('output', { x: 200, y: 0 });
+    store.addWire({ nodeId: a.id, pinId: 'out' }, { nodeId: chip.id, pinId: 'in0' });
+    store.addWire({ nodeId: b.id, pinId: 'out' }, { nodeId: chip.id, pinId: 'in1' });
+    store.addWire({ nodeId: chip.id, pinId: 'out0' }, { nodeId: out.id, pinId: 'in' });
+    return store.toJSON();
+  }
+
+  const chipNode = (state: CircuitState) => state.nodes.find((n) => n.type === 'chip')!;
+  const inCount = (state: CircuitState) =>
+    chipNode(state).pins.filter((p) => p.kind === 'in').length;
+
+  it('I/O inalterado: mantém os fios e regenera os pinos (com o novo nome)', () => {
+    const state = stateWithInstance(defWithIO(2, 1, 'chip1'));
+    const edited = captureDefinition(defWithIO(2, 1, 'chip1').internal, 'RENOMEADO', 'chip1');
+    reconcileInstances(state, edited);
+    expect(state.wires).toHaveLength(3);
+    expect(inCount(state)).toBe(2);
+    expect(chipNode(state).name).toBe('RENOMEADO');
+  });
+
+  it('aumento de I/O: cria o pino novo (sem conexão) e preserva os fios', () => {
+    const state = stateWithInstance(defWithIO(2, 1, 'chip1'));
+    reconcileInstances(state, defWithIO(3, 1, 'chip1'));
+    expect(inCount(state)).toBe(3);
+    expect(chipNode(state).pins.some((p) => p.id === 'in2')).toBe(true);
+    expect(state.wires).toHaveLength(3); // in0, in1, out0 sobrevivem
+  });
+
+  it('redução de I/O: remove os fios dos pinos eliminados', () => {
+    const state = stateWithInstance(defWithIO(2, 1, 'chip1'));
+    reconcileInstances(state, defWithIO(1, 1, 'chip1'));
+    expect(inCount(state)).toBe(1);
+    // O fio que chegava em in1 (pino removido) some; in0 e out0 permanecem.
+    expect(state.wires).toHaveLength(2);
+    expect(state.wires.some((w) => w.to.pinId === 'in1')).toBe(false);
+  });
+
+  it('reconcilia instâncias aninhadas dentro de outra definição', () => {
+    const inner = defWithIO(2, 1, 'chip1');
+    // "Outro" chip que contém uma instância do inner, mais I/O próprios.
+    const store = new CircuitStore();
+    const a = store.addNode('input', { x: -100, y: 0 });
+    const nested = store.addChipInstance(inner, { x: 0, y: 0 });
+    store.addWire({ nodeId: a.id, pinId: 'out' }, { nodeId: nested.id, pinId: 'in1' });
+    const outer = captureDefinition(store.toJSON(), 'OUTER', 'chip2');
+
+    reconcileInstances(outer.internal, defWithIO(1, 1, 'chip1')); // inner perdeu in1
+    expect(outer.internal.wires.some((w) => w.to.pinId === 'in1')).toBe(false);
+  });
+
+  it('é no-op quando não há instâncias do chip no estado', () => {
+    const state = stateWithInstance(defWithIO(2, 1, 'chip1'));
+    const before = state.wires.length;
+    reconcileInstances(state, defWithIO(1, 1, 'chip-outro')); // id diferente
+    expect(state.wires).toHaveLength(before);
+    expect(inCount(state)).toBe(2);
   });
 });
 

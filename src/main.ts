@@ -14,7 +14,7 @@ import {
   nodeSize,
 } from './model';
 import { CircuitStore } from './store';
-import { ChipLibrary, captureDefinition, validateChipName } from './chip';
+import { ChipLibrary, captureDefinition, reconcileInstances, validateChipName } from './chip';
 import { loadChips, saveChips } from './persistence';
 import {
   drawCircuit,
@@ -447,14 +447,19 @@ function exitEdit(): void {
 
 /**
  * Conclui a edição: recaptura o espaço como a definição do chip, **preservando o
- * id** (para não quebrar as instâncias) e atualiza a biblioteca. Como a simulação
- * resolve por `defId`, a nova lógica propaga automaticamente para todas as
- * instâncias enquanto o nº de I/O não muda; a reconciliação para mudanças de I/O
- * é tratada na Fase 4.
+ * id** (para não quebrar as instâncias) e atualiza a biblioteca. A nova lógica
+ * propaga automaticamente (a simulação resolve por `defId`); além disso, as
+ * instâncias têm os pinos reconciliados — no espaço a ser restaurado e dentro
+ * das outras definições — de modo que mudanças no nº/rótulo de I/O fiquem
+ * refletidas e fios para pinos removidos sejam descartados.
  */
 function finishEdit(): void {
   if (!editing) return;
   const def = captureDefinition(structuredClone(store.toJSON()), editing.name, editing.defId);
+  reconcileInstances(editing.snapshot, def);
+  for (const other of library.list()) {
+    if (other.id !== def.id) reconcileInstances(other.internal, def);
+  }
   library.update(def);
   refreshPalette();
   exitEdit();

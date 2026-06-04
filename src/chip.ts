@@ -1,4 +1,4 @@
-import type { ChipDefinition, CircuitState } from './model';
+import { type ChipDefinition, type CircuitState, chipInstancePins } from './model';
 
 let seq = 0;
 
@@ -47,6 +47,31 @@ export function captureDefinition(state: CircuitState, name: string, id?: string
     outputLabels: outputs.map((n) => n.name ?? 'OUT'),
     internal: state,
   };
+}
+
+/**
+ * Reconcilia, **in place**, as instâncias de um chip dentro de um `CircuitState`
+ * após a sua definição ter sido editada. Os pinos de cada instância são
+ * regenerados a partir da nova definição (refletindo novos rótulos/posições) e
+ * os fios ligados a pinos que **deixaram de existir** (quando o nº de I/O diminui)
+ * são removidos. Como os ids de pino são estáveis por índice (`in0..inN`,
+ * `out0..outM`), os fios dos índices sobreviventes permanecem válidos e os pinos
+ * recém-criados ficam sem conexão. No-op se não houver instâncias do chip.
+ */
+export function reconcileInstances(state: CircuitState, def: ChipDefinition): void {
+  const template = chipInstancePins(def);
+  const validPinIds = new Set(template.map((p) => p.id));
+  const affected = new Set<string>();
+  for (const node of state.nodes) {
+    if (node.type !== 'chip' || node.defId !== def.id) continue;
+    affected.add(node.id);
+    node.name = def.name;
+    node.pins = template.map((p) => ({ ...p })); // pinos próprios por instância
+  }
+  if (affected.size === 0) return;
+  const endpointDangling = (ref: { nodeId: string; pinId: string }) =>
+    affected.has(ref.nodeId) && !validPinIds.has(ref.pinId);
+  state.wires = state.wires.filter((w) => !endpointDangling(w.from) && !endpointDangling(w.to));
 }
 
 export type NameValidation = { ok: true; name: string } | { ok: false; reason: string };

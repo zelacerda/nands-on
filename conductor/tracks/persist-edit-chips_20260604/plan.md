@@ -86,17 +86,17 @@ quando o número de I/O mudar.
 
 ### Tasks
 
-- [ ] Task 4.1: Recapturar a definição editada via `captureDefinition`, **preservando o
+- [x] Task 4.1: Recapturar a definição editada via `captureDefinition`, **preservando o
       `id`** original (atualizar `name`, `inputCount`, `outputCount`, labels, `internal`).
-- [ ] Task 4.2: Implementar função pura de **reconciliação de uma instância** dado o def
+- [x] Task 4.2: Implementar função pura de **reconciliação de uma instância** dado o def
       novo: regenerar pinos via `chipInstancePins(newDef)`, manter wires cujos `pinId`
       sobrevivem e remover os de pinos eliminados.
-- [ ] Task 4.3: Aplicar a reconciliação a (a) todos os nós do espaço atual e (b) o
+- [x] Task 4.3: Aplicar a reconciliação a (a) todos os nós do espaço atual e (b) o
       `internal` de **todas** as outras definições que contenham instâncias daquele
       `defId`.
-- [ ] Task 4.4: Persistir todas as definições alteradas e recarregar a paleta; reavaliar a
+- [x] Task 4.4: Persistir todas as definições alteradas e recarregar a paleta; reavaliar a
       simulação.
-- [ ] Task 4.5: Testes da reconciliação: I/O inalterado (no-op nos fios), aumento de I/O
+- [x] Task 4.5: Testes da reconciliação: I/O inalterado (no-op nos fios), aumento de I/O
       (pinos novos livres) e redução de I/O (fios de pinos eliminados removidos), incluindo
       instâncias aninhadas.
 
