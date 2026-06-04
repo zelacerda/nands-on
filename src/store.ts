@@ -58,6 +58,23 @@ export class CircuitStore {
     this.wires.clear();
   }
 
+  /**
+   * Substitui o conteúdo do espaço pelo estado dado (ex.: abrir um chip para
+   * edição, ou restaurar o espaço ao concluir). Faz cópia profunda para não
+   * compartilhar referências com a origem, e avança o contador de ids para além
+   * dos ids carregados, evitando colisão ao criar novos nós/fios depois.
+   */
+  loadState(state: CircuitState): void {
+    const copy = structuredClone(state);
+    this.nodes = new Map(copy.nodes.map((n) => [n.id, n]));
+    this.wires = new Map(copy.wires.map((w) => [w.id, w]));
+    this.seq = 0;
+    for (const id of [...this.nodes.keys(), ...this.wires.keys()]) {
+      const m = /^[nw](\d+)$/.exec(id);
+      if (m) this.seq = Math.max(this.seq, Number(m[1]));
+    }
+  }
+
   /** Quantidade de nós de um dado tipo (ex.: para condicionar o botão "Fazer"). */
   countByType(type: CircuitNode['type']): number {
     let n = 0;

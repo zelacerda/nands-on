@@ -70,4 +70,27 @@ describe('CircuitStore', () => {
     expect(json.wires).toHaveLength(0);
     expect(json.nodes[0].type).toBe('nand');
   });
+
+  describe('loadState', () => {
+    it('substitui o conteúdo por uma cópia profunda (sem alias)', () => {
+      const store = new CircuitStore();
+      const source = { nodes: [{ id: 'n1', type: 'nand' as const, pos: { x: 5, y: 6 }, pins: [] }], wires: [] };
+      store.loadState(source);
+      expect(store.listNodes()).toHaveLength(1);
+      // Mutar a origem não afeta o estado carregado.
+      source.nodes[0]!.pos.x = 999;
+      expect(store.getNode('n1')!.pos.x).toBe(5);
+    });
+
+    it('avança o contador de ids para além dos nós/fios carregados', () => {
+      const store = new CircuitStore();
+      store.loadState({
+        nodes: [{ id: 'n4', type: 'input' as const, pos: { x: 0, y: 0 }, pins: createPins('input') }],
+        wires: [],
+      });
+      // O próximo nó criado não pode reutilizar n1..n4.
+      const next = store.addNode('nand', { x: 0, y: 0 });
+      expect(Number(next.id.replace('n', ''))).toBeGreaterThan(4);
+    });
+  });
 });

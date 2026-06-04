@@ -97,6 +97,21 @@ body {
   background: #45323a;
 }
 
+#palette button#edit-chip {
+  color: #e0af68;
+  border-color: #5a4a32;
+}
+
+#palette button#edit-chip:hover {
+  background: #45402d;
+}
+
+/* Chip selecionado na paleta (com "Editar" visível): anel de destaque. */
+#palette button.chip-btn.selected {
+  border-color: #e0af68;
+  box-shadow: 0 0 0 2px rgba(224, 175, 104, 0.45);
+}
+
 /* Botão "Fazer" (canto superior direito). */
 #make {
   position: fixed;
@@ -116,6 +131,61 @@ body {
 
 #make:hover {
   background: #aede7a;
+}
+
+/* Barra de edição de chip (canto superior direito, no lugar do "Fazer"). */
+#edit-bar {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 12px;
+  background: rgba(39, 43, 51, 0.9);
+  border: 1px solid #5a4a32;
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+}
+
+#edit-bar[hidden] {
+  display: none;
+}
+
+#edit-label {
+  font:
+    600 13px system-ui,
+    sans-serif;
+  color: #e0af68;
+}
+
+#edit-bar button {
+  font:
+    700 13px system-ui,
+    sans-serif;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+#finish-edit {
+  color: #1a1d23;
+  background: #9ece6a;
+}
+
+#finish-edit:hover {
+  background: #aede7a;
+}
+
+#cancel-edit {
+  color: #d8dee9;
+  background: #353b45;
+}
+
+#cancel-edit:hover {
+  background: #3f4651;
 }
 
 /* Diálogo de nomeação. */

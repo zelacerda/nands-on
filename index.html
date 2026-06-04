@@ -16,10 +16,17 @@
       <button type="button" data-add="input">Entrada</button>
       <button type="button" data-add="output">Saída</button>
       <button type="button" class="logic-btn" data-add="nand">NAND</button>
+      <button type="button" id="edit-chip" hidden>Editar</button>
       <button type="button" id="delete" hidden>Excluir</button>
     </nav>
 
     <button type="button" id="make" hidden>Fazer</button>
+
+    <div id="edit-bar" hidden>
+      <span id="edit-label"></span>
+      <button type="button" id="finish-edit">Salvar edição</button>
+      <button type="button" id="cancel-edit">Cancelar</button>
+    </div>
 
     <div id="name-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="name-title">
       <div class="dialog-box">

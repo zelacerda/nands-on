@@ -5,6 +5,7 @@ import {
   NODE_SIZE,
   type ChipDefinition,
   type CircuitNode,
+  type CircuitState,
   type PinRef,
   type PrimitiveType,
   chipInstancePins,
@@ -196,7 +197,12 @@ let paletteDrag: {
   previewWorld: Vec2 | null;
 } | null = null;
 
-function attachPaletteDrag(btn: HTMLElement, item: PaletteItem): void {
+/**
+ * Liga um botão da paleta ao arrasto-para-criar. `onTap` é chamado quando o
+ * gesto termina sem caracterizar arrasto (clique/toque simples) — usado pelos
+ * botões de chip para revelar "Editar" / renomear, sem criar instância.
+ */
+function attachPaletteDrag(btn: HTMLElement, item: PaletteItem, onTap?: () => void): void {
   btn.addEventListener('pointerdown', (e) => {
     if (paletteDrag) return; // já há um arrasto em andamento; ignora ponteiros extras
     e.preventDefault();
@@ -223,7 +229,10 @@ function attachPaletteDrag(btn: HTMLElement, item: PaletteItem): void {
     if (btn.hasPointerCapture(e.pointerId)) btn.releasePointerCapture(e.pointerId);
 
     const end = { x: e.clientX, y: e.clientY };
-    if (!isDrag(drag.start, end)) return; // clique simples: reservado para edição futura
+    if (!isDrag(drag.start, end)) {
+      onTap?.(); // clique simples: edição (chips), no-op para primitivas
+      return;
+    }
     const world = clientToWorldOnCanvas(end);
     if (world) spawnItem(drag.item, world);
   });
@@ -234,16 +243,57 @@ function attachPaletteDrag(btn: HTMLElement, item: PaletteItem): void {
   });
 }
 
+// --- Seleção e edição de chip na paleta ----------------------------------
+
+const editChipBtn = document.querySelector<HTMLButtonElement>('#edit-chip')!;
+/** Definição do chip selecionado na paleta (cujo "Editar" está visível), ou `null`. */
+let selectedChipDef: ChipDefinition | null = null;
+/** Último toque simples sobre um botão de chip, para detectar duplo clique/toque. */
+let lastChipTap: { defId: string; time: number } | null = null;
+
+/** Marca o botão `btn` como selecionado e revela "Editar"; limpa os demais. */
+function selectChip(def: ChipDefinition, btn: HTMLElement): void {
+  selectedChipDef = def;
+  palette.querySelectorAll('button.chip-btn.selected').forEach((b) => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  editChipBtn.hidden = false;
+}
+
+/** Limpa a seleção de chip na paleta e esconde "Editar". */
+function clearChipSelection(): void {
+  selectedChipDef = null;
+  palette.querySelectorAll('button.chip-btn.selected').forEach((b) => b.classList.remove('selected'));
+  editChipBtn.hidden = true;
+}
+
+/**
+ * Toque/clique simples num botão de chip: o primeiro seleciona (revela "Editar");
+ * um segundo toque rápido no mesmo chip abre a renomeação.
+ */
+function onChipTap(def: ChipDefinition, btn: HTMLElement): void {
+  const now = performance.now();
+  const isDouble =
+    lastChipTap !== null && lastChipTap.defId === def.id && now - lastChipTap.time <= DOUBLE_TAP_MS;
+  if (isDouble) {
+    lastChipTap = null;
+    openNameDialog({ kind: 'rename', def });
+    return;
+  }
+  lastChipTap = { defId: def.id, time: now };
+  selectChip(def, btn);
+}
+
 /** Reconstrói os botões de chip na paleta a partir da biblioteca. */
 function refreshPalette(): void {
   palette.querySelectorAll('button.chip-btn').forEach((b) => b.remove());
+  clearChipSelection();
   for (const def of library.list()) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'chip-btn';
     btn.textContent = def.name;
-    attachPaletteDrag(btn, { kind: 'chip', def });
-    palette.insertBefore(btn, deleteBtn);
+    attachPaletteDrag(btn, { kind: 'chip', def }, () => onChipTap(def, btn));
+    palette.insertBefore(btn, editChipBtn);
   }
 }
 
@@ -266,11 +316,22 @@ function canMake(): boolean {
   return store.countByType('input') >= 1 && store.countByType('output') >= 1;
 }
 
-function openNameDialog(): void {
-  nameInput.value = '';
+/**
+ * O diálogo de nome serve tanto para **criar** um chip (fluxo "Fazer") quanto
+ * para **renomear** um chip existente (duplo clique na paleta). O modo decide o
+ * texto pré-preenchido, o rótulo do botão e a ação ao confirmar.
+ */
+type NameDialogMode = { kind: 'create' } | { kind: 'rename'; def: ChipDefinition };
+let nameDialogMode: NameDialogMode = { kind: 'create' };
+
+function openNameDialog(mode: NameDialogMode): void {
+  nameDialogMode = mode;
+  nameInput.value = mode.kind === 'rename' ? mode.def.name : '';
+  nameConfirm.textContent = mode.kind === 'rename' ? 'Salvar' : 'Criar';
   nameError.hidden = true;
   nameDialog.hidden = false;
   nameInput.focus();
+  nameInput.select();
 }
 
 function closeNameDialog(): void {
@@ -295,13 +356,39 @@ function nodesCenter(): Vec2 | null {
   return { x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
 }
 
-function confirmMake(): void {
-  const check = validateChipName(library, nameInput.value);
+/**
+ * Propaga o novo nome de um chip para o rótulo exibido em todas as suas
+ * instâncias — tanto no espaço atual quanto nas aninhadas em outras definições —
+ * de modo que a renomeação seja visível em todo lugar (a simulação continua
+ * resolvendo por `defId`, não pelo nome).
+ */
+function propagateChipName(defId: string, newName: string): void {
+  for (const node of store.listNodes()) if (node.defId === defId) node.name = newName;
+  for (const other of library.list()) {
+    for (const node of other.internal.nodes) if (node.defId === defId) node.name = newName;
+  }
+}
+
+function confirmName(): void {
+  const mode = nameDialogMode;
+  const excludeId = mode.kind === 'rename' ? mode.def.id : undefined;
+  const check = validateChipName(library, nameInput.value, excludeId);
   if (!check.ok) {
     nameError.textContent = check.reason;
     nameError.hidden = false;
     return;
   }
+
+  if (mode.kind === 'rename') {
+    // Atualiza os rótulos das instâncias antes de renomear, para que o save
+    // disparado por `rename` (onMutate) já persista as definições atualizadas.
+    propagateChipName(mode.def.id, check.name);
+    library.rename(mode.def.id, check.name);
+    refreshPalette();
+    closeNameDialog();
+    return;
+  }
+
   // Captura o espaço como definição (preserva chips aninhados) e registra na biblioteca.
   const center = nodesCenter();
   const def = captureDefinition(store.toJSON(), check.name);
@@ -316,14 +403,68 @@ function confirmMake(): void {
 }
 
 makeBtn.addEventListener('click', () => {
-  if (canMake()) openNameDialog();
+  if (canMake()) openNameDialog({ kind: 'create' });
 });
-nameConfirm.addEventListener('click', confirmMake);
+nameConfirm.addEventListener('click', confirmName);
 nameCancel.addEventListener('click', closeNameDialog);
 nameInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') confirmMake();
+  if (e.key === 'Enter') confirmName();
   else if (e.key === 'Escape') closeNameDialog();
 });
+
+// --- Editar um chip existente --------------------------------------------
+
+const editBar = document.querySelector<HTMLDivElement>('#edit-bar')!;
+const editLabel = document.querySelector<HTMLSpanElement>('#edit-label')!;
+const finishEditBtn = document.querySelector<HTMLButtonElement>('#finish-edit')!;
+const cancelEditBtn = document.querySelector<HTMLButtonElement>('#cancel-edit')!;
+
+/**
+ * Edição em andamento, ou `null`. Guarda o id e o nome do chip editado e um
+ * snapshot do espaço de trabalho anterior, restaurado ao concluir/cancelar.
+ */
+let editing: { defId: string; name: string; snapshot: CircuitState } | null = null;
+
+/** Abre o circuito interno de um chip no espaço para edição. */
+function openChipForEdit(def: ChipDefinition): void {
+  if (editing) return;
+  editing = { defId: def.id, name: def.name, snapshot: structuredClone(store.toJSON()) };
+  store.loadState(def.internal);
+  setSelection(null);
+  clearChipSelection();
+  editLabel.textContent = `Editando: ${def.name}`;
+  editBar.hidden = false;
+}
+
+/** Sai do modo edição, restaurando o espaço de trabalho guardado. */
+function exitEdit(): void {
+  if (!editing) return;
+  store.loadState(editing.snapshot);
+  editing = null;
+  editBar.hidden = true;
+  setSelection(null);
+}
+
+/**
+ * Conclui a edição: recaptura o espaço como a definição do chip, **preservando o
+ * id** (para não quebrar as instâncias) e atualiza a biblioteca. Como a simulação
+ * resolve por `defId`, a nova lógica propaga automaticamente para todas as
+ * instâncias enquanto o nº de I/O não muda; a reconciliação para mudanças de I/O
+ * é tratada na Fase 4.
+ */
+function finishEdit(): void {
+  if (!editing) return;
+  const def = captureDefinition(structuredClone(store.toJSON()), editing.name, editing.defId);
+  library.update(def);
+  refreshPalette();
+  exitEdit();
+}
+
+editChipBtn.addEventListener('click', () => {
+  if (selectedChipDef) openChipForEdit(selectedChipDef);
+});
+finishEditBtn.addEventListener('click', finishEdit);
+cancelEditBtn.addEventListener('click', exitEdit);
 
 // --- Renomear entrada/saída (duplo clique / toque duplo) -----------------
 
@@ -409,6 +550,8 @@ canvas.addEventListener('pointerdown', (e) => {
   const screen = pointerScreen(e);
   pointers.set(e.pointerId, screen);
   canvas.setPointerCapture(e.pointerId);
+  // Interagir com o canvas tira o foco do chip selecionado na paleta.
+  clearChipSelection();
 
   if (pointers.size >= 2) {
     beginPinch();
@@ -592,8 +735,9 @@ function render(): void {
   signalState = simulate(store.toJSON(), resolveChip, signalState);
   drawCircuit(ctx!, camera, store, signalState);
 
-  // Atualiza a visibilidade do botão "Fazer" apenas quando muda.
-  const able = canMake();
+  // Atualiza a visibilidade do botão "Fazer" apenas quando muda. Durante a edição
+  // de um chip o botão fica oculto (a barra de edição ocupa o canto).
+  const able = canMake() && editing === null;
   if (able !== lastCanMake) {
     makeBtn.hidden = !able;
     lastCanMake = able;

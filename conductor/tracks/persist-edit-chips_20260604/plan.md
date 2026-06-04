@@ -45,14 +45,14 @@ clique abre a edição do nome.
 
 ### Tasks
 
-- [ ] Task 2.1: Ao clicar (simples) num botão de chip, revelar um controle **"Editar"**
+- [x] Task 2.1: Ao clicar (simples) num botão de chip, revelar um controle **"Editar"**
       associado àquele chip (estado de seleção do botão na paleta).
-- [ ] Task 2.2: Implementar duplo clique no botão de chip para abrir um campo/diálogo de
+- [x] Task 2.2: Implementar duplo clique no botão de chip para abrir um campo/diálogo de
       **renomear**, reutilizando `validateChipName` (vazio/duplicata).
-- [ ] Task 2.3: Atualizar a definição (`name`) no lugar (mantendo `id`), persistir e
+- [x] Task 2.3: Atualizar a definição (`name`) no lugar (mantendo `id`), persistir e
       recarregar a paleta; confirmar que instâncias continuam válidas (resolução por
       `defId`).
-- [ ] Task 2.4: Conciliar os gestos com o drag-para-criar existente (não disparar criação
+- [x] Task 2.4: Conciliar os gestos com o drag-para-criar existente (não disparar criação
       ao clicar/duplo-clicar para editar).
 
 ### Verification
@@ -67,11 +67,11 @@ restaurá-lo ao final.
 
 ### Tasks
 
-- [ ] Task 3.1: Introduzir um **estado de "modo edição"** (qual `defId` está sendo editado)
+- [x] Task 3.1: Introduzir um **estado de "modo edição"** (qual `defId` está sendo editado)
       e snapshot do espaço atual (`store.toJSON()`) para restauração posterior.
-- [ ] Task 3.2: Ao clicar em "Editar", carregar `def.internal` no `store` (substituindo o
+- [x] Task 3.2: Ao clicar em "Editar", carregar `def.internal` no `store` (substituindo o
       espaço) e indicar visualmente que se está editando aquele chip.
-- [ ] Task 3.3: Fornecer ação de **concluir edição** (Salvar) e, opcionalmente, Cancelar —
+- [x] Task 3.3: Fornecer ação de **concluir edição** (Salvar) e, opcionalmente, Cancelar —
       ambas restaurando o snapshot do espaço anterior ao sair do modo edição.
 
 ### Verification
