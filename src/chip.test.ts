@@ -29,11 +29,38 @@ describe('captureDefinition', () => {
     expect(def.outputCount).toBe(1);
   });
 
-  it('preserva a topologia interna capturada', () => {
+  it('preserva a topologia interna capturada (como cópia independente)', () => {
     const state = sampleState();
     const def = captureDefinition(state, 'X');
     expect(def.internal.nodes).toHaveLength(4);
-    expect(def.internal).toBe(state);
+    // A definição guarda uma cópia, não a mesma referência do espaço de origem,
+    // para que zerar os estados das entradas não mute o espaço de trabalho vivo.
+    expect(def.internal).not.toBe(state);
+  });
+
+  it('grava as entradas desligadas — zera value e clock', () => {
+    const store = new CircuitStore();
+    const a = store.addNode('input', { x: 0, y: 0 });
+    const b = store.addNode('input', { x: 0, y: 80 });
+    store.addNode('output', { x: 200, y: 0 });
+    store.setNodeValue(a.id, true); // ON
+    store.cycleInputState(b.id); // OFF → ON
+    store.cycleInputState(b.id); // ON → CLK
+    const def = captureDefinition(store.toJSON(), 'C');
+    for (const n of def.internal.nodes.filter((n) => n.type === 'input')) {
+      expect(n.value ?? false).toBe(false);
+      expect(n.clock ?? false).toBe(false);
+    }
+  });
+
+  it('não muta o estado de origem ao capturar', () => {
+    const store = new CircuitStore();
+    const a = store.addNode('input', { x: 0, y: 0 });
+    store.addNode('output', { x: 200, y: 0 });
+    store.setNodeValue(a.id, true);
+    const state = store.toJSON();
+    captureDefinition(state, 'C');
+    expect(state.nodes.find((n) => n.id === a.id)?.value).toBe(true);
   });
 
   it('gera ids únicos por captura', () => {
