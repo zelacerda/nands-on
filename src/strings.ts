@@ -20,6 +20,7 @@ export const STRINGS = {
   // Paleta de componentes
   'palette.input': 'IN',
   'palette.output': 'OUT',
+  'palette.clock': 'CLK',
   'palette.edit': 'Edit',
   'palette.delete': 'Delete',
 
