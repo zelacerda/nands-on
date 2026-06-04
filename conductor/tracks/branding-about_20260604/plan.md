@@ -3,7 +3,7 @@
 **Track ID:** branding-about_20260604
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-04
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -17,12 +17,12 @@ a partir da flag) ganha um teste unitário pequeno.
 
 ### Tasks
 
-- [ ] Task 1.1: Criar `public/favicon.svg` (glifo simples, leve, no tema do app) e
+- [x] Task 1.1: Criar `public/favicon.svg` (glifo simples, leve, no tema do app) e
       referenciá-lo em `index.html` (`<link rel="icon" type="image/svg+xml">`).
-- [ ] Task 1.2: Em `index.html`, ajustar `<title>` para "NANDS-ON — From NAND to CPU"
+- [x] Task 1.2: Em `index.html`, ajustar `<title>` para "NANDS-ON — From NAND to CPU"
       e adicionar meta Open Graph/Twitter (`og:title`, `og:description`, `og:url`,
       `og:image`, `twitter:card`), reusando o favicon como `og:image` por ora.
-- [ ] Task 1.3: Em `strings.ts`, adicionar as chaves de branding/créditos/rótulos
+- [x] Task 1.3: Em `strings.ts`, adicionar as chaves de branding/créditos/rótulos
       (nome, subtítulo, corpo dos créditos, "About", "Close", "Don't show again",
       labels de link) e aplicar onde for texto estático do `<head>`/markup.
 
@@ -34,15 +34,15 @@ a partir da flag) ganha um teste unitário pequeno.
 
 ### Tasks
 
-- [ ] Task 2.1: Em `index.html`, adicionar o markup do botão "?" e do overlay/painel
+- [x] Task 2.1: Em `index.html`, adicionar o markup do botão "?" e do overlay/painel
       "Sobre" (identidade, créditos com link ao Digital-Logic-Sim, link do repo,
       checkbox "não mostrar novamente", botão "Fechar"), com `data-i18n`.
-- [ ] Task 2.2: Em `style.css`, estilizar o botão "?" (canto, discreto) e o
+- [x] Task 2.2: Em `style.css`, estilizar o botão "?" (canto, discreto) e o
       overlay/painel no tema escuro atual (reusando as cores existentes).
-- [ ] Task 2.3: Extrair a flag de dispensa para um helper de `localStorage`
+- [x] Task 2.3: Extrair a flag de dispensa para um helper de `localStorage`
       (`nandson.welcomeDismissed`) com função pura `shouldAutoShowWelcome(dismissed)`
       e cobrir com um teste unitário.
-- [ ] Task 2.4: Em `main.ts`, ligar o botão "?" (abrir), o "Fechar"/overlay/`Esc`
+- [x] Task 2.4: Em `main.ts`, ligar o botão "?" (abrir), o "Fechar"/overlay/`Esc`
       (fechar), o checkbox (persistir a flag) e o **auto-abrir** no load quando não
       dispensado.
 
@@ -52,11 +52,12 @@ a partir da flag) ganha um teste unitário pequeno.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos
-- [ ] Testes passando e build/lint sem erros
-- [ ] Conferência manual: 1º acesso abre boas-vindas; marcar "não mostrar novamente"
+- [x] Todos os critérios de aceitação atendidos
+- [x] Testes passando (102) e build/lint sem erros
+- [~] Conferência manual: 1º acesso abre boas-vindas; marcar "não mostrar novamente"
       + recarregar não reabre; botão "?" abre o painel; fechar por botão/overlay/`Esc`
-- [ ] Pronto para revisão
+      — recomendada via dev server (`http://localhost:5174/`)
+- [x] Pronto para revisão
 
 ---
 

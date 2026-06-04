@@ -24,7 +24,7 @@ Hub de navegação para o contexto do projeto.
 - [Entrada de Clock (CLK) e Botões de I/O Circulares](./tracks/clock-input_20260604/index.md) — `clock-input_20260604` (complete)
 - [Zerar Estados de Entrada ao Salvar Chip e Desligar Saídas Sem Conexão](./tracks/reset-state_20260604/index.md) — `reset-state_20260604` (complete)
 - [Make Deixa o Espaço Vazio (Sem Instância Automática)](./tracks/make-clear-space_20260604/index.md) — `make-clear-space_20260604` (complete)
-- [Branding NANDS-ON e Painel Sobre/Boas-vindas](./tracks/branding-about_20260604/index.md) — `branding-about_20260604` (pending)
+- [Branding NANDS-ON e Painel Sobre/Boas-vindas](./tracks/branding-about_20260604/index.md) — `branding-about_20260604` (complete)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
