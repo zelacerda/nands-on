@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { chipInstancePins, chipSize, nodeSize, type CircuitState } from './model';
-import { ChipLibrary, captureDefinition, DuplicateChipNameError, validateChipName } from './chip';
+import {
+  ChipLibrary,
+  captureDefinition,
+  DuplicateChipNameError,
+  primeSeqFromIds,
+  validateChipName,
+} from './chip';
 import { CircuitStore } from './store';
 
 /** Monta um CircuitState simples: 2 entradas, 1 saída e uma NAND. */
@@ -186,6 +192,92 @@ describe('validateChipName', () => {
     const lib = new ChipLibrary();
     const res = validateChipName(lib, '  AND  ');
     expect(res).toEqual({ ok: true, name: 'AND' });
+  });
+
+  it('ignora o próprio chip (excludeId) ao revalidar o mesmo nome', () => {
+    const lib = new ChipLibrary();
+    lib.add(captureDefinition(sampleState(), 'AND'));
+    const def = lib.get('AND')!;
+    // Renomear "AND" para "AND" deve passar quando exclui a si mesmo...
+    expect(validateChipName(lib, 'AND', def.id).ok).toBe(true);
+    // ...mas continua colidindo com OUTRO chip de mesmo nome.
+    lib.add(captureDefinition(sampleState(), 'OR'));
+    expect(validateChipName(lib, 'OR', def.id).ok).toBe(false);
+  });
+});
+
+describe('primeSeqFromIds / captureDefinition com id', () => {
+  it('reusa o id passado e não consome o contador sequencial', () => {
+    const reused = captureDefinition(sampleState(), 'X', 'chip42');
+    expect(reused.id).toBe('chip42');
+    // O próximo id automático não deve ser afetado pelo id reusado.
+    const auto = captureDefinition(sampleState(), 'Y');
+    expect(auto.id).not.toBe('chip42');
+  });
+
+  it('avança o contador para além dos ids restaurados, evitando colisão', () => {
+    primeSeqFromIds(['chip3', 'chip100', 'chip7']);
+    const next = captureDefinition(sampleState(), 'Z');
+    expect(Number(next.id.replace('chip', ''))).toBeGreaterThan(100);
+  });
+});
+
+describe('ChipLibrary — edição e carga', () => {
+  it('getById recupera por id estável', () => {
+    const lib = new ChipLibrary();
+    const def = captureDefinition(sampleState(), 'AND');
+    lib.add(def);
+    expect(lib.getById(def.id)).toBe(def);
+  });
+
+  it('update substitui a definição de mesmo id preservando a chave de nome', () => {
+    const lib = new ChipLibrary();
+    const def = captureDefinition(sampleState(), 'AND');
+    lib.add(def);
+    const edited = captureDefinition(sampleState(), 'AND', def.id);
+    lib.update(edited);
+    expect(lib.get('AND')).toBe(edited);
+    expect(lib.list()).toHaveLength(1);
+  });
+
+  it('rename muda o nome mantendo o id e a posição na ordem', () => {
+    const lib = new ChipLibrary();
+    const first = captureDefinition(sampleState(), 'A');
+    lib.add(first);
+    lib.add(captureDefinition(sampleState(), 'B'));
+    lib.rename(first.id, 'AND');
+    expect(lib.get('A')).toBeUndefined();
+    expect(lib.getById(first.id)?.name).toBe('AND');
+    // Mantém a ordem: o renomeado continua sendo o primeiro.
+    expect(lib.list()[0]!.id).toBe(first.id);
+  });
+
+  it('load substitui o conteúdo e prepara o contador de ids', () => {
+    const lib = new ChipLibrary();
+    const defs = [
+      captureDefinition(sampleState(), 'A', 'chip5'),
+      captureDefinition(sampleState(), 'B', 'chip9'),
+    ];
+    lib.load(defs);
+    expect(lib.list()).toHaveLength(2);
+    // Após carregar, um chip novo recebe id além dos restaurados.
+    lib.add(captureDefinition(sampleState(), 'C'));
+    expect(Number(lib.get('C')!.id.replace('chip', ''))).toBeGreaterThan(9);
+  });
+
+  it('dispara onMutate em add/update/rename, mas não em load', () => {
+    const lib = new ChipLibrary();
+    let calls = 0;
+    lib.onMutate = () => {
+      calls += 1;
+    };
+    const def = captureDefinition(sampleState(), 'A');
+    lib.add(def);
+    lib.update(captureDefinition(sampleState(), 'A', def.id));
+    lib.rename(def.id, 'B');
+    expect(calls).toBe(3);
+    lib.load([captureDefinition(sampleState(), 'C')]);
+    expect(calls).toBe(3); // load não conta como mutação a persistir
   });
 });
 

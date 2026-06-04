@@ -14,6 +14,7 @@ import {
 } from './model';
 import { CircuitStore } from './store';
 import { ChipLibrary, captureDefinition, validateChipName } from './chip';
+import { loadChips, saveChips } from './persistence';
 import {
   drawCircuit,
   drawGhostWire,
@@ -114,6 +115,9 @@ function deleteSelection(): void {
 // --- Paleta --------------------------------------------------------------
 
 const library = new ChipLibrary();
+// Qualquer mutação da biblioteca (criar/editar/renomear chip) é persistida no
+// IndexedDB de forma assíncrona.
+library.onMutate = (defs) => void saveChips(defs);
 const palette = document.querySelector<HTMLElement>('#palette')!;
 
 /** Resolve a topologia interna de um nó `chip` para a simulação recursiva. */
@@ -625,3 +629,11 @@ function render(): void {
 window.addEventListener('resize', resize);
 resize();
 requestAnimationFrame(render);
+
+// Restaura a biblioteca de chips persistida e repovoa a paleta. Assíncrono: o
+// editor já está utilizável; os chips salvos aparecem assim que carregam.
+void loadChips().then((defs) => {
+  if (defs.length === 0) return;
+  library.load(defs);
+  refreshPalette();
+});
