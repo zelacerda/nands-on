@@ -333,6 +333,42 @@ describe('simulate — circuitos sequenciais (realimentação)', () => {
   });
 });
 
+describe('simulate — desconexão desliga pinos sem fio', () => {
+  it('desliga a saída quando o fio que a alimenta é removido', () => {
+    const store = new CircuitStore();
+    const inp = store.addNode('input', { x: 0, y: 0 });
+    const out = store.addNode('output', { x: 100, y: 0 });
+    const wire = store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: out.id, pinId: 'in' });
+    store.setNodeValue(inp.id, true);
+
+    let sig = simulate(store.toJSON());
+    expect(sig.pinValues.get(pinKey(out.id, 'in'))).toBe(true);
+
+    // Remove o fio e re-simula preservando `prev` (memória entre frames): a saída,
+    // agora sem fonte, deve desligar — a interrupção propaga até ela.
+    store.removeWire(wire.id);
+    sig = simulate(store.toJSON(), undefined, sig);
+    expect(sig.pinValues.get(pinKey(out.id, 'in'))).toBe(false);
+  });
+
+  it('trata pino de entrada sem fio como false mesmo após já ter recebido sinal', () => {
+    const store = new CircuitStore();
+    const a = store.addNode('input', { x: 0, y: 0 });
+    const nand = store.addNode('nand', { x: 100, y: 0 });
+    const out = store.addNode('output', { x: 220, y: 0 });
+    const w1 = store.addWire({ nodeId: a.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in0' });
+    store.addWire({ nodeId: nand.id, pinId: 'out' }, { nodeId: out.id, pinId: 'in' });
+    store.setNodeValue(a.id, true);
+
+    let sig = simulate(store.toJSON());
+    expect(sig.pinValues.get(pinKey(nand.id, 'in0'))).toBe(true);
+
+    store.removeWire(w1.id);
+    sig = simulate(store.toJSON(), undefined, sig);
+    expect(sig.pinValues.get(pinKey(nand.id, 'in0'))).toBe(false);
+  });
+});
+
 describe('simulate — clock', () => {
   const HALF = CLOCK_PERIOD_MS / 2;
 
