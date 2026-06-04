@@ -13,5 +13,6 @@
 | [x] | touch-inline-edit_20260604 | Edição In-Place de Rótulos (I/O e Chips) e Correção no Touch | 2026-06-04 | 2026-06-04 |
 | [x] | clock-input_20260604 | Entrada de Clock (CLK) e Botões de I/O Circulares | 2026-06-04 | 2026-06-04 |
 | [x] | reset-state_20260604 | Zerar Estados de Entrada ao Salvar Chip e Desligar Saídas Sem Conexão | 2026-06-04 | 2026-06-04 |
+| [~] | make-clear-space_20260604 | Make Deixa o Espaço Vazio (Sem Instância Automática) | 2026-06-04 | 2026-06-04 |
 
 <!-- Tracks registrados por /conductor:new-track -->
