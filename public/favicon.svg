@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NANDS-ON">
+  <!-- Fundo no tema escuro do app -->
+  <rect width="64" height="64" rx="14" fill="#1a1d23" />
+  <!-- Pinos de entrada e de saída -->
+  <g stroke="#7aa2f7" stroke-width="4" stroke-linecap="round">
+    <line x1="6" y1="25" x2="20" y2="25" />
+    <line x1="6" y1="39" x2="20" y2="39" />
+    <line x1="52" y1="32" x2="60" y2="32" />
+  </g>
+  <!-- Corpo da porta AND (D) -->
+  <path d="M20 16 H33 A16 16 0 0 1 33 48 H20 Z" fill="#7aa2f7" />
+  <!-- Bolha de negação (NAND) -->
+  <circle cx="51" cy="32" r="5" fill="#1a1d23" stroke="#7aa2f7" stroke-width="4" />
+</svg>

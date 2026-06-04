@@ -12,10 +12,26 @@
  */
 export const STRINGS = {
   // Metadados / acessibilidade
-  'meta.description': 'From NAND to CPU — a digital logic simulator in the browser.',
+  'meta.description':
+    'NANDS-ON — build digital logic from a single NAND gate up to a CPU, right in your browser.',
   'a11y.editor': 'Circuit editor',
   'a11y.palette': 'Component palette',
   'a11y.renameInput': 'Input or output name',
+  'a11y.about': 'About NANDS-ON',
+
+  // Marca e painel "Sobre" / boas-vindas
+  'app.name': 'NANDS-ON',
+  'app.tagline': 'From NAND to CPU',
+  'about.button': '?',
+  'about.intro':
+    'Build digital logic hands-on: start from a single NAND gate, package your circuits into reusable chips, and work your way up to a CPU — all in the browser.',
+  'about.creditsTitle': 'Credits',
+  'about.author': 'Created by Zé Lacerda.',
+  'about.inspiredBy': 'Inspired by',
+  'about.dlsLink': "Sebastian Lague's Digital-Logic-Sim",
+  'about.repoLink': 'Source on GitHub',
+  'about.dontShowAgain': "Don't show this again",
+  'about.close': 'Close',
 
   // Paleta de componentes
   'palette.input': 'IN',
