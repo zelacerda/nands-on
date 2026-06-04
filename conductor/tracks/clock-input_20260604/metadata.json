@@ -1,0 +1,18 @@
+{
+  "id": "clock-input_20260604",
+  "title": "Entrada de Clock (CLK) e Botões de I/O Circulares",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-06-04T18:34:36Z",
+  "updated": "2026-06-04T18:34:36Z",
+  "current_phase": 2,
+  "current_task": "2.1",
+  "phases": {
+    "total": 3,
+    "completed": 1
+  },
+  "tasks": {
+    "total": 10,
+    "completed": 4
+  }
+}
