@@ -430,6 +430,7 @@ body {
 
 .tutorial-progress {
   margin-bottom: 6px;
+  padding-right: 24px; /* espaço para o "×" no canto superior direito */
   font:
     700 11px system-ui,
     sans-serif;
@@ -439,25 +440,34 @@ body {
 }
 
 .tutorial-text {
-  margin-bottom: 12px;
   font-size: 14px;
   line-height: 1.5;
 }
 
+/* Botão de sair: "×" circular pequeno no canto superior direito do callout. */
 #tutorial-exit {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   font:
-    600 13px system-ui,
+    700 15px system-ui,
     sans-serif;
-  color: #d8dee9;
+  line-height: 1;
+  color: #aeb6c2;
   background: #353b45;
   border: 1px solid #4a525e;
-  border-radius: 8px;
-  padding: 8px 14px;
-  min-height: 36px;
+  border-radius: 50%;
   cursor: pointer;
 }
 
 #tutorial-exit:hover {
+  color: #d8dee9;
   background: #3f4651;
 }
 

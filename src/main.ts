@@ -881,11 +881,10 @@ function setTutorialHighlight(selector?: string): void {
 function renderTutorialStep(): void {
   const step = currentStep(NOT_TUTORIAL_STEPS, tutorialState);
   if (!step) {
-    // Concluído: mensagem final; o botão passa a apenas fechar ("Close").
+    // Concluído: mensagem final (o "×" continua fechando o callout).
     setTutorialHighlight(undefined);
     tutorialProgress.textContent = t('tutorial.doneTitle');
     tutorialText.textContent = t('tutorial.done');
-    tutorialExit.textContent = t('about.close');
     return;
   }
   tutorialProgress.textContent = t('tutorial.progress', {
@@ -893,7 +892,6 @@ function renderTutorialStep(): void {
     total: NOT_TUTORIAL_STEPS.length,
   });
   tutorialText.textContent = t(step.textKey);
-  tutorialExit.textContent = t('tutorial.exit');
   setTutorialHighlight(step.highlightSelector);
 }
 
