@@ -25,6 +25,7 @@ Hub de navegação para o contexto do projeto.
 - [Zerar Estados de Entrada ao Salvar Chip e Desligar Saídas Sem Conexão](./tracks/reset-state_20260604/index.md) — `reset-state_20260604` (complete)
 - [Make Deixa o Espaço Vazio (Sem Instância Automática)](./tracks/make-clear-space_20260604/index.md) — `make-clear-space_20260604` (complete)
 - [Branding NANDS-ON e Painel Sobre/Boas-vindas](./tracks/branding-about_20260604/index.md) — `branding-about_20260604` (complete)
+- [Walkthrough Interativo — Construir um NOT a partir do NAND](./tracks/tutorial-not_20260604/index.md) — `tutorial-not_20260604` (pending)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
