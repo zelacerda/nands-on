@@ -40,19 +40,19 @@ carregamento da página.
 
 ### Tasks
 
-- [ ] Task 2.1: Anotar elementos do `index.html` com `data-i18n` (texto) e
+- [x] Task 2.1: Anotar elementos do `index.html` com `data-i18n` (texto) e
       `data-i18n-attr` (para `aria-label`/`placeholder`/meta), removendo os textos PT
       hardcoded; manter "NAND" e o `<title>` (nome próprio). Trocar `lang="pt-BR"` →
       `lang="en"`.
-- [ ] Task 2.2: Criar bootstrap `applyStrings(root)` (em `src/strings.ts` ou
+- [x] Task 2.2: Criar bootstrap `applyStrings(root)` (em `src/strings.ts` ou
       `src/i18n.ts`) que varre `[data-i18n]` / `[data-i18n-attr]` e injeta os textos do
       módulo; chamar no início do `main.ts`.
-- [ ] Task 2.3: Garantir ordem de execução — strings aplicadas antes de qualquer leitura
+- [x] Task 2.3: Garantir ordem de execução — strings aplicadas antes de qualquer leitura
       de texto da UI dependente.
 
 ### Verification
 
-- [ ] App carrega com todos os textos estáticos em inglês; nenhum texto PT hardcoded
+- [x] App carrega com todos os textos estáticos em inglês; nenhum texto PT hardcoded
       remanescente no `index.html` (exceto `<title>`/NAND).
 
 ## Phase 3: Strings dinâmicas em TS
@@ -61,16 +61,16 @@ Substituir as strings de UI geradas dinamicamente por referências ao módulo ce
 
 ### Tasks
 
-- [ ] Task 3.1: `main.ts` — `nameConfirm.textContent` (Save/Create), `editLabel`
+- [x] Task 3.1: `main.ts` — `nameConfirm.textContent` (Save/Create), `editLabel`
       (`Editing: {name}` via `t()`), e o `confirm()` do Clear DB passam a usar `STRINGS`.
-- [ ] Task 3.2: `chip.ts` — mensagens de validação de nome (`reason`) passam a usar
+- [x] Task 3.2: `chip.ts` — mensagens de validação de nome (`reason`) passam a usar
       `STRINGS`/`t()` em inglês.
-- [ ] Task 3.3: Buscar por strings de UI em PT remanescentes no `src/` (excluindo
+- [x] Task 3.3: Buscar por strings de UI em PT remanescentes no `src/` (excluindo
       dev-facing acordados) e migrar quaisquer pendências.
 
 ### Verification
 
-- [ ] Nenhuma string de UI em PT em `main.ts`/`chip.ts`; mensagens de validação e labels
+- [x] Nenhuma string de UI em PT em `main.ts`/`chip.ts`; mensagens de validação e labels
       dinâmicos aparecem em inglês.
 
 ## Phase 4: Verificação final e ajustes

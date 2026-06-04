@@ -16,6 +16,7 @@ import {
 import { CircuitStore } from './store';
 import { ChipLibrary, captureDefinition, reconcileInstances, validateChipName } from './chip';
 import { clearChips, loadChips, saveChips } from './persistence';
+import { applyStrings, t } from './strings';
 import {
   drawCircuit,
   drawGhostWire,
@@ -37,6 +38,9 @@ const ctx = canvas.getContext('2d');
 if (!ctx) {
   throw new Error('Contexto 2D indisponível.');
 }
+
+// Preenche os textos estáticos da UI a partir do módulo central de strings.
+applyStrings();
 
 const camera = new Camera();
 const store = new CircuitStore();
@@ -327,7 +331,9 @@ let nameDialogMode: NameDialogMode = { kind: 'create' };
 function openNameDialog(mode: NameDialogMode): void {
   nameDialogMode = mode;
   nameInput.value = mode.kind === 'rename' ? mode.def.name : '';
-  nameConfirm.textContent = mode.kind === 'rename' ? 'Salvar' : 'Criar';
+  nameConfirm.textContent = t(
+    mode.kind === 'rename' ? 'nameDialog.confirmRename' : 'nameDialog.confirmCreate',
+  );
   nameError.hidden = true;
   nameDialog.hidden = false;
   nameInput.focus();
@@ -432,7 +438,7 @@ function openChipForEdit(def: ChipDefinition): void {
   store.loadState(def.internal);
   setSelection(null);
   clearChipSelection();
-  editLabel.textContent = `Editando: ${def.name}`;
+  editLabel.textContent = t('editBar.editing', { name: def.name });
   editBar.hidden = false;
 }
 
@@ -780,7 +786,7 @@ function render(): void {
 // dispositivos. TODO: ocultar/gated quando a feature amadurecer.
 const clearDbBtn = document.querySelector<HTMLButtonElement>('#clear-db')!;
 clearDbBtn.addEventListener('click', async () => {
-  if (!confirm('Limpar o banco local? Todos os chips salvos serão removidos.')) return;
+  if (!confirm(t('clearDb.confirm'))) return;
   await clearChips();
   location.reload();
 });

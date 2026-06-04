@@ -1,4 +1,5 @@
 import { type ChipDefinition, type CircuitState, chipInstancePins } from './model';
+import { t } from './strings';
 
 let seq = 0;
 
@@ -88,10 +89,10 @@ export function validateChipName(
   excludeId?: string,
 ): NameValidation {
   const name = raw.trim();
-  if (!name) return { ok: false, reason: 'Informe um nome para o componente.' };
+  if (!name) return { ok: false, reason: t('validation.emptyName') };
   const existing = library.get(name);
   if (existing && existing.id !== excludeId) {
-    return { ok: false, reason: `Já existe um chip chamado "${name}".` };
+    return { ok: false, reason: t('validation.duplicateName', { name }) };
   }
   return { ok: true, name };
 }

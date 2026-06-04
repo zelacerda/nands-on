@@ -1,48 +1,48 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <meta name="description" content="From NAND to CPU — simulador de lógica digital no browser." />
+    <meta name="description" content="" data-i18n-attr="content:meta.description" />
     <title>From NAND to CPU</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <canvas id="editor" aria-label="Editor de circuitos"></canvas>
-    <nav id="palette" aria-label="Paleta de componentes">
-      <button type="button" data-add="input">Entrada</button>
-      <button type="button" data-add="output">Saída</button>
+    <canvas id="editor" data-i18n-attr="aria-label:a11y.editor"></canvas>
+    <nav id="palette" data-i18n-attr="aria-label:a11y.palette">
+      <button type="button" data-add="input" data-i18n="palette.input"></button>
+      <button type="button" data-add="output" data-i18n="palette.output"></button>
       <button type="button" class="logic-btn" data-add="nand">NAND</button>
-      <button type="button" id="edit-chip" hidden>Editar</button>
-      <button type="button" id="delete" hidden>Excluir</button>
+      <button type="button" id="edit-chip" hidden data-i18n="palette.edit"></button>
+      <button type="button" id="delete" hidden data-i18n="palette.delete"></button>
     </nav>
 
-    <button type="button" id="make" hidden>Fazer</button>
+    <button type="button" id="make" hidden data-i18n="make"></button>
 
     <div id="edit-bar" hidden>
       <span id="edit-label"></span>
-      <button type="button" id="finish-edit">Salvar edição</button>
-      <button type="button" id="cancel-edit">Cancelar</button>
+      <button type="button" id="finish-edit" data-i18n="editBar.finish"></button>
+      <button type="button" id="cancel-edit" data-i18n="editBar.cancel"></button>
     </div>
 
     <div id="name-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="name-title">
       <div class="dialog-box">
-        <label id="name-title" for="chip-name">Nome do componente</label>
+        <label id="name-title" for="chip-name" data-i18n="nameDialog.title"></label>
         <input id="chip-name" type="text" autocomplete="off" spellcheck="false" />
         <p id="name-error" class="error" hidden></p>
         <div class="dialog-actions">
-          <button type="button" id="name-cancel">Cancelar</button>
-          <button type="button" id="name-confirm">Criar</button>
+          <button type="button" id="name-cancel" data-i18n="nameDialog.cancel"></button>
+          <button type="button" id="name-confirm" data-i18n="nameDialog.confirmCreate"></button>
         </div>
       </div>
     </div>
 
     <!-- Afordância temporária de desenvolvimento: sempre visível (inclusive no
          deploy) para facilitar testes em outros dispositivos. Ocultar/gated no futuro. -->
-    <button type="button" id="clear-db">Limpar banco</button>
+    <button type="button" id="clear-db" data-i18n="clearDb"></button>
 
     <div id="rename-overlay" hidden>
       <input
@@ -50,7 +50,7 @@
         type="text"
         autocomplete="off"
         spellcheck="false"
-        aria-label="Nome da entrada ou saída"
+        data-i18n-attr="aria-label:a11y.renameInput"
       />
     </div>
 
