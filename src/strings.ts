@@ -30,7 +30,7 @@ export const STRINGS = {
   'about.inspiredBy': 'Inspired by',
   'about.dlsLink': "Sebastian Lague's Digital-Logic-Sim",
   'about.repoLink': 'Source on GitHub',
-  'about.dontShowAgain': "Don't show this again",
+  'about.dontShowAgain': "Don't show this at start-up",
   'about.close': 'Close',
 
   // Paleta de componentes
