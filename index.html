@@ -42,6 +42,49 @@
          deploy) para facilitar testes em outros dispositivos. Ocultar/gated no futuro. -->
     <button type="button" id="clear-db" data-i18n="clearDb"></button>
 
+    <!-- Botão "?" que abre o painel Sobre. -->
+    <button
+      type="button"
+      id="about-btn"
+      data-i18n="about.button"
+      data-i18n-attr="aria-label:a11y.about"
+    ></button>
+
+    <!-- Painel "Sobre" — também exibido como boas-vindas no primeiro acesso. -->
+    <div id="about-overlay" hidden>
+      <div id="about-panel" role="dialog" aria-modal="true" aria-labelledby="about-title">
+        <h1 id="about-title">
+          <span class="about-name" data-i18n="app.name"></span>
+          <span class="about-tagline" data-i18n="app.tagline"></span>
+        </h1>
+        <p class="about-intro" data-i18n="about.intro"></p>
+        <h2 class="about-credits-title" data-i18n="about.creditsTitle"></h2>
+        <p data-i18n="about.author"></p>
+        <p>
+          <span data-i18n="about.inspiredBy"></span>
+          <a
+            href="https://github.com/SebLague/Digital-Logic-Sim/tree/Version-0"
+            target="_blank"
+            rel="noopener"
+            data-i18n="about.dlsLink"
+          ></a>
+        </p>
+        <p>
+          <a
+            href="https://github.com/zelacerda/logic"
+            target="_blank"
+            rel="noopener"
+            data-i18n="about.repoLink"
+          ></a>
+        </p>
+        <label class="about-dismiss">
+          <input type="checkbox" id="about-dont-show" />
+          <span data-i18n="about.dontShowAgain"></span>
+        </label>
+        <button type="button" id="about-close" data-i18n="about.close"></button>
+      </div>
+    </div>
+
     <div id="rename-overlay" hidden>
       <input
         id="rename-input"

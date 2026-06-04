@@ -29,6 +29,7 @@ import { type ChipResolver, type SignalState, simulate } from './simulator';
 import { validateConnection } from './connection';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
+import { isWelcomeDismissed, setWelcomeDismissed, shouldAutoShowWelcome } from './welcome';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#editor');
 if (!canvas) {
@@ -798,6 +799,42 @@ clearDbBtn.addEventListener('click', async () => {
   await clearChips();
   location.reload();
 });
+
+// --- Painel "Sobre" / boas-vindas ----------------------------------------
+
+const aboutBtn = document.querySelector<HTMLButtonElement>('#about-btn')!;
+const aboutOverlay = document.querySelector<HTMLDivElement>('#about-overlay')!;
+const aboutPanel = document.querySelector<HTMLDivElement>('#about-panel')!;
+const aboutClose = document.querySelector<HTMLButtonElement>('#about-close')!;
+const aboutDontShow = document.querySelector<HTMLInputElement>('#about-dont-show')!;
+
+function openAbout(): void {
+  // O checkbox reflete a preferência atual ao abrir (vale tanto para o "?" quanto
+  // para a abertura automática de boas-vindas).
+  aboutDontShow.checked = isWelcomeDismissed();
+  aboutOverlay.hidden = false;
+}
+
+function closeAbout(): void {
+  // Ao fechar, persiste a escolha do checkbox: controla se as boas-vindas voltam a
+  // abrir sozinhas no próximo acesso.
+  setWelcomeDismissed(aboutDontShow.checked);
+  aboutOverlay.hidden = true;
+}
+
+aboutBtn.addEventListener('click', openAbout);
+aboutClose.addEventListener('click', closeAbout);
+// Clique no fundo (fora do painel) fecha; clique dentro do painel não.
+aboutOverlay.addEventListener('click', (e) => {
+  if (!aboutPanel.contains(e.target as Node)) closeAbout();
+});
+// Esc fecha enquanto o painel estiver aberto.
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !aboutOverlay.hidden) closeAbout();
+});
+
+// Primeiro acesso (sem a flag de dispensa): abre as boas-vindas automaticamente.
+if (shouldAutoShowWelcome(isWelcomeDismissed())) openAbout();
 
 window.addEventListener('resize', resize);
 resize();
