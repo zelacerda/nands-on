@@ -15,7 +15,7 @@ import {
 } from './model';
 import { CircuitStore } from './store';
 import { ChipLibrary, captureDefinition, reconcileInstances, validateChipName } from './chip';
-import { loadChips, saveChips } from './persistence';
+import { clearChips, loadChips, saveChips } from './persistence';
 import {
   drawCircuit,
   drawGhostWire,
@@ -774,6 +774,16 @@ function render(): void {
 
   requestAnimationFrame(render);
 }
+
+// --- Limpar banco (afordância temporária de desenvolvimento) -------------
+// Sempre visível, inclusive no deploy, para facilitar testes em outros
+// dispositivos. TODO: ocultar/gated quando a feature amadurecer.
+const clearDbBtn = document.querySelector<HTMLButtonElement>('#clear-db')!;
+clearDbBtn.addEventListener('click', async () => {
+  if (!confirm('Limpar o banco local? Todos os chips salvos serão removidos.')) return;
+  await clearChips();
+  location.reload();
+});
 
 window.addEventListener('resize', resize);
 resize();

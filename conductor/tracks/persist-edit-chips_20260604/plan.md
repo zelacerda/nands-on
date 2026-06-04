@@ -109,12 +109,12 @@ quando o número de I/O mudar.
 
 ### Tasks
 
-- [ ] Task 5.1: Adicionar ação de **limpar o IndexedDB** (apagar object store) e recarregar
+- [x] Task 5.1: Adicionar ação de **limpar o IndexedDB** (apagar object store) e recarregar
       em estado vazio.
-- [ ] Task 5.2: Exibir o botão **sempre** (inclusive no deploy/produção), para permitir
+- [x] Task 5.2: Exibir o botão **sempre** (inclusive no deploy/produção), para permitir
       testes em outros dispositivos. Tratar como afordância **temporária** (ex.: comentário/
       TODO marcando que deve ser ocultada/gated no futuro).
-- [ ] Task 5.3: Tratar erros de IndexedDB (indisponível/privado) com degradação graciosa
+- [x] Task 5.3: Tratar erros de IndexedDB (indisponível/privado) com degradação graciosa
       (app funciona em memória) e ajustes visuais finais.
 
 ### Verification
