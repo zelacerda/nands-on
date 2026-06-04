@@ -405,3 +405,76 @@ body {
 #about-close:hover {
   background: #aede7a;
 }
+
+/* Callout do tutorial — caixa não-bloqueante centrada embaixo. */
+#tutorial-callout {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  width: calc(100% - 32px);
+  max-width: 460px;
+  padding: 16px 18px;
+  color: #d8dee9;
+  background: rgba(39, 43, 51, 0.96);
+  border: 1px solid #4a5680;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+#tutorial-callout[hidden] {
+  display: none;
+}
+
+.tutorial-progress {
+  margin-bottom: 6px;
+  font:
+    700 11px system-ui,
+    sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #7aa2f7;
+}
+
+.tutorial-text {
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#tutorial-exit {
+  font:
+    600 13px system-ui,
+    sans-serif;
+  color: #d8dee9;
+  background: #353b45;
+  border: 1px solid #4a525e;
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-height: 36px;
+  cursor: pointer;
+}
+
+#tutorial-exit:hover {
+  background: #3f4651;
+}
+
+/* Destaque do alvo do passo atual (ex.: botão da paleta). */
+.tutorial-highlight {
+  outline: 2px solid #ffd23f;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 210, 63, 0.3);
+  animation: tutorial-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes tutorial-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(255, 210, 63, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(255, 210, 63, 0.12);
+  }
+}
