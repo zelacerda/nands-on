@@ -156,10 +156,10 @@ function computeNodeOutputs(
 ): boolean {
   switch (node.type) {
     case 'input':
-      return setPin(node.id, 'out', inputValueOf(node));
-    case 'clock':
-      // Fonte que oscila com o tempo, independente de fios de entrada.
-      return setPin(node.id, 'out', clockValue(now));
+      // Em modo clock, a entrada oscila com o tempo (fonte autônoma); caso
+      // contrário, emite seu estado estático (ou, dentro de um chip, o valor do
+      // pino externo mapeado por `inputValueOf`).
+      return setPin(node.id, 'out', node.clock ? clockValue(now) : inputValueOf(node));
     case 'output':
       return false; // sem pinos de saída
     case 'nand': {
@@ -190,7 +190,9 @@ function computeChipOutputs(
   if (!internal) return false;
 
   const byY = (a: CircuitNode, b: CircuitNode) => a.pos.y - b.pos.y;
-  const inNodes = internal.nodes.filter((n) => n.type === 'input').sort(byY);
+  // Entradas em modo clock não recebem pino externo — são fontes internas que
+  // oscilam pelo tempo —, então não entram no mapeamento dos pinos de entrada.
+  const inNodes = internal.nodes.filter((n) => n.type === 'input' && !n.clock).sort(byY);
   const outNodes = internal.nodes.filter((n) => n.type === 'output').sort(byY);
 
   // Valores das entradas externas, na ordem dos pinos `in` do nó instância.

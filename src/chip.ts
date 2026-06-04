@@ -35,7 +35,9 @@ export function primeSeqFromIds(ids: Iterable<string>): void {
  */
 export function captureDefinition(state: CircuitState, name: string, id?: string): ChipDefinition {
   const byY = (a: { pos: { y: number } }, b: { pos: { y: number } }) => a.pos.y - b.pos.y;
-  const inputs = state.nodes.filter((n) => n.type === 'input').sort(byY);
+  // Entradas em modo clock são fontes internas autônomas: ficam na topologia, mas
+  // não viram pinos de entrada externos do chip.
+  const inputs = state.nodes.filter((n) => n.type === 'input' && !n.clock).sort(byY);
   const outputs = state.nodes.filter((n) => n.type === 'output').sort(byY);
   return {
     id: id ?? nextChipId(),

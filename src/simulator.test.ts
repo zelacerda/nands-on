@@ -344,9 +344,11 @@ describe('simulate — clock', () => {
     expect(clockValue(CLOCK_PERIOD_MS)).toBe(true); // novo ciclo
   });
 
-  it('um nó clock oscila a saída conforme o instante `now`', () => {
+  it('uma entrada em modo clock oscila a saída conforme o instante `now`', () => {
     const store = new CircuitStore();
-    const clk = store.addNode('clock', { x: 0, y: 0 });
+    const clk = store.addNode('input', { x: 0, y: 0 });
+    store.cycleInputState(clk.id); // OFF → ON
+    store.cycleInputState(clk.id); // ON → CLK
     const out = store.addNode('output', { x: 100, y: 0 });
     store.addWire({ nodeId: clk.id, pinId: 'out' }, { nodeId: out.id, pinId: 'in' });
 
@@ -361,14 +363,16 @@ describe('simulate — clock', () => {
     expect(at(CLOCK_PERIOD_MS)).toBe(true);
   });
 
-  it('um clock encapsulado dentro de um chip continua oscilando', () => {
+  it('uma entrada em modo clock encapsulada num chip continua oscilando', () => {
     // Chip sem entradas e com 1 saída, alimentada por um clock interno.
     const inner = new CircuitStore();
-    const clk = inner.addNode('clock', { x: 0, y: 0 });
+    const clk = inner.addNode('input', { x: 0, y: 0 });
+    inner.cycleInputState(clk.id); // OFF → ON
+    inner.cycleInputState(clk.id); // ON → CLK
     const o = inner.addNode('output', { x: 100, y: 0 });
     inner.addWire({ nodeId: clk.id, pinId: 'out' }, { nodeId: o.id, pinId: 'in' });
     const clockChip = captureDefinition(inner.toJSON(), 'CLK');
-    expect(clockChip.inputCount).toBe(0); // o clock não vira pino externo
+    expect(clockChip.inputCount).toBe(0); // entrada em modo clock não vira pino externo
     expect(clockChip.outputCount).toBe(1);
 
     const store = new CircuitStore();

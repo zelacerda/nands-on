@@ -77,12 +77,12 @@ let ghostValid = false;
 let pinchPrev: PinchSample | null = null;
 /**
  * Nó `input` que já estava selecionado ao iniciar este gesto. Se o ponteiro
- * subir sem caracterizar arrasto, o clique alterna o estado do input em vez de
- * apenas movê-lo/selecioná-lo.
+ * subir sem caracterizar arrasto, o clique avança o estado do input no ciclo
+ * (OFF → ON → CLK → OFF) em vez de apenas movê-lo/selecioná-lo.
  */
 let toggleCandidateId: string | null = null;
 /** Último toque simples sobre um nó, para detectar duplo clique/toque. */
-let lastTap: { time: number; pos: Vec2; nodeId: string; toggled: boolean } | null = null;
+let lastTap: { time: number; pos: Vec2; nodeId: string; cycled: boolean } | null = null;
 
 /** Janela (ms) e folga (px de tela) para caracterizar um toque/clique duplo. */
 const DOUBLE_TAP_MS = 350;
@@ -678,23 +678,27 @@ function endPointer(e: PointerEvent): void {
         Math.hypot(up.x - lastTap.pos.x, up.y - lastTap.pos.y) <= DOUBLE_TAP_DIST;
       if (isDouble) {
         // Duplo toque sobre entrada/saída: abre a edição in-place do rótulo. A
-        // intenção é editar, não alternar — então desfaz o toggle que o 1º toque
-        // tenha aplicado a um input já selecionado.
-        const wasToggled = lastTap?.toggled ?? false;
+        // intenção é editar, não ciclar — então desfaz o avanço de estado que o 1º
+        // toque tenha aplicado a um input já selecionado. Como o ciclo tem três
+        // estados (OFF→ON→CLK→OFF), dois avanços equivalem a recuar um.
+        const wasCycled = lastTap?.cycled ?? false;
         lastTap = null;
         const node = store.getNode(dragNodeId);
         if (node && (node.type === 'input' || node.type === 'output')) {
-          if (wasToggled && node.type === 'input') store.toggleNodeValue(node.id);
+          if (wasCycled && node.type === 'input') {
+            store.cycleInputState(node.id);
+            store.cycleInputState(node.id);
+          }
           openRenameOverlay(node);
         }
       } else {
-        // Toque simples sobre um input já selecionado alterna o estado.
-        let toggled = false;
+        // Toque simples sobre um input já selecionado avança seu estado no ciclo.
+        let cycled = false;
         if (toggleCandidateId) {
-          store.toggleNodeValue(toggleCandidateId);
-          toggled = true;
+          store.cycleInputState(toggleCandidateId);
+          cycled = true;
         }
-        lastTap = { time: now, pos: up, nodeId: dragNodeId, toggled };
+        lastTap = { time: now, pos: up, nodeId: dragNodeId, cycled };
       }
     }
   }

@@ -75,12 +75,11 @@ body {
   background: #2d333b;
 }
 
-/* Botões de I/O (IN/CLK/OUT): círculos, espelhando a forma desses nós no canvas.
-   A cor da borda reflete o conector exposto — laranja para os que têm pino de
-   saída (IN, CLK) e azul claro para o que tem pino de entrada (OUT) — tornando
+/* Botões de I/O (IN/OUT): círculos, espelhando a forma desses nós no canvas. A
+   cor da borda reflete o conector exposto — laranja para a entrada (que tem pino
+   de saída) e azul claro para a saída (que tem pino de entrada) — tornando
    intuitivo o que injeta e o que observa sinal. */
 #palette button[data-add='input'],
-#palette button[data-add='clock'],
 #palette button[data-add='output'] {
   width: 44px;
   height: 44px;
@@ -90,8 +89,7 @@ body {
   border-radius: 50%;
 }
 
-#palette button[data-add='input'],
-#palette button[data-add='clock'] {
+#palette button[data-add='input'] {
   border-color: #e0af68;
 }
 

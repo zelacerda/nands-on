@@ -7,10 +7,18 @@
 
 ## Summary
 
-Adicionar uma entrada de **clock (CLK)** que alterna ON/OFF automaticamente num
-ciclo fixo de 1s (0,5s ligado, 0,5s desligado), e padronizar os botões de **IN**,
-**OUT** e **CLK** da paleta como círculos, com a cor da borda refletindo o tipo de
-conector.
+Adicionar um **modo clock** à entrada (`input`): tocando uma entrada selecionada, o
+usuário cicla **OFF → ON → CLK → OFF**. No modo CLK, a entrada alterna ON/OFF
+automaticamente num ciclo fixo de 1s (0,5s ligado, 0,5s desligado). Padronizar
+ainda os botões de **IN** e **OUT** da paleta como círculos, com a cor da borda
+refletindo o tipo de conector.
+
+> **Revisão (durante a implementação):** a primeira abordagem criava o clock como
+> um **tipo primitivo separado** (`'clock'`) com botão próprio na paleta. Após teste
+> de uso, optou-se por tratar o clock como um **estado da própria entrada** — mais
+> simples e intuitivo —, eliminando o tipo e o botão dedicados. O comportamento de
+> simulação (clock como fonte que oscila com o tempo, inclusive encapsulado) foi
+> preservado.
 
 ## Context
 
@@ -29,19 +37,20 @@ entrada de clock para simular componentes como flip-flops e controladores simple
 
 ## Acceptance Criteria
 
-- [ ] A paleta tem um botão **circular "CLK"** ao lado de IN/OUT que cria um nó
-      clock no canvas (mesmo gesto de arrastar-para-criar dos demais componentes).
-- [ ] O nó CLK é um **círculo com rótulo "CLK"** e um único **pino de saída**, que
-      alterna ON/OFF automaticamente num ciclo fixo de 1s (0,5s ON, 0,5s OFF).
-- [ ] O CLK **acende/apaga** em sincronia com seu sinal e **propaga corretamente**
-      pela simulação (ex.: alimenta o clock de um flip-flop e o faz comutar).
-- [ ] O CLK continua oscilando quando **encapsulado dentro de um chip** — atua como
-      fonte interna e **não** vira um pino externo de entrada do chip.
-- [ ] Os botões de **IN, OUT e CLK** na paleta são **circulares com o texto dentro**,
-      e a **cor da borda reflete o conector**: IN e CLK em laranja (expõem pino de
-      saída), OUT em azul claro (expõe pino de entrada).
-- [ ] O período do clock é definido por uma **constante única** no código,
-      preparando a futura configurabilidade — **sem UI de configuração** nesta versão.
+- [x] Tocar uma **entrada selecionada** cicla seu estado **OFF → ON → CLK → OFF**.
+- [x] No estado **CLK**, a entrada é um **círculo com rótulo "CLK"** (ou o nome dado)
+      cuja saída alterna ON/OFF automaticamente num ciclo fixo de 1s (0,5s ON,
+      0,5s OFF).
+- [x] A entrada em modo CLK **acende/apaga** em sincronia com seu sinal e **propaga
+      corretamente** pela simulação (ex.: alimenta o clock de um flip-flop).
+- [x] Uma entrada em modo CLK continua oscilando quando **encapsulada dentro de um
+      chip** — atua como fonte interna e **não** vira um pino externo de entrada.
+- [x] Os botões de **IN e OUT** na paleta são **circulares com o texto dentro**, e a
+      **cor da borda reflete o conector**: IN em laranja (expõe pino de saída), OUT
+      em azul claro (expõe pino de entrada).
+- [x] O período do clock é definido por uma **constante única** no código
+      (`CLOCK_PERIOD_MS`), preparando a futura configurabilidade — **sem UI de
+      configuração** nesta versão.
 
 ## Dependencies
 
@@ -60,23 +69,26 @@ Todas as dependências já estão concluídas; nada bloqueia o início.
 
 ## Technical Notes
 
-- **Modelo:** novo `PrimitiveType` `'clock'` em `model.ts`, com dimensão 40×40 (como
-  IN/OUT) e pino único `out` à direita (`createPins`). O TypeScript em modo strict
-  forçará o tratamento do novo tipo em `NODE_SIZE`, `createPins`, `nodeLabel`, etc.
-- **Simulação no tempo:** `simulate(...)` passa a receber um timestamp `now`; o caso
-  `'clock'` em `computeNodeOutputs` calcula o estado via
-  `Math.floor(now / HALF_PERIOD_MS) % 2 === 0`. Fazer isso **dentro do simulador**
-  (e propagar `now` para a avaliação recursiva de chips) garante que clocks aninhados
-  também oscilem. Constante `CLOCK_PERIOD_MS = 1000` (meio-ciclo 500 ms).
+- **Modelo:** o clock é um **estado da entrada**, não um tipo. `CircuitNode` ganha
+  `clock?: boolean` (relevante para `input`); `value` é ignorado quando `clock` é
+  `true`. Não há novo `PrimitiveType`.
+- **Interação:** `store.cycleInputState(nodeId)` avança OFF → ON → CLK → OFF; o toque
+  simples sobre uma entrada já selecionada chama esse ciclo (`main.ts`). O duplo
+  toque (renomear) desfaz o avanço aplicando o ciclo duas vezes (ring de 3 estados).
+- **Simulação no tempo:** `simulate(...)` recebe um timestamp `now`; no caso `input`
+  de `computeNodeOutputs`, a saída é `clockValue(now)` quando `node.clock`, senão o
+  valor estático/externo. `clockValue` usa `CLOCK_PERIOD_MS = 1000` (meio-ciclo 500).
+  Propagar `now` à avaliação recursiva de chips faz clocks aninhados oscilarem.
 - **Render loop:** `main.ts` passa `performance.now()` ao `simulate`.
-- **Render do nó:** clock é "não-lógico" (círculo, como I/O); `nodeLabel` → `"CLK"`,
-  e `nodeLit` acende quando o pino `out` está em 1.
-- **Encapsulamento:** garantir que `'clock'` não seja contado como entrada na captura
-  de chip (não vira pino externo) nem em `canMake` — que conta apenas `type === 'input'`.
-- **Paleta/botões:** botão `data-add="clock"` em `index.html` (i18n `palette.clock` =
-  `"CLK"`); CSS torna os três botões de I/O circulares (dimensão fixa, `border-radius:
-  50%`, texto centrado) com borda laranja (`#e0af68`) para IN/CLK e azul (`#7aa2f7`)
-  para OUT, preservando alvo de toque confortável (≥ 40 px).
+- **Render do nó:** entrada em modo clock exibe `node.name ?? 'CLK'`; o corpo acende
+  pelo pino `out` (que carrega `clockValue`), fazendo o nó piscar.
+- **Encapsulamento:** entradas em modo clock são excluídas dos pinos externos tanto
+  em `captureDefinition` quanto no mapeamento de `computeChipOutputs`
+  (`type === 'input' && !clock`), permanecendo como fontes internas.
+- **Paleta/botões:** sem botão dedicado de clock. CSS torna os botões de I/O
+  (`data-add="input|output"`) circulares (dimensão fixa, `border-radius: 50%`, texto
+  centrado) com borda laranja (`#e0af68`) para IN e azul (`#7aa2f7`) para OUT,
+  preservando alvo de toque confortável (≥ 40 px).
 
 ---
 

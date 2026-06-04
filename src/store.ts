@@ -108,14 +108,25 @@ export class CircuitStore {
   }
 
   /**
-   * Alterna o estado booleano de um nó `input`. No-op para outros tipos de nó.
-   * Retorna o novo valor, ou `undefined` se o nó não existir ou não for `input`.
+   * Avança o estado de um nó `input` no ciclo OFF → ON → CLK → OFF: desligado,
+   * ligado (estático) e modo clock (oscila com o tempo). No-op para outros tipos.
+   * No modo CLK o `value` estático é zerado — a saída passa a derivar do tempo.
    */
-  toggleNodeValue(nodeId: string): boolean | undefined {
+  cycleInputState(nodeId: string): void {
     const node = this.nodes.get(nodeId);
-    if (!node || node.type !== 'input') return undefined;
-    node.value = !node.value;
-    return node.value;
+    if (!node || node.type !== 'input') return;
+    if (node.clock) {
+      // CLK → OFF
+      node.clock = false;
+      node.value = false;
+    } else if (node.value) {
+      // ON → CLK
+      node.value = false;
+      node.clock = true;
+    } else {
+      // OFF → ON
+      node.value = true;
+    }
   }
 
   /** Define o estado booleano de um nó `input`. No-op para outros tipos. */

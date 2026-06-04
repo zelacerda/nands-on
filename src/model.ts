@@ -1,7 +1,7 @@
 import type { Vec2 } from './camera';
 
 /** Tipos primitivos com pinos e dimensões fixas. */
-export type PrimitiveType = 'nand' | 'input' | 'output' | 'clock';
+export type PrimitiveType = 'nand' | 'input' | 'output';
 
 /** Tipos de nó disponíveis: primitivas e instâncias de chip. */
 export type NodeType = PrimitiveType | 'chip';
@@ -37,9 +37,16 @@ export interface CircuitNode {
   /**
    * Para nós `input`: estado booleano atual (ligado/desligado). Alternado pelo
    * usuário e usado como fonte de sinal pela simulação. `undefined` equivale a
-   * desligado.
+   * desligado. Ignorado quando {@link CircuitNode.clock} é `true`.
    */
   value?: boolean;
+  /**
+   * Para nós `input`: quando `true`, a entrada está em **modo clock** — sua saída
+   * oscila automaticamente com o tempo (ver `clockValue`), ignorando `value`. O
+   * usuário cicla OFF → ON → CLK → OFF tocando a entrada selecionada. Um clock
+   * encapsulado num chip permanece como fonte interna (não vira pino externo).
+   */
+  clock?: boolean;
 }
 
 /** Referência a um pino específico de um nó. */
@@ -67,8 +74,6 @@ export const NODE_SIZE: Record<PrimitiveType, { w: number; h: number }> = {
   nand: { w: 96, h: 56 },
   input: { w: 40, h: 40 },
   output: { w: 40, h: 40 },
-  // Clock tem a mesma forma/dimensão de uma entrada (círculo com pino de saída).
-  clock: { w: 40, h: 40 },
 };
 
 /** Parâmetros de layout dos chips. */
@@ -188,8 +193,6 @@ export function createPins(type: PrimitiveType): Pin[] {
         { id: 'out', kind: 'out', offset: { x: w, y: h * 0.5 } },
       ];
     case 'input':
-    case 'clock':
-      // Ambos são fontes de sinal: um único pino de saída à direita.
       return [{ id: 'out', kind: 'out', offset: { x: w, y: h * 0.5 } }];
     case 'output':
       return [{ id: 'in', kind: 'in', offset: { x: 0, y: h * 0.5 } }];
