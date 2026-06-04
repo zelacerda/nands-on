@@ -454,7 +454,9 @@ body {
   justify-content: center;
   width: 24px;
   height: 24px;
-  padding: 0;
+  /* Compensa o desalinhamento óptico do "×": o padding inferior sobe o glifo
+     (metade do valor) dentro da centralização flex. */
+  padding: 0 0 2px;
   font:
     700 15px system-ui,
     sans-serif;
