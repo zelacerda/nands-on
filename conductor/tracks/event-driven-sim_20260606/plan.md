@@ -46,23 +46,23 @@ eventos, recomputando apenas portas afetadas.
 
 ### Tasks
 
-- [ ] Task 2.1: Implementar a classe/escopo `Simulator` a partir de um `CompiledNetlist`:
+- [x] Task 2.1: Implementar a classe/escopo `Simulator` a partir de um `CompiledNetlist`:
       valores correntes por net, fila de eventos por tempo simulado, atraso unitário por
       porta, e laço de processamento de eventos.
-- [ ] Task 2.2: Implementar `setInput(nodeId, value)` (agenda evento na fonte) e
+- [x] Task 2.2: Implementar `setInput(nodeId, value)` (agenda evento na fonte) e
       `advanceTo(now)` (processa eventos até o instante), com tratamento de
       delta-cycles e teto de iterações como guarda contra oscilação (loops de atraso-zero
       e estados metaestáveis, ex.: SR latch em S=R=1→0,0).
-- [ ] Task 2.3: Implementar `snapshot() -> SignalState`, reconstruindo `pinValues` (por
+- [x] Task 2.3: Implementar `snapshot() -> SignalState`, reconstruindo `pinValues` (por
       `pinKey` de topo) e `wireValues` (por `wireId`) a partir dos nets via os mapas da
       Fase 1.
-- [ ] Task 2.4: Testes do motor — combinacional (paridade com tabelas-verdade) e
+- [x] Task 2.4: Testes do motor — combinacional (paridade com tabelas-verdade) e
       sequencial (SR Latch mantém memória; JK mestre-escravo faz hold/set/reset/toggle),
       reproduzindo os cenários já cobertos pelo `simulator.test.ts` atual.
 
 ### Verification
 
-- [ ] Testes de combinacional e sequencial passam; `npm run build` limpo.
+- [x] Testes de combinacional e sequencial passam; `npm run build` limpo.
 
 ## Phase 3: Clock como pulso/edge
 
