@@ -91,21 +91,24 @@ Ligar o motor novo ao loop da aplicação, recompilando só quando a topologia m
 
 ### Tasks
 
-- [ ] Task 4.1: Adicionar ao `store` um contador de versão (topologia) e marcação de
+- [x] Task 4.1: Adicionar ao `store` um contador de versão (topologia) e marcação de
       "sujou" nas mutações relevantes (`addNode`/`addWire`/`removeNode`/`removeWire`/
       `loadState`/`clear`), e separar as mudanças de entrada (`setNodeValue`/
-      `cycleInputState`) como eventos de input.
-- [ ] Task 4.2: Atualizar `main.ts` (atual chamada única em `simulate(...)` por frame)
+      `cycleInputState`) como eventos de input. Implementado como `topologyVersion`, que
+      bumpa só em mudanças estruturais — preserva a memória dos latches ao alternar entradas.
+- [x] Task 4.2: Atualizar `main.ts` (atual chamada única em `simulate(...)` por frame)
       para construir/reconstruir o `Simulator` quando a versão de topologia muda, empurrar
       mudanças de entrada/clock como eventos, avançar para `performance.now()` e usar
-      `snapshot()` no `render`.
-- [ ] Task 4.3: Confirmar que `render.ts` permanece inalterado (consome `pinValues`/
-      `wireValues` exatamente como antes).
+      `snapshot()` no `render`. Implementado via `evaluate(now)`; `setClock()` sincroniza
+      modo-clock sem rebuild.
+- [x] Task 4.3: Confirmar que `render.ts` permanece inalterado (consome `pinValues`/
+      `wireValues` exatamente como antes). Confirmado via git (sem modificação em render.ts).
 
 ### Verification
 
-- [ ] App roda (`npm run dev`): montar NAND/IO, alternar entradas e clock reflete na tela;
-      circuito sequencial preserva memória ao vivo.
+- [x] Checks automatizados verdes (build/typecheck + 117 testes + lint); `render.ts` intocado.
+- [ ] Smoke test ao vivo (`npm run dev`) — deferido ao fechamento do track (workflow:
+      verificação manual no encerramento).
 
 ## Phase 5: Polish e aposentadoria do motor antigo
 

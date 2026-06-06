@@ -25,7 +25,9 @@ import {
   drawWireHighlight,
 } from './render';
 import { hitNode, hitPin, hitWire } from './hittest';
-import { type ChipResolver, type SignalState, simulate } from './simulator';
+import { type ChipResolver, type SignalState } from './simulator';
+import { compile } from './netlist';
+import { Simulator } from './engine';
 import { validateConnection } from './connection';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
@@ -739,9 +741,32 @@ window.addEventListener('keydown', (e) => {
 
 let lastCanMake: boolean | null = null;
 
-// Estado de sinal preservado entre frames — dá memória de runtime aos
-// circuitos sequenciais (ex.: SR Latch mantém o estado de hold).
+// Estado de sinal do frame, produzido pelo motor event-driven.
 let signalState: SignalState | undefined;
+
+// Motor de simulação stateful. É reconstruído apenas quando a **topologia** muda
+// (nós/fios), recompilando o netlist achatado; alternâncias de entrada/modo de
+// clock são empurradas como eventos, preservando a memória de runtime (latches).
+let sim: Simulator | undefined;
+let simVersion = -1;
+
+/**
+ * Garante que o motor reflete a topologia atual e sincroniza o estado das
+ * entradas, então avança o tempo simulado até `now` (ms) e devolve o snapshot.
+ */
+function evaluate(now: number): SignalState {
+  if (sim === undefined || simVersion !== store.topologyVersion) {
+    sim = new Simulator(compile(store.toJSON(), resolveChip));
+    simVersion = store.topologyVersion;
+  }
+  for (const node of store.listNodes()) {
+    if (node.type !== 'input') continue;
+    sim.setClock(node.id, node.clock === true);
+    if (!node.clock) sim.setInput(node.id, node.value === true);
+  }
+  sim.advanceTo(now);
+  return sim.snapshot();
+}
 
 function render(): void {
   const dpr = window.devicePixelRatio || 1;
@@ -757,10 +782,9 @@ function render(): void {
     if (node) drawNodeHighlight(ctx!, camera, node);
   }
 
-  // Avalia o circuito a cada frame, reaproveitando o estado anterior para que
-  // circuitos sequenciais (com realimentação) preservem sua memória. O instante
-  // atual alimenta os nós `clock`, que oscilam com o tempo.
-  signalState = simulate(store.toJSON(), resolveChip, signalState, performance.now());
+  // Avalia o circuito a cada frame pelo motor event-driven (stateful): só
+  // recompila quando a topologia muda; o clock avança com o tempo atual.
+  signalState = evaluate(performance.now());
   drawCircuit(ctx!, camera, store, signalState);
 
   // Atualiza a visibilidade do botão "Fazer" apenas quando muda. Durante a edição

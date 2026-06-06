@@ -201,6 +201,28 @@ export class Simulator {
   }
 
   /**
+   * Liga/desliga o modo clock de uma entrada **sem reconstruir** o motor (e,
+   * portanto, sem perder a memória de runtime). Idempotente; no-op se o nó não
+   * for uma entrada conhecida. Uma entrada que vira clock passa a repousar em 0
+   * entre pulsos.
+   */
+  setClock(nodeId: string, isClock: boolean): void {
+    const net = this.inputNet.get(nodeId);
+    if (!net) return;
+    const isMember = this.clockDisplay.has(nodeId);
+    if (isClock && !isMember) {
+      this.clockInputs.push(nodeId);
+      this.clockDisplay.set(nodeId, false);
+      this.driveNet(net, false);
+      this.settle();
+    } else if (!isClock && isMember) {
+      const i = this.clockInputs.indexOf(nodeId);
+      if (i >= 0) this.clockInputs.splice(i, 1);
+      this.clockDisplay.delete(nodeId);
+    }
+  }
+
+  /**
    * Avança o tempo até o instante `now` (ms): atualiza o nível de exibição dos
    * clocks (blink ~1Hz) e dispara um pulso de lógica a cada **borda de subida**
    * cruzada desde a última chamada (limitado por {@link MAX_CATCHUP_PULSES}).

@@ -20,10 +20,21 @@ export class CircuitStore {
   private nodes = new Map<string, CircuitNode>();
   private wires = new Map<string, Wire>();
   private seq = 0;
+  private topoVersion = 0;
 
   private nextId(prefix: string): string {
     this.seq += 1;
     return `${prefix}${this.seq}`;
+  }
+
+  /**
+   * Versão da **topologia** (nós e fios). Incrementa apenas em mudanças
+   * estruturais — não em mudanças de valor/modo de entrada nem de rótulo. A
+   * camada de simulação usa isto para recompilar o netlist só quando necessário,
+   * preservando a memória de runtime (latches) entre alternâncias de entrada.
+   */
+  get topologyVersion(): number {
+    return this.topoVersion;
   }
 
   /** Cria e adiciona uma primitiva (NAND/I/O) na posição (mundo) dada. */
@@ -35,6 +46,7 @@ export class CircuitStore {
       pins: createPins(type),
     };
     this.nodes.set(node.id, node);
+    this.topoVersion += 1;
     return node;
   }
 
@@ -49,6 +61,7 @@ export class CircuitStore {
       name: def.name,
     };
     this.nodes.set(node.id, node);
+    this.topoVersion += 1;
     return node;
   }
 
@@ -56,6 +69,7 @@ export class CircuitStore {
   clear(): void {
     this.nodes.clear();
     this.wires.clear();
+    this.topoVersion += 1;
   }
 
   /**
@@ -73,6 +87,7 @@ export class CircuitStore {
       const m = /^[nw](\d+)$/.exec(id);
       if (m) this.seq = Math.max(this.seq, Number(m[1]));
     }
+    this.topoVersion += 1;
   }
 
   /** Quantidade de nós de um dado tipo (ex.: para condicionar o botão "Fazer"). */
@@ -90,17 +105,19 @@ export class CircuitStore {
         this.wires.delete(wire.id);
       }
     }
+    this.topoVersion += 1;
   }
 
   /** Cria e adiciona um fio de um pino de saída para um pino de entrada. */
   addWire(from: PinRef, to: PinRef): Wire {
     const wire: Wire = { id: this.nextId('w'), from, to };
     this.wires.set(wire.id, wire);
+    this.topoVersion += 1;
     return wire;
   }
 
   removeWire(wireId: string): void {
-    this.wires.delete(wireId);
+    if (this.wires.delete(wireId)) this.topoVersion += 1;
   }
 
   getNode(nodeId: string): CircuitNode | undefined {
