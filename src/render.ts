@@ -20,6 +20,9 @@ const COLOR = {
   signalOn: '#ffd23f',
   signalOnStroke: '#ffe27a',
   signalOnLabel: '#1b1f17',
+  /** Sinal instável (oscilando/metaestável): destaca em vermelho. */
+  oscillating: '#f7768e',
+  oscillatingStroke: '#ff9bab',
 } as const;
 
 /** Verdadeiro se o nó deve aparecer "aceso" segundo o estado de sinal. */
@@ -29,6 +32,17 @@ function nodeLit(node: CircuitNode, signal: SignalState): boolean {
   if (node.type === 'input') return signal.pinValues.get(pinKey(node.id, 'out')) ?? false;
   if (node.type === 'output') return signal.pinValues.get(pinKey(node.id, 'in')) ?? false;
   return false;
+}
+
+/** Pino que representa o estado de um nó de I/O (saída de entrada / entrada de saída). */
+function ioPinKey(node: CircuitNode): string {
+  return pinKey(node.id, node.type === 'input' ? 'out' : 'in');
+}
+
+/** Verdadeiro se o nó de I/O está com sinal instável (oscilando). */
+function nodeOscillating(node: CircuitNode, signal: SignalState): boolean {
+  if (node.type !== 'input' && node.type !== 'output') return false;
+  return signal.oscillating?.has(ioPinKey(node)) ?? false;
 }
 
 /**
@@ -173,7 +187,11 @@ export function drawNode(
 
   const logic = isLogicNode(node.type);
   const lit = signal ? nodeLit(node, signal) : false;
-  if (!logic && lit) {
+  const osc = signal ? nodeOscillating(node, signal) : false;
+  if (!logic && osc) {
+    ctx.fillStyle = COLOR.oscillating;
+    ctx.strokeStyle = COLOR.oscillatingStroke;
+  } else if (!logic && lit) {
     ctx.fillStyle = COLOR.signalOn;
     ctx.strokeStyle = COLOR.signalOnStroke;
   } else {
@@ -205,7 +223,7 @@ export function drawNode(
   // Rótulo central, centrado na região livre entre as reservas (equilibrado
   // mesmo quando um lado tem rótulos mais largos que o outro).
   const label = nodeLabel(node);
-  ctx.fillStyle = lit && !logic ? COLOR.signalOnLabel : COLOR.label;
+  ctx.fillStyle = (lit || osc) && !logic ? COLOR.signalOnLabel : COLOR.label;
   ctx.font = `${Math.max(9, 12 * cam.zoom)}px system-ui, sans-serif`;
   ctx.textBaseline = 'middle';
   const centerX = origin.x + (leftReserve + (sw - rightReserve)) / 2;
@@ -215,10 +233,18 @@ export function drawNode(
   // Pinos (verde quando carregam sinal ligado).
   for (const pin of node.pins) {
     const p = cam.worldToScreen(pinWorldPos(node, pin));
-    const on = signal?.pinValues.get(pinKey(node.id, pin.id)) ?? false;
+    const key = pinKey(node.id, pin.id);
+    const pinOsc = signal?.oscillating?.has(key) ?? false;
+    const on = signal?.pinValues.get(key) ?? false;
     ctx.beginPath();
     ctx.arc(p.x, p.y, PIN_RADIUS * cam.zoom, 0, Math.PI * 2);
-    ctx.fillStyle = on ? COLOR.signalOn : pin.kind === 'in' ? COLOR.pinIn : COLOR.pinOut;
+    ctx.fillStyle = pinOsc
+      ? COLOR.oscillating
+      : on
+        ? COLOR.signalOn
+        : pin.kind === 'in'
+          ? COLOR.pinIn
+          : COLOR.pinOut;
     ctx.fill();
   }
 
@@ -253,7 +279,11 @@ export function drawWires(
     const from = store.pinPos(wire.from);
     const to = store.pinPos(wire.to);
     if (!from || !to) continue;
-    ctx.strokeStyle = signal?.wireValues.get(wire.id) ? COLOR.signalOn : COLOR.wire;
+    ctx.strokeStyle = signal?.oscillating?.has(wire.id)
+      ? COLOR.oscillating
+      : signal?.wireValues.get(wire.id)
+        ? COLOR.signalOn
+        : COLOR.wire;
     drawWireSegment(ctx, cam.worldToScreen(from), cam.worldToScreen(to));
   }
 }
