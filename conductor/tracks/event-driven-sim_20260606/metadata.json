@@ -1,0 +1,18 @@
+{
+  "id": "event-driven-sim_20260606",
+  "title": "Motor de Simulação Event-Driven",
+  "type": "refactor",
+  "status": "in_progress",
+  "created": "2026-06-06T12:48:44-03:00",
+  "updated": "2026-06-06T12:48:44-03:00",
+  "current_phase": 1,
+  "current_task": "1.4",
+  "phases": {
+    "total": 5,
+    "completed": 1
+  },
+  "tasks": {
+    "total": 16,
+    "completed": 4
+  }
+}

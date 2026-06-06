@@ -16,5 +16,6 @@
 | [x] | make-clear-space_20260604 | Make Deixa o Espaço Vazio (Sem Instância Automática) | 2026-06-04 | 2026-06-04 |
 | [x] | branding-about_20260604 | Branding NANDS-ON e Painel Sobre/Boas-vindas | 2026-06-04 | 2026-06-04 |
 | [x] | tutorial-not_20260604 | Walkthrough Interativo — Construir um NOT a partir do NAND | 2026-06-04 | 2026-06-04 |
+| [~] | event-driven-sim_20260606 | Motor de Simulação Event-Driven | 2026-06-06 | 2026-06-06 |
 
 <!-- Tracks registrados por /conductor:new-track -->
