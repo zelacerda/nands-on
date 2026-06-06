@@ -4,6 +4,13 @@ import { clockValue, pinKey, type SignalState } from './simulator';
 /** Atraso de propagação de uma porta, em ticks de tempo simulado. */
 const GATE_DELAY = 1;
 
+/**
+ * Quantas vezes um net precisa mudar, num `settle` que **não convergiu**, para
+ * ser considerado oscilante (filtra nets que só assentaram tarde dos que de fato
+ * ficam alternando). Só se aplica quando o teto de delta-cycles é atingido.
+ */
+const OSCILLATION_MIN_CHANGES = 3;
+
 /** Uma porta NAND no netlist plano: dois nets de entrada (ou nulo = false) e o net de saída. */
 interface Gate {
   out: string;
@@ -38,6 +45,10 @@ export class Simulator {
   private readonly buckets = new Map<number, Set<number>>();
   private time = 0;
   private readonly settleCap: number;
+  /** Quantas vezes cada net mudou no `settle` corrente (detecção de oscilação). */
+  private readonly changeCount = new Map<string, number>();
+  /** Nets que não convergiram no último `settle` (oscilando/metaestáveis). */
+  private readonly oscillating = new Set<string>();
 
   constructor(private readonly netlist: CompiledNetlist) {
     const flat = netlist.flat;
@@ -101,6 +112,7 @@ export class Simulator {
     const out = !(a && b);
     if (this.value.get(g.out) === out) return;
     this.value.set(g.out, out);
+    this.changeCount.set(g.out, (this.changeCount.get(g.out) ?? 0) + 1);
     for (const consumer of this.fanout.get(g.out) ?? []) {
       this.schedule(consumer, this.time + GATE_DELAY);
     }
@@ -120,18 +132,30 @@ export class Simulator {
    * juntas.
    */
   private settle(): void {
+    this.changeCount.clear();
+    this.oscillating.clear();
     let steps = 0;
+    let capped = false;
     for (;;) {
       const t = this.nextTime();
       if (t === undefined) break;
       if (++steps > this.settleCap) {
         this.buckets.clear();
+        capped = true;
         break;
       }
       const bucket = this.buckets.get(t)!;
       this.buckets.delete(t);
       this.time = t;
       for (const gate of bucket) this.evaluate(gate);
+    }
+    // Não convergiu: os nets que mais oscilaram são marcados como instáveis. Só
+    // se considera oscilação quando o teto é atingido — um circuito que assenta
+    // (mesmo com hazards transitórios) nunca é marcado.
+    if (capped) {
+      for (const [net, count] of this.changeCount) {
+        if (count >= OSCILLATION_MIN_CHANGES) this.oscillating.add(net);
+      }
     }
   }
 
@@ -191,6 +215,9 @@ export class Simulator {
     for (const { pin, net } of this.flatPins) {
       pinValues.set(pin, net ? (this.value.get(net) ?? false) : false);
     }
-    return liftSignal({ pinValues, wireValues: new Map(), chipStates: new Map() }, this.netlist);
+    return liftSignal(
+      { pinValues, wireValues: new Map(), chipStates: new Map(), oscillating: this.oscillating },
+      this.netlist,
+    );
   }
 }

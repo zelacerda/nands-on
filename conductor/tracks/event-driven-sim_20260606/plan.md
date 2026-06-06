@@ -113,21 +113,25 @@ Ligar o motor novo ao loop da aplicação, recompilando só quando a topologia m
 
 ### Tasks
 
-- [ ] Task 5.0: Indicação visual de oscilação/metaestabilidade — o motor detecta a
+- [x] Task 5.0: Indicação visual de oscilação/metaestabilidade — o motor detecta a
       não-convergência (teto de delta-cycles atingido) e marca os nets instáveis; o
-      `SignalState` ganha esse conjunto e o `render.ts` os pinta de forma distinta. Faz o
-      JK level-triggered "ingênuo" aparecer como **oscilando**, em vez de travar em
-      silêncio (decisão da Fase 3 revisada).
-- [ ] Task 5.1: Cobrir casos de borda — circuito vazio, pino de entrada sem fio propaga
-      `false`, remoção de fio/nó propaga desligamento e dispara recompilação.
-- [ ] Task 5.2: Aposentar o caminho de relaxação em `simulator.ts` (remover ou manter
-      atrás de flag de transição) e migrar/atualizar `simulator.test.ts` para o motor novo.
-- [ ] Task 5.3: Avaliação qualitativa de fluidez com um circuito grande (muitas instâncias
-      de chip) comparado ao comportamento anterior.
+      `SignalState` ganha `oscillating` e o `render.ts` os pinta de vermelho. _(Nota: no
+      motor event-driven o JK level-triggered ingênuo **assenta num ponto fixo** (trava,
+      não alterna) em vez de oscilar; o indicador captura osciladores reais — anel de
+      inversões ímpares / NAND realimentada nela mesma.)_
+- [x] Task 5.1: Cobrir casos de borda — circuito vazio, pino de entrada sem fio propaga
+      `false`, remoção de fio/nó propaga desligamento e dispara recompilação (via
+      `topologyVersion`). Coberto em `engine.edge.test.ts`.
+- [x] Task 5.2: Aposentar o caminho de relaxação em `simulator.ts` — confirmado que
+      produção (main/render/engine) não usa mais `simulate` (só tipos/primitivas); `simulate`
+      fica documentado como **oráculo de referência** dos testes (valida a compilação).
+- [x] Task 5.3: Avaliação de fluidez — medição (40 chips × 8 NAND, 300 frames):
+      relaxação ≈182ms vs event-driven ≈35ms (~5× mais rápido), e a vantagem cresce com
+      aninhamento (a relaxação re-expande chips por iteração/frame).
 
 ### Verification
 
-- [ ] `npm test` e `npm run build` limpos; sem regressões observáveis no editor.
+- [x] `npm test` (123) e `npm run build` limpos; lint limpo; smoke test ao vivo OK.
 
 ## Final Verification
 

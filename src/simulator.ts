@@ -16,6 +16,13 @@ export interface SignalState {
    * encapsulado), permitindo que o estado interno persista entre avaliações.
    */
   chipStates: Map<string, SignalState>;
+  /**
+   * Pinos (`pinKey`) e fios (`wireId`) cujo sinal **não convergiu** — circuito
+   * oscilando/metaestável (ex.: um latch level-triggered "ingênuo" com o clock
+   * alto). A renderização os destaca como instáveis. Opcional: o motor de
+   * relaxação não o popula (fica `undefined`).
+   */
+  oscillating?: Set<string>;
 }
 
 /** Chave estável de um pino para indexar valores de sinal. */
@@ -42,6 +49,13 @@ export function clockValue(now: number): boolean {
 export type ChipResolver = (node: CircuitNode) => CircuitState | undefined;
 
 /**
+ * **Motor de relaxação — aposentado da aplicação.** Desde a migração para o
+ * motor event-driven (`engine.ts`, alimentado por `netlist.ts`), o app não usa
+ * mais esta função; ela permanece como **oráculo de referência** nos testes
+ * (valida a compilação de netlist e o comportamento esperado). As primitivas
+ * compartilhadas deste módulo (`SignalState`, `pinKey`, `clockValue`,
+ * `CLOCK_PERIOD_MS`, `ChipResolver`) seguem em uso normal.
+ *
  * Avalia um circuito. Os nós `input` fornecem seu `value` como fonte; a NAND
  * calcula `!(in0 && in1)`; os fios transportam o valor do pino de saída para o
  * de entrada. A propagação é iterativa (relaxação) até estabilizar.
