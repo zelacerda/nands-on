@@ -1,24 +1,8 @@
 import { type CompiledNetlist, liftSignal } from './netlist';
-import { CLOCK_PERIOD_MS, clockValue, pinKey, type SignalState } from './simulator';
+import { clockValue, pinKey, type SignalState } from './simulator';
 
 /** Atraso de propagação de uma porta, em ticks de tempo simulado. */
 const GATE_DELAY = 1;
-
-/**
- * Largura do pulso de clock, em ticks. Curta o bastante para o JK
- * level-triggered mínimo inverter **uma só vez** (o laço de re-toggle leva mais
- * ticks que isto — calibrado: o JK mínimo alterna com ≤2 e trava com ≥3), e
- * longa o bastante para um latch/mestre-escravo capturar o dado na borda
- * (verificado robusto para qualquer largura). Ver engine.clock.test.ts.
- */
-const CLOCK_PULSE_TICKS = 2;
-
-/**
- * Limite de pulsos de clock disparados numa única chamada de `advanceTo` quando
- * muitos ciclos passaram (ex.: aba em segundo plano). Evita travar processando
- * milhares de pulsos atrasados; o clock apenas "continua andando".
- */
-const MAX_CATCHUP_PULSES = 4;
 
 /** Uma porta NAND no netlist plano: dois nets de entrada (ou nulo = false) e o net de saída. */
 interface Gate {
@@ -46,25 +30,16 @@ export class Simulator {
   private readonly fanout = new Map<string, number[]>();
   /** nodeId de entrada → seu net de saída. */
   private readonly inputNet = new Map<string, string>();
-  /** nodeIds de entradas em modo clock (fontes de pulso). */
+  /** nodeIds de entradas em modo clock (fonte de nível ~1Hz, onda quadrada). */
   private readonly clockInputs: string[] = [];
-  /** Valor de **exibição** de cada entrada de clock (nível ~1Hz, p/ o blink). */
-  private readonly clockDisplay = new Map<string, boolean>();
-  /** Índice do último ciclo de clock processado (detecção de borda de subida). */
-  private lastEdgeIndex: number | undefined;
   /** Todos os pinos planos e o net cujo valor cada um carrega (nulo = false). */
   private readonly flatPins: { pin: string; net: string | null }[] = [];
   /** Eventos pendentes: tempo → conjunto de índices de porta a reavaliar. */
   private readonly buckets = new Map<number, Set<number>>();
   private time = 0;
   private readonly settleCap: number;
-  private readonly pulseTicks: number;
 
-  constructor(
-    private readonly netlist: CompiledNetlist,
-    options: { pulseTicks?: number } = {},
-  ) {
-    this.pulseTicks = options.pulseTicks ?? CLOCK_PULSE_TICKS;
+  constructor(private readonly netlist: CompiledNetlist) {
     const flat = netlist.flat;
     // Produtor que dirige cada pino consumidor (no plano, todo produtor é `…:out`).
     const driver = new Map<string, string>();
@@ -77,10 +52,7 @@ export class Simulator {
         const net = pinKey(node.id, 'out');
         this.inputNet.set(node.id, net);
         this.value.set(net, node.value === true);
-        if (node.clock) {
-          this.clockInputs.push(node.id);
-          this.clockDisplay.set(node.id, false);
-        }
+        if (node.clock) this.clockInputs.push(node.id);
         this.flatPins.push({ pin: net, net });
       } else if (node.type === 'nand') {
         const out = pinKey(node.id, 'out');
@@ -142,17 +114,16 @@ export class Simulator {
   }
 
   /**
-   * Processa a fila até esvaziar (ou `maxTime`, se dado), em ordem de tempo, ou
-   * até atingir o teto de delta-cycles (guarda contra oscilação). Cada "tempo" é
-   * um delta-cycle: todas as portas agendadas para aquele instante são avaliadas
-   * juntas. Com `maxTime`, para após processar os eventos até esse instante e
-   * fixa `time = maxTime` (usado para janelar o pulso de clock).
+   * Processa a fila até esvaziar, em ordem de tempo, ou até atingir o teto de
+   * delta-cycles (guarda contra oscilação/metaestabilidade). Cada "tempo" é um
+   * delta-cycle: todas as portas agendadas para aquele instante são avaliadas
+   * juntas.
    */
-  private settle(maxTime?: number): void {
+  private settle(): void {
     let steps = 0;
     for (;;) {
       const t = this.nextTime();
-      if (t === undefined || (maxTime !== undefined && t > maxTime)) break;
+      if (t === undefined) break;
       if (++steps > this.settleCap) {
         this.buckets.clear();
         break;
@@ -162,7 +133,6 @@ export class Simulator {
       this.time = t;
       for (const gate of bucket) this.evaluate(gate);
     }
-    if (maxTime !== undefined && maxTime > this.time) this.time = maxTime;
   }
 
   /** Atualiza o valor de um net e agenda as portas que o consomem. */
@@ -172,21 +142,6 @@ export class Simulator {
     for (const consumer of this.fanout.get(net) ?? []) {
       this.schedule(consumer, this.time + GATE_DELAY);
     }
-  }
-
-  /**
-   * Dispara um pulso de clock: leva todas as entradas de clock a 1 por uma
-   * janela curta (`CLOCK_PULSE_TICKS`), depois a 0, assentando o circuito. A
-   * janela estreita faz o JK level-triggered inverter uma única vez, em vez de
-   * oscilar enquanto o clock fica alto.
-   */
-  private pulseClocks(): void {
-    if (this.clockInputs.length === 0) return;
-    const start = this.time;
-    for (const id of this.clockInputs) this.driveNet(this.inputNet.get(id)!, true);
-    this.settle(start + this.pulseTicks);
-    for (const id of this.clockInputs) this.driveNet(this.inputNet.get(id)!, false);
-    this.settle();
   }
 
   /**
@@ -203,40 +158,26 @@ export class Simulator {
   /**
    * Liga/desliga o modo clock de uma entrada **sem reconstruir** o motor (e,
    * portanto, sem perder a memória de runtime). Idempotente; no-op se o nó não
-   * for uma entrada conhecida. Uma entrada que vira clock passa a repousar em 0
-   * entre pulsos.
+   * for uma entrada conhecida.
    */
   setClock(nodeId: string, isClock: boolean): void {
-    const net = this.inputNet.get(nodeId);
-    if (!net) return;
-    const isMember = this.clockDisplay.has(nodeId);
-    if (isClock && !isMember) {
-      this.clockInputs.push(nodeId);
-      this.clockDisplay.set(nodeId, false);
-      this.driveNet(net, false);
-      this.settle();
-    } else if (!isClock && isMember) {
-      const i = this.clockInputs.indexOf(nodeId);
-      if (i >= 0) this.clockInputs.splice(i, 1);
-      this.clockDisplay.delete(nodeId);
-    }
+    if (!this.inputNet.has(nodeId)) return;
+    const i = this.clockInputs.indexOf(nodeId);
+    if (isClock && i < 0) this.clockInputs.push(nodeId);
+    else if (!isClock && i >= 0) this.clockInputs.splice(i, 1);
   }
 
   /**
-   * Avança o tempo até o instante `now` (ms): atualiza o nível de exibição dos
-   * clocks (blink ~1Hz) e dispara um pulso de lógica a cada **borda de subida**
-   * cruzada desde a última chamada (limitado por {@link MAX_CATCHUP_PULSES}).
+   * Avança o tempo até o instante `now` (ms): leva cada entrada de clock ao seu
+   * **nível** atual (onda quadrada ~1Hz via {@link clockValue}) e assenta o
+   * circuito. Como o clock é nível, flip-flops mestre-escravo/edge-triggered
+   * funcionam e a lógica combinacional acompanha o blink; um latch
+   * level-triggered "ingênuo" (ex.: JK mínimo) oscila enquanto o clock fica
+   * alto — comportamento fiel ao hardware.
    */
   advanceTo(now: number): void {
-    for (const id of this.clockInputs) this.clockDisplay.set(id, clockValue(now));
-    const edgeIndex = Math.floor(now / CLOCK_PERIOD_MS);
-    if (this.lastEdgeIndex === undefined) {
-      this.lastEdgeIndex = edgeIndex; // primeira chamada: sincroniza sem disparar
-    } else if (edgeIndex > this.lastEdgeIndex) {
-      const pulses = Math.min(edgeIndex - this.lastEdgeIndex, MAX_CATCHUP_PULSES);
-      for (let i = 0; i < pulses; i++) this.pulseClocks();
-      this.lastEdgeIndex = edgeIndex;
-    }
+    const level = clockValue(now);
+    for (const id of this.clockInputs) this.driveNet(this.inputNet.get(id)!, level);
     this.settle();
   }
 
@@ -249,10 +190,6 @@ export class Simulator {
     const pinValues = new Map<string, boolean>();
     for (const { pin, net } of this.flatPins) {
       pinValues.set(pin, net ? (this.value.get(net) ?? false) : false);
-    }
-    // Entradas de clock exibem o nível ~1Hz (blink), não o pulso de lógica.
-    for (const id of this.clockInputs) {
-      pinValues.set(pinKey(id, 'out'), this.clockDisplay.get(id) ?? false);
     }
     return liftSignal({ pinValues, wireValues: new Map(), chipStates: new Map() }, this.netlist);
   }

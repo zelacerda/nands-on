@@ -71,19 +71,18 @@ level-triggered mínimos.
 
 ### Tasks
 
-- [x] Task 3.1: Modelar a entrada CLK como fonte que agenda eventos de pulso/edge no tempo
-      simulado, derivando o período de `CLOCK_PERIOD_MS` (pulso curto relativo ao atraso
-      do laço de realimentação). Decisão: o pino CLK exibe nível (blink ~1Hz) enquanto a
-      lógica recebe um pulso estreito na borda de subida (semântica edge-triggered).
-      Largura calibrada empiricamente: `CLOCK_PULSE_TICKS=2` (JK mínimo alterna com ≤2,
-      trava com ≥3; mestre-escravo e latch robustos para qualquer largura).
-- [x] Task 3.2: Teste-chave — o **JK level-triggered mínimo (2 NAND3 decompostas + 2
-      NAND)** alterna corretamente (`0101…`) sob o clock por pulso; gated SR/D latch
-      respondem na borda esperada.
+- [x] Task 3.1: Modelar a entrada CLK como fonte de **nível** (onda quadrada ~1Hz via
+      `clockValue`): `advanceTo` leva cada net de clock ao nível atual e assenta. _(Revisão
+      após smoke test: a abordagem inicial de pulso de borda foi descartada — fazia o clock
+      não acionar lógica combinacional visivelmente. Nível concilia combinacional + mestre-
+      escravo; o JK mínimo oscila, como no hardware.)_
+- [x] Task 3.2: Testes — lógica combinacional acompanha o nível do clock (anti-fase numa
+      NAND); gated D latch transparente com CLK alto / segura com baixo; **JK mestre-escravo
+      alterna a cada ciclo** sob clock automático.
 
 ### Verification
 
-- [x] O JK mínimo alterna por ciclo no teste; nenhum estado preso/oscilação descontrolada.
+- [x] Combinacional acompanha o clock; mestre-escravo alterna; gated latch transparente.
 
 ## Phase 4: Integração (store + main; render intocado)
 
@@ -114,6 +113,11 @@ Ligar o motor novo ao loop da aplicação, recompilando só quando a topologia m
 
 ### Tasks
 
+- [ ] Task 5.0: Indicação visual de oscilação/metaestabilidade — o motor detecta a
+      não-convergência (teto de delta-cycles atingido) e marca os nets instáveis; o
+      `SignalState` ganha esse conjunto e o `render.ts` os pinta de forma distinta. Faz o
+      JK level-triggered "ingênuo" aparecer como **oscilando**, em vez de travar em
+      silêncio (decisão da Fase 3 revisada).
 - [ ] Task 5.1: Cobrir casos de borda — circuito vazio, pino de entrada sem fio propaga
       `false`, remoção de fio/nó propaga desligamento e dispara recompilação.
 - [ ] Task 5.2: Aposentar o caminho de relaxação em `simulator.ts` (remover ou manter

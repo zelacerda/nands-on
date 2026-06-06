@@ -45,9 +45,13 @@ grandes — até uma CPU — sem perder responsividade.
       realimentação (tratamento de delta-cycles / guarda contra oscilação).
 - [ ] O motor produz um `SignalState` (`pinValues` + `wireValues`) consumível pelo
       `render.ts` **sem alterações no `render.ts`**.
-- [ ] **Clock vira pulso/edge:** entradas em modo CLK agendam eventos periódicos; o
-      **JK level-triggered mínimo (2 NAND3 + 2 NAND) alterna corretamente** sob esse
-      clock (verificado por teste).
+- [ ] **Clock é nível (onda quadrada ~1Hz):** entradas em modo CLK oscilam com o tempo,
+      acionando lógica combinacional (acompanha o blink) e flip-flops mestre-escravo/
+      edge-triggered. O **JK level-triggered mínimo oscila** enquanto o clock fica alto —
+      fiel ao hardware — e é **exibido como instável** (ver visualização de oscilação).
+      _(Revisão: a abordagem de "clock por pulso para alternar o JK mínimo" foi abandonada
+      durante a Fase 3 — nenhuma forma de onda concilia, no mesmo fio, acionar combinacional
+      visivelmente e impedir a oscilação do JK mínimo; o nível é a escolha fiel e didática.)_
 - [ ] Circuitos sequenciais já suportados continuam corretos: SR Latch e JK
       mestre-escravo mantêm memória entre frames e respondem como esperado.
 - [ ] A integração no `main.ts` constrói/reconstrói o simulador **apenas quando a
