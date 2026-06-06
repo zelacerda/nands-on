@@ -71,16 +71,19 @@ level-triggered mínimos.
 
 ### Tasks
 
-- [ ] Task 3.1: Modelar a entrada CLK como fonte que agenda eventos de pulso/edge no tempo
+- [x] Task 3.1: Modelar a entrada CLK como fonte que agenda eventos de pulso/edge no tempo
       simulado, derivando o período de `CLOCK_PERIOD_MS` (pulso curto relativo ao atraso
-      do laço de realimentação).
-- [ ] Task 3.2: Teste-chave — o **JK level-triggered mínimo (2 NAND3 decompostas + 2
+      do laço de realimentação). Decisão: o pino CLK exibe nível (blink ~1Hz) enquanto a
+      lógica recebe um pulso estreito na borda de subida (semântica edge-triggered).
+      Largura calibrada empiricamente: `CLOCK_PULSE_TICKS=2` (JK mínimo alterna com ≤2,
+      trava com ≥3; mestre-escravo e latch robustos para qualquer largura).
+- [x] Task 3.2: Teste-chave — o **JK level-triggered mínimo (2 NAND3 decompostas + 2
       NAND)** alterna corretamente (`0101…`) sob o clock por pulso; gated SR/D latch
       respondem na borda esperada.
 
 ### Verification
 
-- [ ] O JK mínimo alterna por ciclo no teste; nenhum estado preso/oscilação descontrolada.
+- [x] O JK mínimo alterna por ciclo no teste; nenhum estado preso/oscilação descontrolada.
 
 ## Phase 4: Integração (store + main; render intocado)
 
