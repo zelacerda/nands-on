@@ -2,6 +2,7 @@ import type { Vec2 } from './camera';
 import { type PinRef, nodeSize, pinWorldPos } from './model';
 import { PIN_RADIUS } from './render';
 import type { CircuitStore } from './store';
+import { wirePath } from './wire';
 
 /** Distância euclidiana entre dois pontos. */
 function dist(a: Vec2, b: Vec2): number {
@@ -53,16 +54,48 @@ export function hitNode(store: CircuitStore, p: Vec2): string | null {
   return null;
 }
 
+/** Menor distância de `p` a uma polilinha (mínimo entre seus segmentos). */
+function distToPolyline(p: Vec2, pts: Vec2[]): number {
+  let best = Infinity;
+  for (let i = 1; i < pts.length; i++) {
+    best = Math.min(best, distToSegment(p, pts[i - 1]!, pts[i]!));
+  }
+  return best;
+}
+
 /**
- * Retorna o id do fio cuja trajetória passa a até `tol` (mundo) de `p`.
- * O fio é aproximado pelo segmento reto entre os pinos para o teste.
+ * Retorna o id do fio cujo traçado ortogonal passa a até `tol` (mundo) de `p`,
+ * considerando todos os segmentos da polilinha.
  */
 export function hitWire(store: CircuitStore, p: Vec2, tol: number): string | null {
   for (const wire of store.listWires()) {
     const from = store.pinPos(wire.from);
     const to = store.pinPos(wire.to);
     if (!from || !to) continue;
-    if (distToSegment(p, from, to) <= tol) return wire.id;
+    const { points } = wirePath(from, to, wire.barOffset);
+    if (distToPolyline(p, points) <= tol) return wire.id;
+  }
+  return null;
+}
+
+/** Resultado de um acerto na barra ajustável de um fio. */
+export interface WireBarHit {
+  wireId: string;
+  /** Eixo do ajuste da barra: `x` (caso Z) ou `y` (caso S). */
+  axis: 'x' | 'y';
+}
+
+/**
+ * Retorna o fio (e o eixo de ajuste) cuja **barra** intermediária passa a até
+ * `tol` (mundo) de `p`, ou `null`. Usado para iniciar o arraste da barra.
+ */
+export function hitWireBar(store: CircuitStore, p: Vec2, tol: number): WireBarHit | null {
+  for (const wire of store.listWires()) {
+    const from = store.pinPos(wire.from);
+    const to = store.pinPos(wire.to);
+    if (!from || !to) continue;
+    const { bar } = wirePath(from, to, wire.barOffset);
+    if (distToSegment(p, bar.a, bar.b) <= tol) return { wireId: wire.id, axis: bar.axis };
   }
   return null;
 }

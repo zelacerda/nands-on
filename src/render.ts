@@ -2,6 +2,7 @@ import type { Camera, Vec2 } from './camera';
 import { type CircuitNode, type NodeType, nodeSize, pinLabel, pinWorldPos } from './model';
 import type { CircuitStore } from './store';
 import { type SignalState, pinKey } from './simulator';
+import { wirePath } from './wire';
 
 /** Raio do pino, em unidades de mundo. */
 export const PIN_RADIUS = 7;
@@ -340,13 +341,21 @@ export function drawNode(
   );
 }
 
-/** Desenha uma linha de fio entre dois pontos de tela (curva de Bézier horizontal). */
-export function drawWireSegment(ctx: CanvasRenderingContext2D, from: Vec2, to: Vec2): void {
-  const dx = Math.max(30, Math.abs(to.x - from.x) * 0.5);
+/** Traça uma polilinha por uma sequência de pontos de tela. */
+function strokePolyline(ctx: CanvasRenderingContext2D, pts: Vec2[]): void {
+  if (pts.length < 2) return;
   ctx.beginPath();
-  ctx.moveTo(from.x, from.y);
-  ctx.bezierCurveTo(from.x + dx, from.y, to.x - dx, to.y, to.x, to.y);
+  ctx.moveTo(pts[0]!.x, pts[0]!.y);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i]!.x, pts[i]!.y);
   ctx.stroke();
+}
+
+/**
+ * Vértices (em tela) do traçado ortogonal de um fio entre dois pontos de mundo,
+ * com o deslocamento de barra `barOffset`.
+ */
+function wireScreenPoints(cam: Camera, from: Vec2, to: Vec2, barOffset?: number): Vec2[] {
+  return wirePath(from, to, barOffset).points.map((p) => cam.worldToScreen(p));
 }
 
 /** Desenha todos os fios do circuito (verde quando transportam sinal ligado). */
@@ -366,7 +375,7 @@ export function drawWires(
       : signal?.wireValues.get(wire.id)
         ? COLOR.signalOn
         : COLOR.wire;
-    drawWireSegment(ctx, cam.worldToScreen(from), cam.worldToScreen(to));
+    strokePolyline(ctx, wireScreenPoints(cam, from, to, wire.barOffset));
   }
 }
 
@@ -418,19 +427,27 @@ export function drawNodeHighlight(
   ctx.stroke();
 }
 
-/** Realça um fio selecionado. */
-export function drawWireHighlight(ctx: CanvasRenderingContext2D, from: Vec2, to: Vec2): void {
+/** Realça um fio selecionado (traçado ortogonal entre os pontos de mundo). */
+export function drawWireHighlight(
+  ctx: CanvasRenderingContext2D,
+  cam: Camera,
+  from: Vec2,
+  to: Vec2,
+  barOffset?: number,
+): void {
   ctx.strokeStyle = COLOR_SELECT;
   ctx.lineWidth = 6;
-  drawWireSegment(ctx, from, to);
+  strokePolyline(ctx, wireScreenPoints(cam, from, to, barOffset));
 }
 
 /**
- * Desenha o "fio fantasma" durante o arrasto de criação de conexão.
- * `valid` controla a cor (verde válido / vermelho inválido).
+ * Desenha o "fio fantasma" durante o arrasto de criação de conexão, já com o
+ * traçado ortogonal padrão. `from`/`to` em mundo; `valid` controla a cor
+ * (verde válido / vermelho inválido).
  */
 export function drawGhostWire(
   ctx: CanvasRenderingContext2D,
+  cam: Camera,
   from: Vec2,
   to: Vec2,
   valid: boolean,
@@ -439,6 +456,6 @@ export function drawGhostWire(
   ctx.strokeStyle = valid ? COLOR_VALID : COLOR_INVALID;
   ctx.lineWidth = 3.5;
   ctx.setLineDash([6, 4]);
-  drawWireSegment(ctx, from, to);
+  strokePolyline(ctx, wireScreenPoints(cam, from, to));
   ctx.restore();
 }

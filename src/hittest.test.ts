@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { NODE_SIZE } from './model';
 import { CircuitStore } from './store';
-import { hitNode, hitPin, hitWire } from './hittest';
+import { hitNode, hitPin, hitWire, hitWireBar } from './hittest';
+import { wirePath } from './wire';
 
 describe('hitNode', () => {
   it('acerta um ponto dentro do retângulo do nó', () => {
@@ -57,5 +58,45 @@ describe('hitWire', () => {
     const nand = store.addNode('nand', { x: 200, y: 0 });
     store.addWire({ nodeId: input.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in0' });
     expect(hitWire(store, { x: 100, y: 400 }, 6)).toBeNull();
+  });
+
+  it('acerta o fio no segmento vertical da barra (canto do Z)', () => {
+    const store = new CircuitStore();
+    const input = store.addNode('input', { x: 0, y: 0 });
+    const nand = store.addNode('nand', { x: 200, y: 80 });
+    const wire = store.addWire(
+      { nodeId: input.id, pinId: 'out' },
+      { nodeId: nand.id, pinId: 'in0' },
+    );
+    const from = store.pinPos(wire.from)!;
+    const to = store.pinPos(wire.to)!;
+    const { bar } = wirePath(from, to, wire.barOffset);
+    const mid = { x: bar.a.x, y: (bar.a.y + bar.b.y) / 2 };
+    expect(hitWire(store, mid, 6)).toBe(wire.id);
+  });
+});
+
+describe('hitWireBar', () => {
+  it('detecta a barra e o eixo de ajuste (caso Z → eixo x)', () => {
+    const store = new CircuitStore();
+    const input = store.addNode('input', { x: 0, y: 0 });
+    const nand = store.addNode('nand', { x: 200, y: 80 });
+    const wire = store.addWire(
+      { nodeId: input.id, pinId: 'out' },
+      { nodeId: nand.id, pinId: 'in0' },
+    );
+    const from = store.pinPos(wire.from)!;
+    const to = store.pinPos(wire.to)!;
+    const { bar } = wirePath(from, to, wire.barOffset);
+    const mid = { x: bar.a.x, y: (bar.a.y + bar.b.y) / 2 };
+    expect(hitWireBar(store, mid, 6)).toEqual({ wireId: wire.id, axis: 'x' });
+  });
+
+  it('retorna null fora da barra', () => {
+    const store = new CircuitStore();
+    const input = store.addNode('input', { x: 0, y: 0 });
+    const nand = store.addNode('nand', { x: 200, y: 80 });
+    store.addWire({ nodeId: input.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in0' });
+    expect(hitWireBar(store, { x: 1000, y: 1000 }, 6)).toBeNull();
   });
 });
