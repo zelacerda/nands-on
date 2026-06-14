@@ -60,6 +60,13 @@ export interface Wire {
   id: string;
   from: PinRef;
   to: PinRef;
+  /**
+   * Deslocamento manual da "barra" intermediária do traçado ortogonal, relativo
+   * à posição padrão (meio do caminho), em unidades de mundo. Interpretado no
+   * eixo X no caso Z (`out.x < in.x`) e no eixo Y no caso S. `undefined`/`0` =
+   * traçado padrão. Ver `wirePath` em `wire.ts`.
+   */
+  barOffset?: number;
 }
 
 /** Estado serializável do circuito (útil para persistência futura). */
