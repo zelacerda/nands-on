@@ -1,6 +1,6 @@
 import './style.css';
 import { Camera, type Vec2 } from './camera';
-import { drawGrid } from './grid';
+import { drawGrid, snapNodePos } from './grid';
 import {
   NODE_SIZE,
   type ChipDefinition,
@@ -29,6 +29,7 @@ import { type ChipResolver, type SignalState } from './simulator';
 import { compile } from './netlist';
 import { Simulator } from './engine';
 import { validateConnection } from './connection';
+import { playConnect, playDrop } from './audio';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
 import { isWelcomeDismissed, setWelcomeDismissed, shouldAutoShowWelcome } from './welcome';
@@ -140,20 +141,21 @@ const palette = document.querySelector<HTMLElement>('#palette')!;
 const resolveChip: ChipResolver = (node) =>
   node.defId ? library.list().find((d) => d.id === node.defId)?.internal : undefined;
 
-/** Cria uma primitiva centrada no ponto de mundo `world`. */
-function addNodeAt(type: PrimitiveType, world: Vec2): void {
-  store.addNode(type, centeredTopLeft(world, NODE_SIZE[type]));
+/** Aplica o snap à grade na posição do nó recém-criado. */
+function snapNode(node: CircuitNode): void {
+  const p = snapNodePos(node);
+  node.pos.x = p.x;
+  node.pos.y = p.y;
 }
 
-/** Cria uma instância de chip centrada no ponto de mundo `world`. */
+/** Cria uma primitiva centrada no ponto de mundo `world`, alinhada à grade. */
+function addNodeAt(type: PrimitiveType, world: Vec2): void {
+  snapNode(store.addNode(type, centeredTopLeft(world, NODE_SIZE[type])));
+}
+
+/** Cria uma instância de chip centrada no ponto de mundo `world`, alinhada à grade. */
 function addChipInstanceAt(def: ChipDefinition, world: Vec2): void {
-  store.addChipInstance(
-    def,
-    centeredTopLeft(
-      world,
-      chipSize(def.inputCount, def.outputCount, def.name, def.inputLabels, def.outputLabels),
-    ),
-  );
+  snapNode(store.addChipInstance(def, centeredTopLeft(world, chipSize(def.inputCount, def.outputCount))));
 }
 
 /** Componente que um botão da paleta cria: uma primitiva ou uma instância de chip. */
@@ -165,30 +167,32 @@ type PaletteItem =
 function spawnItem(item: PaletteItem, world: Vec2): void {
   if (item.kind === 'primitive') addNodeAt(item.type, world);
   else addChipInstanceAt(item.def, world);
+  playDrop();
 }
 
 /** Nó transitório (não persistido) usado apenas para a pré-visualização do arrasto. */
 function previewNode(item: PaletteItem, world: Vec2): CircuitNode {
   if (item.kind === 'primitive') {
-    return {
+    const node: CircuitNode = {
       id: '__preview__',
       type: item.type,
       pos: centeredTopLeft(world, NODE_SIZE[item.type]),
       pins: createPins(item.type),
     };
+    snapNode(node);
+    return node;
   }
   const { def } = item;
-  return {
+  const node: CircuitNode = {
     id: '__preview__',
     type: 'chip',
-    pos: centeredTopLeft(
-      world,
-      chipSize(def.inputCount, def.outputCount, def.name, def.inputLabels, def.outputLabels),
-    ),
+    pos: centeredTopLeft(world, chipSize(def.inputCount, def.outputCount)),
     pins: chipInstancePins(def),
     defId: def.id,
     name: def.name,
   };
+  snapNode(node);
+  return node;
 }
 
 /** Converte coordenadas de cliente para mundo, ou `null` se o ponto não está sobre o canvas. */
@@ -633,6 +637,9 @@ canvas.addEventListener('pointermove', (e) => {
     if (node) {
       node.pos.x = world.x - dragOffset.x;
       node.pos.y = world.y - dragOffset.y;
+      const snapped = snapNodePos(node);
+      node.pos.x = snapped.x;
+      node.pos.y = snapped.y;
     }
   } else if (mode === 'wire' && wireStart) {
     ghostEnd = world;
@@ -655,12 +662,20 @@ function endPointer(e: PointerEvent): void {
     const target = hitPin(store, world, worldTol(hitPx(e.pointerType)));
     if (target) {
       const res = validateConnection(store, wireStart, target);
-      if (res.ok) store.addWire(res.from, res.to);
+      if (res.ok) {
+        store.addWire(res.from, res.to);
+        playConnect();
+      }
     }
   } else if (mode === 'dragNode' && dragNodeId) {
     const up = pointerScreen(e);
     // Só conta como toque (não arrasto) se o ponteiro mal se moveu.
-    if (!isDrag(lastPointer, up)) {
+    if (isDrag(lastPointer, up)) {
+      // Soltou um componente após reposicioná-lo (já snapado à grade): toca o
+      // clique e tira a seleção, deixando o componente "assentado" no grid.
+      playDrop();
+      setSelection(null);
+    } else {
       const now = performance.now();
       const isDouble =
         lastTap !== null &&

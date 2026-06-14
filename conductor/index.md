@@ -27,6 +27,7 @@ Hub de navegação para o contexto do projeto.
 - [Branding NANDS-ON e Painel Sobre/Boas-vindas](./tracks/branding-about_20260604/index.md) — `branding-about_20260604` (complete)
 - [Walkthrough Interativo — Construir um NOT a partir do NAND](./tracks/tutorial-not_20260604/index.md) — `tutorial-not_20260604` (complete)
 - [Motor de Simulação Event-Driven](./tracks/event-driven-sim_20260606/index.md) — `event-driven-sim_20260606` (complete)
+- [Snap to Grid com Conectores nos Cruzamentos](./tracks/snap-to-grid_20260614/index.md) — `snap-to-grid_20260614` (complete)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 

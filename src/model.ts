@@ -68,24 +68,40 @@ export interface CircuitState {
   wires: Wire[];
 }
 
+/**
+ * Espaçamento vertical entre pinos adjacentes de um mesmo lado, em unidades de
+ * mundo. Múltiplo de GRID_SIZE (16) para que, com o nó snapado, os pinos caiam
+ * em cruzamentos da grade.
+ */
+export const PIN_SPACING = 32;
+
+/** Largura fixa de todo corpo retangular (NAND e chips), em unidades de mundo. */
+export const CHIP_WIDTH = 128;
+
+/**
+ * Posições verticais (offset Y) de `count` pinos centralizados num corpo de
+ * altura `h`, espaçados de {@link PIN_SPACING}. Com `h = max(nIn, nOut) * 32`,
+ * todos os valores resultam em múltiplos de GRID_SIZE.
+ */
+export function pinYs(count: number, h: number): number[] {
+  if (count <= 0) return [];
+  const span = (count - 1) * PIN_SPACING;
+  const start = (h - span) / 2;
+  return Array.from({ length: count }, (_, i) => start + i * PIN_SPACING);
+}
+
+/** Altura de um corpo retangular dado o nº de entradas/saídas. Múltiplo de 32. */
+export function bodyHeight(inputCount: number, outputCount: number): number {
+  return Math.max(inputCount, outputCount, 1) * PIN_SPACING;
+}
+
 /** Dimensões fixas das primitivas, em unidades de mundo. */
 export const NODE_SIZE: Record<PrimitiveType, { w: number; h: number }> = {
-  // Largura folgada para os rótulos A/B/Q respirarem ao lado do "NAND".
-  nand: { w: 96, h: 56 },
+  // Corpo retangular alinhado à grade: largura fixa, altura = max(in,out) * 32.
+  nand: { w: CHIP_WIDTH, h: bodyHeight(2, 1) },
   input: { w: 40, h: 40 },
   output: { w: 40, h: 40 },
 };
-
-/** Parâmetros de layout dos chips. */
-export const CHIP_MIN_W = 90;
-export const CHIP_PIN_SPACING = 22;
-export const CHIP_PAD_Y = 16;
-/** Padding horizontal e larguras médias estimadas por caractere (nome / rótulo de pino). */
-export const CHIP_PAD_X = 14;
-export const CHIP_NAME_CHAR_W = 8;
-export const CHIP_PIN_LABEL_CHAR_W = 7;
-/** Folga entre os rótulos laterais dos pinos e o nome central, por lado. */
-export const CHIP_LABEL_GAP = 12;
 
 /**
  * Definição de um chip reutilizável: nome, número de pinos externos e a
@@ -125,42 +141,14 @@ export function pinLabel(node: CircuitNode, pin: Pin): string | undefined {
   return undefined;
 }
 
-/** Nº de caracteres (pontos de código) de um rótulo. */
-function visibleLength(text: string): number {
-  return [...text].length;
-}
-
-/** Maior comprimento entre uma lista de rótulos. */
-function maxLabelLength(labels?: string[]): number {
-  if (!labels) return 0;
-  return labels.reduce((m, s) => Math.max(m, visibleLength(s)), 0);
-}
-
 /**
- * Dimensão de uma caixa de chip. A largura acomoda, lado a lado, os rótulos dos
- * pinos de entrada (à esquerda), o nome central e os rótulos dos pinos de saída
- * (à direita) — estimados por nº de caracteres — para que nada se sobreponha.
+ * Dimensão de uma caixa de chip. A largura é fixa ({@link CHIP_WIDTH}) — nomes
+ * extensos são truncados na renderização — e a altura segue
+ * {@link bodyHeight} (`max(nIn, nOut) * 32`), garantindo pinos em cruzamentos da
+ * grade quando o nó está snapado.
  */
-export function chipSize(
-  inputCount: number,
-  outputCount: number,
-  name?: string,
-  inLabels?: string[],
-  outLabels?: string[],
-): { w: number; h: number } {
-  const rows = Math.max(inputCount, outputCount, 1);
-  const h = Math.max(NODE_SIZE.nand.h, rows * CHIP_PIN_SPACING + CHIP_PAD_Y);
-  const nameW = name ? visibleLength(name) * CHIP_NAME_CHAR_W : 0;
-  const leftW = maxLabelLength(inLabels) * CHIP_PIN_LABEL_CHAR_W;
-  const rightW = maxLabelLength(outLabels) * CHIP_PIN_LABEL_CHAR_W;
-  const sideGap = (leftW > 0 ? CHIP_LABEL_GAP : 0) + (rightW > 0 ? CHIP_LABEL_GAP : 0);
-  const content = 2 * CHIP_PAD_X + leftW + rightW + nameW + sideGap;
-  return { w: Math.max(CHIP_MIN_W, content), h };
-}
-
-/** Rótulos dos pinos de um nó de chip, por direção, na ordem dos pinos. */
-function nodePinLabels(node: CircuitNode, kind: PinKind): string[] {
-  return node.pins.filter((p) => p.kind === kind).map((p) => p.label ?? '');
+export function chipSize(inputCount: number, outputCount: number): { w: number; h: number } {
+  return { w: CHIP_WIDTH, h: bodyHeight(inputCount, outputCount) };
 }
 
 /** Dimensão de um nó qualquer (primitiva ou chip). */
@@ -168,13 +156,7 @@ export function nodeSize(node: CircuitNode): { w: number; h: number } {
   if (node.type === 'chip') {
     const inCount = node.pins.filter((p) => p.kind === 'in').length;
     const outCount = node.pins.filter((p) => p.kind === 'out').length;
-    return chipSize(
-      inCount,
-      outCount,
-      node.name,
-      nodePinLabels(node, 'in'),
-      nodePinLabels(node, 'out'),
-    );
+    return chipSize(inCount, outCount);
   }
   return NODE_SIZE[node.type];
 }
@@ -186,12 +168,15 @@ export function nodeSize(node: CircuitNode): { w: number; h: number } {
 export function createPins(type: PrimitiveType): Pin[] {
   const { w, h } = NODE_SIZE[type];
   switch (type) {
-    case 'nand':
+    case 'nand': {
+      const ins = pinYs(2, h); // entradas: 2 posições
+      const out = pinYs(1, h); // saída: 1 posição
       return [
-        { id: 'in0', kind: 'in', offset: { x: 0, y: h * 0.3 } },
-        { id: 'in1', kind: 'in', offset: { x: 0, y: h * 0.7 } },
-        { id: 'out', kind: 'out', offset: { x: w, y: h * 0.5 } },
+        { id: 'in0', kind: 'in', offset: { x: 0, y: ins[0]! } },
+        { id: 'in1', kind: 'in', offset: { x: 0, y: ins[1]! } },
+        { id: 'out', kind: 'out', offset: { x: w, y: out[0]! } },
       ];
+    }
     case 'input':
       return [{ id: 'out', kind: 'out', offset: { x: w, y: h * 0.5 } }];
     case 'output':
@@ -204,21 +189,18 @@ export function createPins(type: PrimitiveType): Pin[] {
  * distribuídas verticalmente de forma uniforme.
  */
 export function chipInstancePins(def: ChipDefinition): Pin[] {
-  // Mesma assinatura usada por nodeSize, para que a borda direita (onde ficam os
-  // pinos de saída) coincida exatamente com a largura do corpo desenhado.
-  const { w, h } = chipSize(
-    def.inputCount,
-    def.outputCount,
-    def.name,
-    def.inputLabels,
-    def.outputLabels,
-  );
+  // Mesma altura/largura usadas por nodeSize, para que a borda direita (onde
+  // ficam os pinos de saída) coincida exatamente com a largura do corpo, e os
+  // pinos fiquem espaçados de PIN_SPACING (caindo em cruzamentos da grade).
+  const { w, h } = chipSize(def.inputCount, def.outputCount);
   const pins: Pin[] = [];
+  const inYs = pinYs(def.inputCount, h);
+  const outYs = pinYs(def.outputCount, h);
   for (let i = 0; i < def.inputCount; i++) {
     pins.push({
       id: `in${i}`,
       kind: 'in',
-      offset: { x: 0, y: (h * (i + 1)) / (def.inputCount + 1) },
+      offset: { x: 0, y: inYs[i]! },
       label: def.inputLabels?.[i],
     });
   }
@@ -226,7 +208,7 @@ export function chipInstancePins(def: ChipDefinition): Pin[] {
     pins.push({
       id: `out${i}`,
       kind: 'out',
-      offset: { x: w, y: (h * (i + 1)) / (def.outputCount + 1) },
+      offset: { x: w, y: outYs[i]! },
       label: def.outputLabels?.[i],
     });
   }

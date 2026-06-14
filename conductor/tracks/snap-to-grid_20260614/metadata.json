@@ -1,0 +1,18 @@
+{
+  "id": "snap-to-grid_20260614",
+  "title": "Snap to Grid com Conectores nos Cruzamentos",
+  "type": "feature",
+  "status": "complete",
+  "created": "2026-06-14T13:19:45-03:00",
+  "updated": "2026-06-14T13:52:00-03:00",
+  "current_phase": 4,
+  "current_task": "4.3",
+  "phases": {
+    "total": 4,
+    "completed": 4
+  },
+  "tasks": {
+    "total": 17,
+    "completed": 17
+  }
+}
