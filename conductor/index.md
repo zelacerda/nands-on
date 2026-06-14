@@ -28,6 +28,7 @@ Hub de navegação para o contexto do projeto.
 - [Walkthrough Interativo — Construir um NOT a partir do NAND](./tracks/tutorial-not_20260604/index.md) — `tutorial-not_20260604` (complete)
 - [Motor de Simulação Event-Driven](./tracks/event-driven-sim_20260606/index.md) — `event-driven-sim_20260606` (complete)
 - [Snap to Grid com Conectores nos Cruzamentos](./tracks/snap-to-grid_20260614/index.md) — `snap-to-grid_20260614` (complete)
+- [Roteamento Ortogonal de Fios](./tracks/orthogonal-wires_20260614/index.md) — `orthogonal-wires_20260614` (pending)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 

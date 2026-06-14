@@ -1,0 +1,18 @@
+{
+  "id": "orthogonal-wires_20260614",
+  "title": "Roteamento Ortogonal de Fios",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-06-14T14:15:39-03:00",
+  "updated": "2026-06-14T14:15:39-03:00",
+  "current_phase": 1,
+  "current_task": "1.1",
+  "phases": {
+    "total": 4,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 12,
+    "completed": 0
+  }
+}
