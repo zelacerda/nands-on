@@ -1,6 +1,6 @@
 import './style.css';
 import { Camera, type Vec2 } from './camera';
-import { drawGrid, snapNodePos } from './grid';
+import { drawGrid, snapNodePos, snapScalar } from './grid';
 import {
   NODE_SIZE,
   type ChipDefinition,
@@ -8,6 +8,7 @@ import {
   type CircuitState,
   type PinRef,
   type PrimitiveType,
+  type Wire,
   chipInstancePins,
   chipSize,
   createPins,
@@ -24,7 +25,8 @@ import {
   drawNodeHighlight,
   drawWireHighlight,
 } from './render';
-import { hitNode, hitPin, hitWire } from './hittest';
+import { hitNode, hitPin, hitWire, hitWireBar } from './hittest';
+import { wirePath } from './wire';
 import { type ChipResolver, type SignalState } from './simulator';
 import { compile } from './netlist';
 import { Simulator } from './engine';
@@ -71,7 +73,7 @@ function resize(): void {
 
 // --- Estado de interação -------------------------------------------------
 
-type Mode = 'idle' | 'pan' | 'dragNode' | 'wire' | 'pinch';
+type Mode = 'idle' | 'pan' | 'dragNode' | 'wire' | 'pinch' | 'dragWaypoint';
 type Selection = { kind: 'node' | 'wire'; id: string } | null;
 
 let mode: Mode = 'idle';
@@ -87,6 +89,14 @@ let wireStart: PinRef | null = null;
 let ghostEnd: Vec2 = { x: 0, y: 0 }; // mundo
 let ghostValid = false;
 let pinchPrev: PinchSample | null = null;
+/** Arraste da barra de um fio: id do fio e eixo do ajuste (`x` no Z, `y` no S). */
+let dragBar: { wireId: string; axis: 'x' | 'y' } | null = null;
+/**
+ * Caso (Z/S) de cada fio conectado ao nó em arraste, capturado ao iniciar o
+ * arraste. Ao recalcular durante o movimento, se o caso de um fio inverter, seu
+ * ajuste manual (`barOffset`) é resetado.
+ */
+let dragNodeWireShapes: Map<string, 'Z' | 'S'> = new Map();
 /**
  * Nó `input` que já estava selecionado ao iniciar este gesto. Se o ponteiro
  * subir sem caracterizar arrasto, o clique avança o estado do input no ciclo
@@ -593,11 +603,26 @@ canvas.addEventListener('pointerdown', (e) => {
     dragNodeId = nodeId;
     const node = store.getNode(nodeId)!;
     dragOffset = { x: world.x - node.pos.x, y: world.y - node.pos.y };
+    // Captura o caso (Z/S) dos fios conectados, para resetar o ajuste se inverter.
+    dragNodeWireShapes = new Map();
+    for (const w of wiresOfNode(nodeId)) {
+      const s = wireShape(w);
+      if (s) dragNodeWireShapes.set(w.id, s);
+    }
     // Clicar num input já selecionado (sem arrastar) alterna seu estado; clicar
     // num input ainda não selecionado apenas o seleciona (comportamento atual).
     const wasSelected = selection?.kind === 'node' && selection.id === nodeId;
     toggleCandidateId = wasSelected && node.type === 'input' ? nodeId : null;
     setSelection({ kind: 'node', id: nodeId });
+    return;
+  }
+
+  // Barra ajustável de um fio: inicia o arraste da barra (antes da seleção geral).
+  const bar = hitWireBar(store, world, worldTol(hitPx(e.pointerType)));
+  if (bar) {
+    dragBar = bar;
+    mode = 'dragWaypoint';
+    setSelection({ kind: 'wire', id: bar.wireId });
     return;
   }
 
@@ -612,11 +637,28 @@ canvas.addEventListener('pointerdown', (e) => {
   mode = 'pan';
 });
 
+/** Caso (Z/S) atual de um fio, ou `null` se algum pino sumiu. */
+function wireShape(wire: Wire): 'Z' | 'S' | null {
+  const from = store.pinPos(wire.from);
+  const to = store.pinPos(wire.to);
+  if (!from || !to) return null;
+  return wirePath(from, to).shape;
+}
+
+/** Fios conectados a um nó (como origem ou destino). */
+function wiresOfNode(nodeId: string): Wire[] {
+  return store.listWires().filter((w) => w.from.nodeId === nodeId || w.to.nodeId === nodeId);
+}
+
 /** Atualiza o cursor no hover (apenas mouse). */
 function updateHoverCursor(world: Vec2): void {
   if (hitPin(store, world, worldTol(8))) canvas!.style.cursor = 'crosshair';
   else if (hitNode(store, world)) canvas!.style.cursor = 'move';
-  else canvas!.style.cursor = 'grab';
+  else {
+    const bar = hitWireBar(store, world, worldTol(8));
+    if (bar) canvas!.style.cursor = bar.axis === 'x' ? 'ew-resize' : 'ns-resize';
+    else canvas!.style.cursor = 'grab';
+  }
 }
 
 canvas.addEventListener('pointermove', (e) => {
@@ -640,6 +682,25 @@ canvas.addEventListener('pointermove', (e) => {
       const snapped = snapNodePos(node);
       node.pos.x = snapped.x;
       node.pos.y = snapped.y;
+      // Se um fio conectado inverteu de caso (Z↔S), reseta seu ajuste manual.
+      for (const [wid, oldShape] of dragNodeWireShapes) {
+        const w = store.listWires().find((x) => x.id === wid);
+        if (!w) continue;
+        const cur = wireShape(w);
+        if (cur && cur !== oldShape) {
+          w.barOffset = undefined;
+          dragNodeWireShapes.set(wid, cur);
+        }
+      }
+    }
+  } else if (mode === 'dragWaypoint' && dragBar) {
+    const w = store.listWires().find((x) => x.id === dragBar!.wireId);
+    const from = w && store.pinPos(w.from);
+    const to = w && store.pinPos(w.to);
+    if (w && from && to) {
+      const def = wirePath(from, to, 0).bar;
+      w.barOffset =
+        dragBar.axis === 'x' ? snapScalar(world.x) - def.a.x : snapScalar(world.y) - def.a.y;
     }
   } else if (mode === 'wire' && wireStart) {
     ghostEnd = world;
@@ -720,6 +781,8 @@ function endPointer(e: PointerEvent): void {
     dragNodeId = null;
     wireStart = null;
     toggleCandidateId = null;
+    dragBar = null;
+    dragNodeWireShapes = new Map();
   }
 }
 canvas.addEventListener('pointerup', endPointer);

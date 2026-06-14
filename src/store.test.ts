@@ -92,5 +92,18 @@ describe('CircuitStore', () => {
       const next = store.addNode('nand', { x: 0, y: 0 });
       expect(Number(next.id.replace('n', ''))).toBeGreaterThan(4);
     });
+
+    it('preserva o barOffset de um fio no round-trip (toJSON → loadState)', () => {
+      const store = new CircuitStore();
+      const a = store.addNode('input', { x: 0, y: 0 });
+      const b = store.addNode('nand', { x: 200, y: 80 });
+      const wire = store.addWire({ nodeId: a.id, pinId: 'out' }, { nodeId: b.id, pinId: 'in0' });
+      wire.barOffset = 32;
+
+      const json = JSON.parse(JSON.stringify(store.toJSON()));
+      const restored = new CircuitStore();
+      restored.loadState(json);
+      expect(restored.listWires()[0]!.barOffset).toBe(32);
+    });
   });
 });

@@ -53,16 +53,16 @@ manualmente. Verificação formal só no encerramento do track (conforme `workfl
 
 ### Tasks
 
-- [ ] Task 3.1: Atualizar `hitWire` (`hittest.ts`) para medir a distância à polilinha
+- [x] Task 3.1: Atualizar `hitWire` (`hittest.ts`) para medir a distância à polilinha
       (mínimo entre os segmentos de `wirePath`).
-- [ ] Task 3.2: Adicionar detecção específica da **barra** (qual fio e que a posição cai
-      sobre o segmento ajustável), para habilitar seu arraste.
-- [ ] Task 3.3: Testes de hit-testing: ponto próximo a cada segmento seleciona o fio; ponto
-      sobre a barra é reconhecido; tolerância respeitada.
+- [x] Task 3.2: Adicionar detecção específica da **barra** (`hitWireBar` → `{ wireId, axis }`)
+      para habilitar seu arraste.
+- [x] Task 3.3: Testes de hit-testing: ponto próximo a um segmento (incl. barra) seleciona o
+      fio; `hitWireBar` reconhece a barra e o eixo; tolerância respeitada.
 
 ### Verification
 
-- [ ] Testes passam; seleção/exclusão de fios continua precisa na app.
+- [x] Testes passam (10 em hittest); seleção/exclusão de fios continua precisa.
 
 ## Phase 4: Interação — Arraste da Barra
 
