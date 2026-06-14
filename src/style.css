@@ -37,11 +37,26 @@ body {
   cursor: grabbing;
 }
 
-#palette {
+/* Dock esquerdo: empilha a caixa de I/O e a barra de componentes, limitado à
+   altura da viewport para que a lista de componentes possa rolar internamente. */
+#left-dock {
   position: fixed;
   top: 12px;
   left: 12px;
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  /* Largura fixa: nomes longos de chip quebram em várias linhas em vez de
+     esticar a barra. */
+  width: 120px;
+  max-height: calc(100vh - 24px);
+}
+
+/* Caixa dedicada de I/O (IN/OUT). */
+#io-box {
+  display: flex;
+  justify-content: center;
   gap: 8px;
   padding: 8px;
   background: rgba(39, 43, 51, 0.9);
@@ -50,10 +65,78 @@ body {
   backdrop-filter: blur(4px);
 }
 
-#palette button {
+/* Botões de I/O (IN/OUT): círculos, espelhando a forma desses nós no canvas. A
+   cor da borda reflete o conector exposto — laranja para a entrada (que tem pino
+   de saída) e azul claro para a saída (que tem pino de entrada) — tornando
+   intuitivo o que injeta e o que observa sinal. */
+#io-box button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
   font:
     600 13px system-ui,
     sans-serif;
+  color: #d8dee9;
+  background: #353b45;
+  border: 1px solid #4a525e;
+  cursor: pointer;
+  /* Permite arrastar o botão para o canvas sem o navegador interpretar como scroll. */
+  touch-action: none;
+}
+
+#io-box button:hover {
+  background: #3f4651;
+}
+
+#io-box button:active {
+  background: #2d333b;
+}
+
+#io-box button[data-add='input'] {
+  border-color: #e0af68;
+}
+
+#io-box button[data-add='output'] {
+  border-color: #7aa2f7;
+}
+
+/* Barra vertical de componentes: lista rolável + controles de scroll + "Make". */
+#palette {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(39, 43, 51, 0.9);
+  border: 1px solid #3a3f4a;
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+}
+
+/* Região rolável da lista (NAND + chips criados). */
+#palette-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  /* Limita a altura para que muitos componentes acionem o scroll interno. */
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  /* Esconde a barra de rolagem nativa: a navegação é feita pelos botões ▲/▼. */
+  scrollbar-width: none;
+}
+
+#palette-list::-webkit-scrollbar {
+  display: none;
+}
+
+#palette button {
+  width: 100%;
+  font:
+    600 13px system-ui,
+    sans-serif;
+  line-height: 1.3;
   color: #d8dee9;
   background: #353b45;
   border: 1px solid #4a525e;
@@ -61,8 +144,11 @@ body {
   padding: 8px 12px;
   cursor: pointer;
   /* Alvo de toque confortável em mobile. */
-  min-width: 56px;
+  min-width: 96px;
   min-height: 40px;
+  /* Nomes longos de chip quebram em várias linhas (como o rótulo no canvas). */
+  white-space: normal;
+  overflow-wrap: anywhere;
   /* Permite arrastar o botão para o canvas sem o navegador interpretar como scroll. */
   touch-action: none;
 }
@@ -73,28 +159,6 @@ body {
 
 #palette button:active {
   background: #2d333b;
-}
-
-/* Botões de I/O (IN/OUT): círculos, espelhando a forma desses nós no canvas. A
-   cor da borda reflete o conector exposto — laranja para a entrada (que tem pino
-   de saída) e azul claro para a saída (que tem pino de entrada) — tornando
-   intuitivo o que injeta e o que observa sinal. */
-#palette button[data-add='input'],
-#palette button[data-add='output'] {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0;
-  border-radius: 50%;
-}
-
-#palette button[data-add='input'] {
-  border-color: #e0af68;
-}
-
-#palette button[data-add='output'] {
-  border-color: #7aa2f7;
 }
 
 /* Botões de componentes lógicos (NAND e chips criados): azul, distinto do I/O. */
@@ -110,56 +174,53 @@ body {
   background: #444f70;
 }
 
-#palette button#delete {
-  color: #f7768e;
-  border-color: #5a3b42;
-}
-
-#palette button#delete:hover {
-  background: #45323a;
-}
-
-#palette button#edit-chip {
-  color: #e0af68;
-  border-color: #5a4a32;
-}
-
-#palette button#edit-chip:hover {
-  background: #45402d;
-}
-
-/* Chip selecionado na paleta (com "Editar" visível): anel de destaque. */
+/* Chip selecionado na paleta: anel de destaque. */
 #palette button.chip-btn.selected {
   border-color: #e0af68;
   box-shadow: 0 0 0 2px rgba(224, 175, 104, 0.45);
 }
 
-/* Botão "Fazer" (canto superior direito). */
+/* Controles de scroll (▲/▼): só visíveis quando a lista transborda. */
+.palette-scroll {
+  min-height: 24px !important;
+  padding: 2px !important;
+  font-size: 11px !important;
+  color: #aeb6c2 !important;
+  opacity: 0.85;
+}
+
+.palette-scroll[hidden] {
+  display: none;
+}
+
+/* Botão "Fazer" — ancorado embaixo da barra, em verde. */
 #make {
-  position: fixed;
-  top: 12px;
-  right: 12px;
   font:
     700 14px system-ui,
-    sans-serif;
-  color: #1a1d23;
-  background: #9ece6a;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 18px;
+    sans-serif !important;
+  color: #1a1d23 !important;
+  background: #9ece6a !important;
+  border: none !important;
+  border-radius: 8px;
+  padding: 10px 12px;
   min-height: 44px;
   cursor: pointer;
 }
 
 #make:hover {
-  background: #aede7a;
+  background: #aede7a !important;
 }
 
-/* Barra de edição de chip (canto superior direito, no lugar do "Fazer"). */
+#make[hidden] {
+  display: none;
+}
+
+/* Barra de edição de chip (topo-centro): indica o modo de edição. */
 #edit-bar {
   position: fixed;
   top: 12px;
-  right: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -168,6 +229,7 @@ body {
   border: 1px solid #5a4a32;
   border-radius: 10px;
   backdrop-filter: blur(4px);
+  z-index: 16;
 }
 
 #edit-bar[hidden] {
@@ -210,28 +272,154 @@ body {
   background: #3f4651;
 }
 
-/* Botão de limpar banco — afordância temporária de desenvolvimento (canto
-   inferior direito), discreta para não competir com os controles principais. */
-#clear-db {
+/* Menu de comandos (≡), no topo-direita. */
+#menu-btn {
   position: fixed;
-  bottom: 12px;
+  top: 12px;
   right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  /* Compensa o desalinhamento óptico do glifo "☰": o padding inferior sobe o
+     símbolo (~3px) dentro da centralização flex. */
+  padding-bottom: 6px;
   font:
-    600 12px system-ui,
+    700 20px system-ui,
     sans-serif;
-  color: #f7768e;
-  background: rgba(39, 43, 51, 0.85);
-  border: 1px solid #5a3b42;
-  border-radius: 8px;
-  padding: 8px 12px;
-  min-height: 36px;
+  line-height: 1;
+  color: #d8dee9;
+  background: rgba(39, 43, 51, 0.9);
+  border: 1px solid #3a3f4a;
+  border-radius: 10px;
   cursor: pointer;
-  opacity: 0.7;
   backdrop-filter: blur(4px);
+  z-index: 17;
 }
 
-#clear-db:hover {
-  opacity: 1;
+#menu-btn:hover {
+  background: #3f4651;
+}
+
+/* Painel suspenso do menu, abaixo do botão ≡. */
+#commands-menu {
+  position: fixed;
+  top: 64px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 180px;
+  padding: 8px;
+  background: rgba(39, 43, 51, 0.96);
+  border: 1px solid #3a3f4a;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 17;
+}
+
+#commands-menu[hidden] {
+  display: none;
+}
+
+.menu-title {
+  padding: 4px 8px;
+  font:
+    700 11px system-ui,
+    sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #aeb6c2;
+}
+
+.menu-item {
+  font:
+    600 13px system-ui,
+    sans-serif;
+  text-align: left;
+  color: #d8dee9;
+  background: #353b45;
+  border: 1px solid #4a525e;
+  border-radius: 6px;
+  padding: 10px 12px;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: #3f4651;
+}
+
+/* Item destacado (laranja) — Limpar banco, afordância temporária de dev. */
+.menu-item-danger {
+  color: #1a1d23;
+  background: #e0af68;
+  border-color: #e0af68;
+}
+
+.menu-item-danger:hover {
+  background: #ecc07e;
+}
+
+/* Barra de ações contextual (inferior-centro): EDIT / RENAME / DELETE. */
+#action-bar {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  background: rgba(39, 43, 51, 0.92);
+  border: 1px solid #3a3f4a;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 14;
+}
+
+#action-bar[hidden] {
+  display: none;
+}
+
+#action-bar button {
+  font:
+    700 13px system-ui,
+    sans-serif;
+  color: #d8dee9;
+  background: #353b45;
+  border: 1px solid #4a525e;
+  border-radius: 8px;
+  padding: 10px 16px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+#action-bar button[hidden] {
+  display: none;
+}
+
+#action-bar button:hover {
+  background: #3f4651;
+}
+
+#action-edit {
+  color: #e0af68;
+  border-color: #5a4a32;
+}
+
+#action-edit:hover {
+  background: #45402d;
+}
+
+#action-delete {
+  color: #f7768e;
+  border-color: #5a3b42;
+}
+
+#action-delete:hover {
   background: #45323a;
 }
 
@@ -268,30 +456,6 @@ body {
      modo que o campo cresça/encolha centralizado ao redor do alvo. */
   width: auto;
   text-align: center;
-}
-
-/* Botão "?" — abre o painel Sobre (discreto, canto inferior esquerdo). */
-#about-btn {
-  position: fixed;
-  bottom: 12px;
-  left: 12px;
-  width: 36px;
-  height: 36px;
-  font:
-    700 16px system-ui,
-    sans-serif;
-  color: #c8d3f5;
-  background: rgba(39, 43, 51, 0.85);
-  border: 1px solid #4a5680;
-  border-radius: 50%;
-  cursor: pointer;
-  opacity: 0.7;
-  backdrop-filter: blur(4px);
-}
-
-#about-btn:hover {
-  opacity: 1;
-  background: #3a4360;
 }
 
 /* Overlay + painel "Sobre" / boas-vindas. */
@@ -406,13 +570,13 @@ body {
   background: #aede7a;
 }
 
-/* Callout do tutorial — caixa não-bloqueante centrada embaixo. */
+/* Callout do tutorial — caixa não-bloqueante centrada no topo. */
 #tutorial-callout {
   position: fixed;
-  bottom: 16px;
+  top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 15;
+  z-index: 18;
   width: calc(100% - 32px);
   max-width: 460px;
   padding: 16px 18px;

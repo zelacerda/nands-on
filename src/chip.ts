@@ -186,6 +186,14 @@ export class ChipLibrary {
     primeSeqFromIds(defs.map((d) => d.id));
   }
 
+  /** Remove a definição de id `id` da biblioteca. No-op se o id não existir. */
+  remove(id: string): void {
+    const def = this.getById(id);
+    if (!def) return;
+    this.byName.delete(def.name);
+    this.onMutate?.(this.list());
+  }
+
   list(): ChipDefinition[] {
     return [...this.byName.values()];
   }

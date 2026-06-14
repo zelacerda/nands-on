@@ -29,6 +29,7 @@ Hub de navegação para o contexto do projeto.
 - [Motor de Simulação Event-Driven](./tracks/event-driven-sim_20260606/index.md) — `event-driven-sim_20260606` (complete)
 - [Snap to Grid com Conectores nos Cruzamentos](./tracks/snap-to-grid_20260614/index.md) — `snap-to-grid_20260614` (complete)
 - [Roteamento Ortogonal de Fios](./tracks/orthogonal-wires_20260614/index.md) — `orthogonal-wires_20260614` (complete)
+- [Reorganização da UI do Editor](./tracks/ui-redesign_20260614/index.md) — `ui-redesign_20260614` (complete)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 

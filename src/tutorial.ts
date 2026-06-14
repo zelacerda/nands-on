@@ -97,7 +97,7 @@ export const NOT_TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'add-input',
     textKey: 'tutorial.step.addInput',
-    highlightSelector: '#palette button[data-add="input"]',
+    highlightSelector: '#io-box button[data-add="input"]',
     isComplete: (ctx) => countType(ctx.nodes, 'input') >= 1,
   },
   {
@@ -109,7 +109,7 @@ export const NOT_TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'add-output',
     textKey: 'tutorial.step.addOutput',
-    highlightSelector: '#palette button[data-add="output"]',
+    highlightSelector: '#io-box button[data-add="output"]',
     isComplete: (ctx) => countType(ctx.nodes, 'output') >= 1,
   },
   {

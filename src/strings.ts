@@ -18,6 +18,7 @@ export const STRINGS = {
   'a11y.palette': 'Component palette',
   'a11y.renameInput': 'Input or output name',
   'a11y.about': 'About NANDS-ON',
+  'a11y.menu': 'Commands menu',
 
   // Marca e painel "Sobre" / boas-vindas
   'app.name': 'NANDS-ON',
@@ -36,8 +37,17 @@ export const STRINGS = {
   // Paleta de componentes
   'palette.input': 'IN',
   'palette.output': 'OUT',
-  'palette.edit': 'Edit',
-  'palette.delete': 'Delete',
+
+  // Menu de comandos (≡)
+  'menu.title': 'COMMANDS',
+  'menu.import': 'Import',
+  'menu.export': 'Export',
+  'menu.about': 'About',
+
+  // Barra de ações contextual (componente/nó/fio selecionado)
+  'action.edit': 'Edit',
+  'action.rename': 'Rename',
+  'action.delete': 'Delete',
 
   // Fluxo "Make"
   'make': 'Make',
@@ -73,7 +83,7 @@ export const STRINGS = {
   'tutorial.step.toggle':
     'Tap the input to select it, then tap again to cycle its state: OFF → ON → CLK → OFF. Watch the output show the opposite — congrats, you just made a NOT gate!',
   'tutorial.step.rename':
-    'Double-tap the input (or the output) to rename it — try naming the input "A".',
+    'Select the input (or the output), then tap "Rename" in the bar below — try naming the input "A".',
   'tutorial.step.make': 'Finally, click "Make" to package your NOT into a reusable chip.',
 } as const;
 
