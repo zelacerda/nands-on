@@ -104,6 +104,75 @@ function drawLabel(
   ctx.fillText(fitted, x, y);
 }
 
+/**
+ * Quebra `text` em linhas que cabem em `maxWidth` (px de tela). Quebra primeiro
+ * por palavras; uma palavra que sozinha não cabe é fracionada por caractere.
+ */
+function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  if (maxWidth <= 0) return [text];
+  const lines: string[] = [];
+  let cur = '';
+  const flush = () => {
+    if (cur) {
+      lines.push(cur);
+      cur = '';
+    }
+  };
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    const tentative = cur ? `${cur} ${word}` : word;
+    if (ctx.measureText(tentative).width <= maxWidth) {
+      cur = tentative;
+      continue;
+    }
+    flush();
+    if (ctx.measureText(word).width <= maxWidth) {
+      cur = word;
+    } else {
+      // Palavra mais larga que a caixa: quebra por caractere.
+      for (const ch of word) {
+        if (ctx.measureText(cur + ch).width <= maxWidth) {
+          cur += ch;
+        } else {
+          flush();
+          cur = ch;
+        }
+      }
+    }
+  }
+  flush();
+  return lines.length ? lines : [text];
+}
+
+/**
+ * Desenha um rótulo centrado (horizontal e verticalmente) em torno de
+ * (`centerX`, `centerY`), quebrando em múltiplas linhas para caber em
+ * `maxWidth`. Limita-se às linhas que cabem em `maxHeight`; havendo excesso, a
+ * última linha visível é truncada com reticências.
+ */
+function drawCenteredMultiline(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  centerX: number,
+  centerY: number,
+  maxWidth: number,
+  maxHeight: number,
+  fontPx: number,
+): void {
+  if (maxWidth <= 0) return;
+  const lineHeight = fontPx * 1.15;
+  let lines = wrapLines(ctx, text, maxWidth);
+  const maxLines = Math.max(1, Math.floor(maxHeight / lineHeight));
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    const last = lines[maxLines - 1]!;
+    lines[maxLines - 1] = fitText(ctx, `${last}…`, maxWidth);
+  }
+  const totalH = lines.length * lineHeight;
+  const startY = centerY - totalH / 2 + lineHeight / 2;
+  ctx.textAlign = 'center';
+  lines.forEach((line, i) => ctx.fillText(line, centerX, startY + i * lineHeight));
+}
+
 /** Rótulo central exibido em cada tipo de nó. */
 function nodeLabel(node: CircuitNode): string {
   switch (node.type) {
@@ -227,11 +296,21 @@ export function drawNode(
   // mesmo quando um lado tem rótulos mais largos que o outro).
   const label = nodeLabel(node);
   ctx.fillStyle = (lit || osc) && !logic ? COLOR.signalOnLabel : COLOR.label;
-  ctx.font = `${Math.max(9, 12 * cam.zoom)}px system-ui, sans-serif`;
+  const fontPx = Math.max(9, 12 * cam.zoom);
+  ctx.font = `${fontPx}px system-ui, sans-serif`;
   ctx.textBaseline = 'middle';
   const centerX = origin.x + (leftReserve + (sw - rightReserve)) / 2;
   const centerMax = Math.max(0, sw - leftReserve - rightReserve);
-  drawLabel(ctx, label, centerX, origin.y + sh / 2, 'center', centerMax);
+  // Largura fixa: o nome quebra em várias linhas, sempre centralizado.
+  drawCenteredMultiline(
+    ctx,
+    label,
+    centerX,
+    origin.y + sh / 2,
+    centerMax,
+    sh - 4 * cam.zoom,
+    fontPx,
+  );
 
   // Pinos (verde quando carregam sinal ligado).
   for (const pin of node.pins) {
@@ -332,7 +411,8 @@ export function drawNodeHighlight(
       origin.y - pad,
       sw + 2 * pad,
       sh + 2 * pad,
-      (BODY_CORNER_RADIUS + 2) * cam.zoom,
+      // Concêntrico ao corpo: raio do corpo + a folga (pad = 3) → sem vão no canto.
+      (BODY_CORNER_RADIUS + 3) * cam.zoom,
     );
   }
   ctx.stroke();

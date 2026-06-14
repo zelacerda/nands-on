@@ -671,8 +671,10 @@ function endPointer(e: PointerEvent): void {
     const up = pointerScreen(e);
     // Só conta como toque (não arrasto) se o ponteiro mal se moveu.
     if (isDrag(lastPointer, up)) {
-      // Soltou um componente após reposicioná-lo (já snapado à grade).
+      // Soltou um componente após reposicioná-lo (já snapado à grade): toca o
+      // clique e tira a seleção, deixando o componente "assentado" no grid.
       playDrop();
+      setSelection(null);
     } else {
       const now = performance.now();
       const isDouble =
