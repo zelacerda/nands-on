@@ -47,6 +47,9 @@ body {
   flex-direction: column;
   align-items: stretch;
   gap: 12px;
+  /* Largura fixa: nomes longos de chip quebram em várias linhas em vez de
+     esticar a barra. */
+  width: 200px;
   max-height: calc(100vh - 24px);
 }
 
@@ -133,6 +136,7 @@ body {
   font:
     600 13px system-ui,
     sans-serif;
+  line-height: 1.3;
   color: #d8dee9;
   background: #353b45;
   border: 1px solid #4a525e;
@@ -142,6 +146,9 @@ body {
   /* Alvo de toque confortável em mobile. */
   min-width: 96px;
   min-height: 40px;
+  /* Nomes longos de chip quebram em várias linhas (como o rótulo no canvas). */
+  white-space: normal;
+  overflow-wrap: anywhere;
   /* Permite arrastar o botão para o canvas sem o navegador interpretar como scroll. */
   touch-action: none;
 }
@@ -270,8 +277,14 @@ body {
   position: fixed;
   top: 12px;
   right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
+  /* Compensa o desalinhamento óptico do glifo "☰": o padding inferior sobe o
+     símbolo (~3px) dentro da centralização flex. */
+  padding-bottom: 6px;
   font:
     700 20px system-ui,
     sans-serif;
