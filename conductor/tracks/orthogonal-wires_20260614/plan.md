@@ -3,7 +3,7 @@
 **Track ID:** orthogonal-wires_20260614
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-14
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -89,10 +89,10 @@ manualmente. Verificação formal só no encerramento do track (conforme `workfl
       da barra, round-trip do `barOffset`); critérios visuais/de interação pendentes de
       validação manual.
 - [x] `npm run test` (146 testes) e `npm run build` (tsc + vite) passam.
-- [ ] Verificação manual (desktop e toque): traçado Z/S, ajuste da barra, mover nós, cores
-      por estado, seleção/exclusão. **Pendente — usuário.**
+- [x] Verificação manual (desktop e toque): traçado Z/S, ajuste da barra, mover nós, cores
+      por estado, seleção/exclusão — aprovada pelo usuário.
 - [x] README atualizado (módulo `wire.ts`, render ortogonal, `hitWireBar`).
-- [ ] Pronto para revisão.
+- [x] Pronto para revisão.
 
 ---
 
