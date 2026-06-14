@@ -72,18 +72,19 @@ para retangulares; pelo conector para I/O).
 
 ### Tasks
 
-- [ ] Task 3.1: Reduzir o raio das bordas do corpo em `src/render.ts:207` (8 → ~4–5) e
-      ajustar o realce de seleção (`:326`) proporcionalmente.
-- [ ] Task 3.2: Garantir truncamento do nome do chip à largura fixa 128 (reticências),
-      revisando as reservas laterais de rótulo de pino (`pinLabelReserve`) para que nada se
-      sobreponha.
-- [ ] Task 3.3: Revisar hit testing (`src/hittest.ts`) e tolerâncias (`hitPx`/`worldTol`
-      em `main.ts`) com a nova escala — seleção de pino/nó/fio continua confortável,
-      inclusive no toque.
+- [x] Task 3.1: Reduzir o raio das bordas do corpo em `src/render.ts:207` (8 → ~4–5) e
+      ajustar o realce de seleção (`:326`) proporcionalmente. Feito via constante
+      `BODY_CORNER_RADIUS = 4` (corpo) e `+2` no realce.
+- [x] Task 3.2: Garantir truncamento do nome do chip à largura fixa 128 (reticências) —
+      já coberto por `drawLabel`/`fitText`, que trunca o nome dentro de `centerMax` (largura
+      menos as reservas laterais de rótulo de pino), sem sobreposição.
+- [x] Task 3.3: Revisar hit testing (`src/hittest.ts`) e tolerâncias (`hitPx`/`worldTol`
+      em `main.ts`) — o espaçamento de pino aumentou (22→32), reduzindo ambiguidade;
+      `PIN_RADIUS`/tolerâncias seguem adequados e os testes de `hittest` passam.
 
 ### Verification
 
-- [ ] Inspeção visual: bordas mais discretas, nomes longos truncados sem quebrar layout,
+- [x] Inspeção visual: bordas mais discretas, nomes longos truncados sem quebrar layout,
       seleção precisa no mouse e no toque.
 
 ## Phase 4: Feedback Sonoro

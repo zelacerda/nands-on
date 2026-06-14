@@ -29,6 +29,7 @@ import { type ChipResolver, type SignalState } from './simulator';
 import { compile } from './netlist';
 import { Simulator } from './engine';
 import { validateConnection } from './connection';
+import { playConnect, playDrop } from './audio';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
 import { isWelcomeDismissed, setWelcomeDismissed, shouldAutoShowWelcome } from './welcome';
@@ -166,6 +167,7 @@ type PaletteItem =
 function spawnItem(item: PaletteItem, world: Vec2): void {
   if (item.kind === 'primitive') addNodeAt(item.type, world);
   else addChipInstanceAt(item.def, world);
+  playDrop();
 }
 
 /** Nó transitório (não persistido) usado apenas para a pré-visualização do arrasto. */
@@ -660,12 +662,18 @@ function endPointer(e: PointerEvent): void {
     const target = hitPin(store, world, worldTol(hitPx(e.pointerType)));
     if (target) {
       const res = validateConnection(store, wireStart, target);
-      if (res.ok) store.addWire(res.from, res.to);
+      if (res.ok) {
+        store.addWire(res.from, res.to);
+        playConnect();
+      }
     }
   } else if (mode === 'dragNode' && dragNodeId) {
     const up = pointerScreen(e);
     // Só conta como toque (não arrasto) se o ponteiro mal se moveu.
-    if (!isDrag(lastPointer, up)) {
+    if (isDrag(lastPointer, up)) {
+      // Soltou um componente após reposicioná-lo (já snapado à grade).
+      playDrop();
+    } else {
       const now = performance.now();
       const isDouble =
         lastTap !== null &&
