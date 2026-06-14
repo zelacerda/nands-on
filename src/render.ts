@@ -6,6 +6,9 @@ import { type SignalState, pinKey } from './simulator';
 /** Raio do pino, em unidades de mundo. */
 export const PIN_RADIUS = 7;
 
+/** Raio das bordas arredondadas do corpo dos componentes, em unidades de mundo. */
+export const BODY_CORNER_RADIUS = 4;
+
 const COLOR = {
   ioBody: '#2d333b',
   ioStroke: '#4a525e',
@@ -204,7 +207,7 @@ export function drawNode(
     ctx.beginPath();
     ctx.arc(origin.x + sw / 2, origin.y + sh / 2, Math.min(sw, sh) / 2, 0, Math.PI * 2);
   } else {
-    roundedRect(ctx, origin.x, origin.y, sw, sh, 8 * cam.zoom);
+    roundedRect(ctx, origin.x, origin.y, sw, sh, BODY_CORNER_RADIUS * cam.zoom);
   }
   ctx.fill();
   ctx.stroke();
@@ -323,7 +326,14 @@ export function drawNodeHighlight(
     ctx.beginPath();
     ctx.arc(origin.x + sw / 2, origin.y + sh / 2, Math.min(sw, sh) / 2 + pad, 0, Math.PI * 2);
   } else {
-    roundedRect(ctx, origin.x - pad, origin.y - pad, sw + 2 * pad, sh + 2 * pad, 10 * cam.zoom);
+    roundedRect(
+      ctx,
+      origin.x - pad,
+      origin.y - pad,
+      sw + 2 * pad,
+      sh + 2 * pad,
+      (BODY_CORNER_RADIUS + 2) * cam.zoom,
+    );
   }
   ctx.stroke();
 }

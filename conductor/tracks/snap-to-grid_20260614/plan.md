@@ -52,20 +52,20 @@ para retangulares; pelo conector para I/O).
 
 ### Tasks
 
-- [ ] Task 2.1: Criar helpers em `src/grid.ts`: `snapToGrid(v)` (arredonda para múltiplos
+- [x] Task 2.1: Criar helpers em `src/grid.ts`: `snapToGrid(v)` (arredonda para múltiplos
       de `GRID_SIZE`) e `snapNodePos(node)` que escolhe a estratégia — canto para
       `nand`/`chip`, conector para `input`/`output` (ajusta `pos` para o pino cair no
       cruzamento, mantendo 40×40).
-- [ ] Task 2.2: Aplicar snap no arraste de nó (`src/main.ts`, `pointermove` do modo
+- [x] Task 2.2: Aplicar snap no arraste de nó (`src/main.ts`, `pointermove` do modo
       `dragNode`) e ao finalizar o arraste.
-- [ ] Task 2.3: Aplicar snap na criação via paleta (`addNodeAt`/`spawnItem`) e no
+- [x] Task 2.3: Aplicar snap na criação via paleta (`addNodeAt`/`spawnItem`) e no
       `previewNode` (preview já aparece alinhado ao alvo).
-- [ ] Task 2.4: Escrever testes da lógica de snap: canto de retangular arredonda a 16;
+- [x] Task 2.4: Escrever testes da lógica de snap: canto de retangular arredonda a 16;
       conector de I/O cai em cruzamento para posições arbitrárias.
 
 ### Verification
 
-- [ ] Testes passam; mover/criar componentes na app confirma conectores nos cruzamentos
+- [x] Testes passam; mover/criar componentes na app confirma conectores nos cruzamentos
       (retangulares e I/O).
 
 ## Phase 3: Ajustes Visuais e Robustez
