@@ -1,10 +1,23 @@
-import type { Camera } from './camera';
+import type { Camera, Vec2 } from './camera';
 
 /** Espaçamento base do grid, em unidades de mundo. */
-export const GRID_SIZE = 32;
+export const GRID_SIZE = 16;
 
-/** A cada quantas linhas desenhamos uma linha "forte" (major). */
-const MAJOR_EVERY = 4;
+/**
+ * A cada quantas linhas desenhamos uma linha "forte" (major). Com GRID_SIZE=16,
+ * 8 linhas mantêm o ritmo visual de uma malha "forte" a cada 128 unidades.
+ */
+const MAJOR_EVERY = 8;
+
+/** Arredonda um valor escalar ao múltiplo de GRID_SIZE mais próximo. */
+export function snapScalar(v: number): number {
+  return Math.round(v / GRID_SIZE) * GRID_SIZE;
+}
+
+/** Arredonda um ponto (mundo) ao cruzamento de grade mais próximo. */
+export function snapToGrid(v: Vec2): Vec2 {
+  return { x: snapScalar(v.x), y: snapScalar(v.y) };
+}
 
 /**
  * Desenha um grid de fundo no espaço de mundo, recortado à viewport.

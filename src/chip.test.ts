@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { chipInstancePins, chipSize, nodeSize, type CircuitState } from './model';
+import {
+  CHIP_WIDTH,
+  chipInstancePins,
+  chipSize,
+  createPins,
+  nodeSize,
+  NODE_SIZE,
+  type CircuitState,
+} from './model';
+import { GRID_SIZE } from './grid';
 import {
   ChipLibrary,
   captureDefinition,
@@ -113,7 +122,7 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
     expect(ins).toHaveLength(2);
     expect(outs).toHaveLength(1);
 
-    const { w } = chipSize(2, 1, def.name, def.inputLabels, def.outputLabels);
+    const { w } = chipSize(2, 1);
     expect(ins.every((p) => p.offset.x === 0)).toBe(true);
     expect(outs.every((p) => p.offset.x === w)).toBe(true);
     // Entradas em ordem vertical crescente.
@@ -126,17 +135,45 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
     expect(big).toBeGreaterThan(small);
   });
 
-  it('largura do chip cresce com nomes longos, mas respeita o mínimo', () => {
-    const short = chipSize(2, 1, 'AND').w;
-    const long = chipSize(2, 1, 'LOOOONG_AND').w;
-    expect(short).toBe(chipSize(2, 1).w); // nome curto não passa do mínimo
-    expect(long).toBeGreaterThan(short);
+  it('largura é fixa (CHIP_WIDTH) independentemente de nome e nº de pinos', () => {
+    expect(chipSize(1, 1).w).toBe(CHIP_WIDTH);
+    expect(chipSize(5, 3).w).toBe(CHIP_WIDTH);
+    expect(NODE_SIZE.nand.w).toBe(CHIP_WIDTH);
   });
 
-  it('largura reserva espaço para os rótulos dos pinos ao lado do nome', () => {
-    const semRotulos = chipSize(1, 1, 'OR').w;
-    const comRotulos = chipSize(1, 1, 'OR', ['+5V'], ['OUT']).w;
-    expect(comRotulos).toBeGreaterThan(semRotulos);
+  it('altura é max(nIn, nOut) * 32', () => {
+    expect(chipSize(2, 1).h).toBe(64); // NAND-like: max(2,1)=2 → 64
+    expect(chipSize(1, 1).h).toBe(32); // NOT/buffer: max=1 → 32
+    expect(chipSize(2, 3).h).toBe(96); // max(2,3)=3 → 96
+  });
+
+  it('todos os offsets de pino (x e y) são múltiplos de GRID_SIZE', () => {
+    for (const [ins, outs] of [
+      [2, 1],
+      [1, 1],
+      [2, 3],
+      [5, 2],
+      [4, 4],
+    ] as const) {
+      const def = {
+        id: 'x',
+        name: 'C',
+        inputCount: ins,
+        outputCount: outs,
+        internal: { nodes: [], wires: [] },
+      };
+      for (const pin of chipInstancePins(def)) {
+        expect(pin.offset.x % GRID_SIZE).toBe(0);
+        expect(pin.offset.y % GRID_SIZE).toBe(0);
+      }
+    }
+  });
+
+  it('pinos do NAND ficam em y=16, 48 (entradas) e 32 (saída)', () => {
+    const pins = createPins('nand');
+    expect(pins.find((p) => p.id === 'in0')!.offset.y).toBe(16);
+    expect(pins.find((p) => p.id === 'in1')!.offset.y).toBe(48);
+    expect(pins.find((p) => p.id === 'out')!.offset.y).toBe(32);
   });
 
   it('pino de saída fica exatamente na borda direita do corpo (nome longo)', () => {
@@ -157,7 +194,7 @@ describe('chipInstancePins / chipSize / nodeSize', () => {
     const store = new CircuitStore();
     const def = captureDefinition(sampleState(), 'D'); // 2 in, 1 out
     const node = store.addChipInstance(def, { x: 0, y: 0 });
-    expect(nodeSize(node)).toEqual(chipSize(2, 1, def.name, def.inputLabels, def.outputLabels));
+    expect(nodeSize(node)).toEqual(chipSize(2, 1));
   });
 });
 
