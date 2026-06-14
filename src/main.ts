@@ -1,6 +1,6 @@
 import './style.css';
 import { Camera, type Vec2 } from './camera';
-import { drawGrid } from './grid';
+import { drawGrid, snapNodePos } from './grid';
 import {
   NODE_SIZE,
   type ChipDefinition,
@@ -140,17 +140,21 @@ const palette = document.querySelector<HTMLElement>('#palette')!;
 const resolveChip: ChipResolver = (node) =>
   node.defId ? library.list().find((d) => d.id === node.defId)?.internal : undefined;
 
-/** Cria uma primitiva centrada no ponto de mundo `world`. */
-function addNodeAt(type: PrimitiveType, world: Vec2): void {
-  store.addNode(type, centeredTopLeft(world, NODE_SIZE[type]));
+/** Aplica o snap à grade na posição do nó recém-criado. */
+function snapNode(node: CircuitNode): void {
+  const p = snapNodePos(node);
+  node.pos.x = p.x;
+  node.pos.y = p.y;
 }
 
-/** Cria uma instância de chip centrada no ponto de mundo `world`. */
+/** Cria uma primitiva centrada no ponto de mundo `world`, alinhada à grade. */
+function addNodeAt(type: PrimitiveType, world: Vec2): void {
+  snapNode(store.addNode(type, centeredTopLeft(world, NODE_SIZE[type])));
+}
+
+/** Cria uma instância de chip centrada no ponto de mundo `world`, alinhada à grade. */
 function addChipInstanceAt(def: ChipDefinition, world: Vec2): void {
-  store.addChipInstance(
-    def,
-    centeredTopLeft(world, chipSize(def.inputCount, def.outputCount)),
-  );
+  snapNode(store.addChipInstance(def, centeredTopLeft(world, chipSize(def.inputCount, def.outputCount))));
 }
 
 /** Componente que um botão da paleta cria: uma primitiva ou uma instância de chip. */
@@ -167,15 +171,17 @@ function spawnItem(item: PaletteItem, world: Vec2): void {
 /** Nó transitório (não persistido) usado apenas para a pré-visualização do arrasto. */
 function previewNode(item: PaletteItem, world: Vec2): CircuitNode {
   if (item.kind === 'primitive') {
-    return {
+    const node: CircuitNode = {
       id: '__preview__',
       type: item.type,
       pos: centeredTopLeft(world, NODE_SIZE[item.type]),
       pins: createPins(item.type),
     };
+    snapNode(node);
+    return node;
   }
   const { def } = item;
-  return {
+  const node: CircuitNode = {
     id: '__preview__',
     type: 'chip',
     pos: centeredTopLeft(world, chipSize(def.inputCount, def.outputCount)),
@@ -183,6 +189,8 @@ function previewNode(item: PaletteItem, world: Vec2): CircuitNode {
     defId: def.id,
     name: def.name,
   };
+  snapNode(node);
+  return node;
 }
 
 /** Converte coordenadas de cliente para mundo, ou `null` se o ponto não está sobre o canvas. */
@@ -627,6 +635,9 @@ canvas.addEventListener('pointermove', (e) => {
     if (node) {
       node.pos.x = world.x - dragOffset.x;
       node.pos.y = world.y - dragOffset.y;
+      const snapped = snapNodePos(node);
+      node.pos.x = snapped.x;
+      node.pos.y = snapped.y;
     }
   } else if (mode === 'wire' && wireStart) {
     ghostEnd = world;

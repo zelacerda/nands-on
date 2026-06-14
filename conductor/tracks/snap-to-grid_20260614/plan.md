@@ -22,27 +22,27 @@ múltiplos de 16, garantindo a queda nos cruzamentos.
 
 ### Tasks
 
-- [ ] Task 1.1: Reduzir `GRID_SIZE` de 32 para 16 em `src/grid.ts` e conferir `drawGrid()`
+- [x] Task 1.1: Reduzir `GRID_SIZE` de 32 para 16 em `src/grid.ts` e conferir `drawGrid()`
       (linhas major/minor continuam coerentes com `MAJOR_EVERY`).
-- [ ] Task 1.2: Atualizar `NODE_SIZE.nand` para 128×64 em `src/model.ts` (input/output
+- [x] Task 1.2: Atualizar `NODE_SIZE.nand` para 128×64 em `src/model.ts` (input/output
       permanecem 40×40).
-- [ ] Task 1.3: Introduzir `PIN_SPACING = 32` e uma função compartilhada de distribuição
+- [x] Task 1.3: Introduzir `PIN_SPACING = 32` e uma função compartilhada de distribuição
       vertical de pinos (ex.: `pinYs(count, h)`) que centraliza `count` pinos espaçados de
       32 dentro da altura `h`.
-- [ ] Task 1.4: Reescrever `createPins('nand')` para usar `pinYs` (entradas em y=16, 48;
+- [x] Task 1.4: Reescrever `createPins('nand')` para usar `pinYs` (entradas em y=16, 48;
       saída em y=32) em vez dos fatores 0.3/0.7/0.5.
-- [ ] Task 1.5: Reescrever `chipSize()` para **largura fixa 128** e **altura
+- [x] Task 1.5: Reescrever `chipSize()` para **largura fixa 128** e **altura
       `max(nIn, nOut, 1) × 32`**; simplificar/aposentar constantes de largura por caractere
       que deixarem de ser usadas (`CHIP_MIN_W`, `CHIP_PAD_X`, `CHIP_NAME_CHAR_W`, etc.).
-- [ ] Task 1.6: Atualizar `chipInstancePins()` para usar `pinYs` (espaçamento 32
+- [x] Task 1.6: Atualizar `chipInstancePins()` para usar `pinYs` (espaçamento 32
       centralizado) no lugar da distribuição uniforme `(h*(i+1))/(count+1)`.
-- [ ] Task 1.7: Escrever testes (vitest) verificando que, para NAND e chips de várias
+- [x] Task 1.7: Escrever testes (vitest) verificando que, para NAND e chips de várias
       combinações de in/out, todos os offsets de pino (x e y) são múltiplos de 16 e a
       altura é `max(nIn, nOut) × 32`.
 
 ### Verification
 
-- [ ] Testes de geometria passam; abrir a app e conferir visualmente NAND/chips com a nova
+- [x] Testes de geometria passam; abrir a app e conferir visualmente NAND/chips com a nova
       proporção e pinos alinhados.
 
 ## Phase 2: Lógica de Snap

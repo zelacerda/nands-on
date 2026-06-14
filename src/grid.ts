@@ -1,4 +1,5 @@
 import type { Camera, Vec2 } from './camera';
+import { type CircuitNode, pinWorldPos } from './model';
 
 /** Espaçamento base do grid, em unidades de mundo. */
 export const GRID_SIZE = 16;
@@ -17,6 +18,30 @@ export function snapScalar(v: number): number {
 /** Arredonda um ponto (mundo) ao cruzamento de grade mais próximo. */
 export function snapToGrid(v: Vec2): Vec2 {
   return { x: snapScalar(v.x), y: snapScalar(v.y) };
+}
+
+/**
+ * Posição (canto superior esquerdo) que alinha um nó à grade. Estratégia por
+ * tipo:
+ * - **Corpos retangulares** (`nand`/`chip`): snap do próprio canto. Como os
+ *   offsets de pino já são múltiplos de GRID_SIZE, os conectores caem em
+ *   cruzamentos automaticamente.
+ * - **Nós de I/O** (`input`/`output`, redondos): snap pelo **conector** — a
+ *   posição é deslocada para que o (único) pino caia no cruzamento mais próximo,
+ *   preservando o tamanho do nó.
+ */
+export function snapNodePos(node: CircuitNode): Vec2 {
+  if (node.type === 'input' || node.type === 'output') {
+    const pin = node.pins[0];
+    if (!pin) return snapToGrid(node.pos);
+    const pinPos = pinWorldPos(node, pin);
+    const target = snapToGrid(pinPos);
+    return {
+      x: node.pos.x + (target.x - pinPos.x),
+      y: node.pos.y + (target.y - pinPos.y),
+    };
+  }
+  return snapToGrid(node.pos);
 }
 
 /**
