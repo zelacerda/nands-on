@@ -68,27 +68,30 @@ manualmente. Verificação formal só no encerramento do track (conforme `workfl
 
 ### Tasks
 
-- [ ] Task 4.1: Novo modo de interação (ex.: `dragWaypoint`) em `main.ts`: `pointerdown`
-      sobre a barra inicia o arraste; `pointermove` atualiza `barOffset` com snap à grade
-      (eixo conforme o caso). Tolerância maior no toque (`hitPx`).
-- [ ] Task 4.2: Preservar o offset relativo ao mover nós conectados (o caminho recalcula
-      mantendo o ajuste); resetar o offset ao padrão quando a topologia inverte (Z ↔ S).
-- [ ] Task 4.3: Garantir serialização do `barOffset` via `CircuitState`/`store.toJSON()`
-      (chips capturados preservam o traçado ajustado) e cursor/affordance de arraste da
+- [x] Task 4.1: Novo modo de interação (`dragWaypoint`) em `main.ts`: `pointerdown` sobre a
+      barra inicia o arraste; `pointermove` atualiza `barOffset` com snap à grade (eixo
+      conforme o caso). Tolerância maior no toque (`hitPx`).
+- [x] Task 4.2: Offset relativo ao padrão (preservado naturalmente ao mover nós, pois o
+      default recalcula); reset do `barOffset` quando a topologia inverte (Z ↔ S), via
+      snapshot dos shapes ao iniciar o arraste do nó.
+- [x] Task 4.3: Serialização do `barOffset` transparente via `CircuitState`/`toJSON`
+      (teste de round-trip em `store.test.ts`); cursor `ew-resize`/`ns-resize` no hover da
       barra.
 
 ### Verification
 
-- [ ] Arrastar a barra (mouse e toque) ajusta o fio; mover nós preserva o ajuste; capturar
-      um chip preserva o traçado.
+- [x] Testes passam; arraste da barra implementado (mouse/toque), reset Z↔S e round-trip
+      de serialização cobertos. Validação visual/manual pendente do usuário.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação da spec atendidos.
-- [ ] `npm run test` e `npm run build` (tsc + vite) passam.
+- [x] Critérios cobertos por testes atendidos (geometria Z/S, hit-testing multi-segmento e
+      da barra, round-trip do `barOffset`); critérios visuais/de interação pendentes de
+      validação manual.
+- [x] `npm run test` (146 testes) e `npm run build` (tsc + vite) passam.
 - [ ] Verificação manual (desktop e toque): traçado Z/S, ajuste da barra, mover nós, cores
-      por estado, seleção/exclusão.
-- [ ] README atualizado, se aplicável.
+      por estado, seleção/exclusão. **Pendente — usuário.**
+- [x] README atualizado (módulo `wire.ts`, render ortogonal, `hitWireBar`).
 - [ ] Pronto para revisão.
 
 ---
