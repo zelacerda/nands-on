@@ -71,10 +71,11 @@ npm run typecheck  # tsc --noEmit
 | `engine.ts` | `Simulator` event-driven: nets, fila de eventos com atraso de porta, clock por nível e detecção de oscilação. |
 | `simulator.ts` | Tipos/primitivas de sinal (`SignalState`, `pinKey`, `clockValue`); `simulate` (relaxação) é oráculo de referência dos testes. |
 | `render.ts` | Desenho em Canvas: nós (NAND/I/O), fios (Bézier), sinais (aceso/oscilando), realces e fio fantasma. |
-| `grid.ts` | Grid de fundo no espaço de mundo. |
+| `grid.ts` | Grid de fundo no espaço de mundo e snap à grade (`snapToGrid`/`snapNodePos`) — corpos pelo canto, I/O pelo conector. |
 | `hittest.ts` | Hit-testing de nós, pinos e fios em coordenadas de mundo. |
 | `connection.ts` | Regras de validação de conexão entre pinos. |
 | `gesture.ts` | Matemática de pinça (ponto médio, distância, fator de zoom). |
+| `audio.ts` | Feedback sonoro sintético via Web Audio (clique de drop e de conexão), sem assets. |
 | `main.ts` | Orquestração: entrada (Pointer Events), modos de interação e render loop. |
 
 Os módulos de lógica pura (`camera`, `model`/`store`, `hittest`, `connection`, `gesture`)

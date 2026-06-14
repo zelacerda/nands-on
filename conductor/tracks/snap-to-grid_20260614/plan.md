@@ -3,7 +3,7 @@
 **Track ID:** snap-to-grid_20260614
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-14
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -110,12 +110,21 @@ para retangulares; pelo conector para I/O).
       múltiplos de 16, altura `max×32`); critérios visuais/sonoros pendentes de validação
       manual do usuário.
 - [x] `npm run test` (131 testes) e `npm run build` (tsc + vite build) passam.
-- [ ] Verificação manual na app (desktop e toque): snap, conectores nos cruzamentos,
-      visual das bordas, truncamento de nomes e sons. **Pendente — usuário.**
+- [x] Verificação manual na app (desktop e toque): snap, conectores nos cruzamentos,
+      visual das bordas, truncamento/quebra de nomes e sons — aprovada pelo usuário.
 - [x] Extensibilidade preservada para roteamento ortogonal futuro (pinos em cruzamentos;
       fios não refatorados).
-- [ ] README atualizado, se aplicável.
-- [ ] Pronto para revisão.
+- [x] README atualizado (tabela de módulos: `grid.ts` com snap e novo `audio.ts`).
+- [x] Pronto para revisão.
+
+## Ajustes pós-spec (durante a implementação, a pedido do usuário)
+
+- Tirar a seleção do componente ao soltá-lo após reposicionar (drop "assenta" o nó).
+- Som de drop refinado para uma pancada surda grave e breve; som de conexão como clique
+  de encaixe (estilo Joy-Con).
+- Nome do componente quebra em múltiplas linhas, sempre centralizado (aproveitando a
+  largura fixa) — substitui o truncamento de linha única.
+- Raio do realce de seleção tornado concêntrico ao corpo (sem vão nos cantos).
 
 ---
 
