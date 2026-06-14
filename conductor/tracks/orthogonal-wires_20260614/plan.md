@@ -39,15 +39,15 @@ manualmente. Verificação formal só no encerramento do track (conforme `workfl
 
 ### Tasks
 
-- [ ] Task 2.1: Substituir o traçado Bézier por polilinha ortogonal em `render.ts`
+- [x] Task 2.1: Substituir o traçado Bézier por polilinha ortogonal em `render.ts`
       (desenho a partir dos vértices de `wirePath`), preservando largura e cores por estado
-      (desligado/ligado/oscilando).
-- [ ] Task 2.2: Aplicar o mesmo traçado ao fio fantasma (`drawGhostWire`) — ortogonal,
+      (desligado/ligado/oscilando). Também `drawWireHighlight` usa a polilinha.
+- [x] Task 2.2: Aplicar o mesmo traçado ao fio fantasma (`drawGhostWire`) — ortogonal,
       tracejado, com a barra no padrão e o feedback de validade (verde/vermelho).
 
 ### Verification
 
-- [ ] Inspeção visual: fios em Z/S corretos; fantasma ortogonal; cores e estados ok.
+- [x] Inspeção visual: fios em Z/S corretos; fantasma ortogonal; cores e estados ok.
 
 ## Phase 3: Hit-testing Multi-segmento
 
