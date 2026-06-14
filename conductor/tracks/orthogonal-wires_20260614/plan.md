@@ -19,21 +19,21 @@ manualmente. Verificação formal só no encerramento do track (conforme `workfl
 
 ### Tasks
 
-- [ ] Task 1.1: Adicionar `barOffset?: number` ao `Wire` (`model.ts`) — deslocamento
+- [x] Task 1.1: Adicionar `barOffset?: number` ao `Wire` (`model.ts`) — deslocamento
       relativo ao padrão (eixo X no caso Z, eixo Y no caso S); `undefined` = padrão.
-- [ ] Task 1.2: Criar helper puro (ex.: `wirePath(from, to, barOffset?)`) que determina o
-      caso (`out.x < in.x` → Z; senão → S), calcula a posição padrão da barra (meio,
-      snapado à grade) somada ao offset, e retorna os vértices (`Vec2[]`) — 3 para Z, 5 para
-      S, com trechos de 1 grid no S.
-- [ ] Task 1.3: Tratar casos de borda na geometria: pinos na mesma altura (Z reto), pinos
+- [x] Task 1.2: Criar helper puro (`wirePath(from, to, barOffset?)` em `wire.ts`) que
+      determina o caso (`out.x < in.x` → Z; senão → S), calcula a posição padrão da barra
+      (meio, snapado à grade) somada ao offset, e retorna os vértices (4 no Z / 6 no S, com
+      trechos de 1 grid no S) e o segmento da barra.
+- [x] Task 1.3: Tratar casos de borda na geometria: pinos na mesma altura (Z reto), pinos
       próximos no caso S (trechos de 1 grid coerentes), snap do ponto da barra.
-- [ ] Task 1.4: Testes (vitest) da geometria: nº de vértices por caso, ortogonalidade
-      (cada segmento é H ou V), trechos de 1 grid no S, vértices em múltiplos de 16, efeito
-      do `barOffset` no eixo correto.
+- [x] Task 1.4: Testes (vitest) da geometria: nº de vértices por caso, ortogonalidade
+      (cada segmento é H ou V), trechos de 1 grid no S, efeito do `barOffset` no eixo
+      correto e clamp no Z.
 
 ### Verification
 
-- [ ] Testes de geometria passam.
+- [x] Testes de geometria passam (11 testes).
 
 ## Phase 2: Renderização Ortogonal
 

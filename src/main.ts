@@ -815,7 +815,7 @@ function render(): void {
     const wire = store.listWires().find((w) => w.id === selection!.id);
     const from = wire && store.pinPos(wire.from);
     const to = wire && store.pinPos(wire.to);
-    if (from && to) drawWireHighlight(ctx!, camera.worldToScreen(from), camera.worldToScreen(to));
+    if (from && to) drawWireHighlight(ctx!, camera, from, to, wire!.barOffset);
   }
 
   // Ghost do componente sendo arrastado da paleta para o canvas.
@@ -830,7 +830,7 @@ function render(): void {
   if (mode === 'wire' && wireStart) {
     const start = store.pinPos(wireStart);
     if (start) {
-      drawGhostWire(ctx!, camera.worldToScreen(start), camera.worldToScreen(ghostEnd), ghostValid);
+      drawGhostWire(ctx!, camera, start, ghostEnd, ghostValid);
     }
   }
 
