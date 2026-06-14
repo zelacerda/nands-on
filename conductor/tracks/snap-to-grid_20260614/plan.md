@@ -91,26 +91,28 @@ para retangulares; pelo conector para I/O).
 
 ### Tasks
 
-- [ ] Task 4.1: Criar módulo `src/audio.ts` com `AudioContext` lazy (inicializado no
+- [x] Task 4.1: Criar módulo `src/audio.ts` com `AudioContext` lazy (inicializado no
       primeiro gesto) e uma função de clique sintético (oscilador/envelope curto); degradar
       silenciosamente quando o contexto não estiver disponível.
-- [ ] Task 4.2: Disparar o clique no **drop** de um componente no grid (`src/main.ts`).
-- [ ] Task 4.3: Disparar o clique na **criação de conexão válida** (após a validação em
+- [x] Task 4.2: Disparar o clique no **drop** de um componente no grid (`src/main.ts`) —
+      em `spawnItem` (criação) e ao soltar após reposicionar (arrasto real).
+- [x] Task 4.3: Disparar o clique na **criação de conexão válida** (após a validação em
       `src/connection.ts`/`main.ts`).
 
 ### Verification
 
-- [ ] Sons tocam nos dois eventos; nenhum erro de console quando o áudio ainda não foi
+- [x] Sons tocam nos dois eventos; nenhum erro de console quando o áudio ainda não foi
       habilitado por gesto.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação da spec atendidos.
-- [ ] `npm run test` e `npm run build` (typecheck) passam — build pega erros de tipo que o
-      vitest não pega.
+- [x] Critérios de aceitação cobertos por testes atendidos (geometria, snap, offsets
+      múltiplos de 16, altura `max×32`); critérios visuais/sonoros pendentes de validação
+      manual do usuário.
+- [x] `npm run test` (131 testes) e `npm run build` (tsc + vite build) passam.
 - [ ] Verificação manual na app (desktop e toque): snap, conectores nos cruzamentos,
-      visual das bordas, truncamento de nomes e sons.
-- [ ] Extensibilidade preservada para roteamento ortogonal futuro (pinos em cruzamentos;
+      visual das bordas, truncamento de nomes e sons. **Pendente — usuário.**
+- [x] Extensibilidade preservada para roteamento ortogonal futuro (pinos em cruzamentos;
       fios não refatorados).
 - [ ] README atualizado, se aplicável.
 - [ ] Pronto para revisão.
