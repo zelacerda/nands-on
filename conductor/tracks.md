@@ -19,6 +19,6 @@
 | [x] | event-driven-sim_20260606 | Motor de Simulação Event-Driven | 2026-06-06 | 2026-06-06 |
 | [x] | snap-to-grid_20260614 | Snap to Grid com Conectores nos Cruzamentos | 2026-06-14 | 2026-06-14 |
 | [x] | orthogonal-wires_20260614 | Roteamento Ortogonal de Fios | 2026-06-14 | 2026-06-14 |
-| [~] | ui-redesign_20260614 | Reorganização da UI do Editor | 2026-06-14 | 2026-06-14 |
+| [x] | ui-redesign_20260614 | Reorganização da UI do Editor | 2026-06-14 | 2026-06-14 |
 
 <!-- Tracks registrados por /conductor:new-track -->

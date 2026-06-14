@@ -3,7 +3,7 @@
 **Track ID:** ui-redesign_20260614
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-14
-**Status:** [~] In Progress — implementação concluída, aguardando verificação visual
+**Status:** [x] Complete
 
 ## Overview
 
@@ -124,7 +124,7 @@ Mover o callout do tutorial e revisar a experiência em desktop e touch.
 - [x] `npm run build` passa sem erros de tipo
 - [x] Comportamento de simulação/interação inalterado (verificação manual no fechamento)
 - [x] Documentação atualizada (se aplicável)
-- [ ] Pronto para review
+- [x] Pronto para review
 
 ---
 
