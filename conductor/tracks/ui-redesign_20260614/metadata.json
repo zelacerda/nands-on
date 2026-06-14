@@ -1,0 +1,18 @@
+{
+  "id": "ui-redesign_20260614",
+  "title": "Reorganização da UI do Editor",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-06-14T18:24:16Z",
+  "updated": "2026-06-14T18:24:16Z",
+  "current_phase": 6,
+  "current_task": "6.2",
+  "phases": {
+    "total": 6,
+    "completed": 6
+  },
+  "tasks": {
+    "total": 16,
+    "completed": 16
+  }
+}
