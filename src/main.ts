@@ -103,12 +103,6 @@ let dragNodeWireShapes: Map<string, 'Z' | 'S'> = new Map();
  * (OFF → ON → CLK → OFF) em vez de apenas movê-lo/selecioná-lo.
  */
 let toggleCandidateId: string | null = null;
-/** Último toque simples sobre um nó, para detectar duplo clique/toque. */
-let lastTap: { time: number; pos: Vec2; nodeId: string; cycled: boolean } | null = null;
-
-/** Janela (ms) e folga (px de tela) para caracterizar um toque/clique duplo. */
-const DOUBLE_TAP_MS = 350;
-const DOUBLE_TAP_DIST = 24;
 
 /** Folga de acerto, em px de tela, maior para toque. */
 function hitPx(pointerType: string): number {
@@ -126,10 +120,56 @@ function pointerScreen(e: { clientX: number; clientY: number }): Vec2 {
   return { x: e.clientX - rect.left, y: e.clientY - rect.top };
 }
 
-const deleteBtn = document.querySelector<HTMLButtonElement>('#delete')!;
+// Barra de ações contextual (inferior-centro): EDIT / RENAME / DELETE conforme o
+// que está selecionado (chip na paleta, nó I/O, outro nó ou fio).
+const actionBar = document.querySelector<HTMLDivElement>('#action-bar')!;
+const actionEditBtn = document.querySelector<HTMLButtonElement>('#action-edit')!;
+const actionRenameBtn = document.querySelector<HTMLButtonElement>('#action-rename')!;
+const actionDeleteBtn = document.querySelector<HTMLButtonElement>('#action-delete')!;
+
+/**
+ * Atualiza a barra de ações para refletir a seleção atual, exibindo apenas as
+ * ações aplicáveis ao contexto:
+ * - chip na paleta → Edit / Rename / Delete (a definição na biblioteca);
+ * - nó de entrada/saída no canvas → Rename / Delete;
+ * - demais nós/fios no canvas → Delete.
+ */
+function updateActionBar(): void {
+  if (selectedChipDef) {
+    actionEditBtn.hidden = false;
+    actionRenameBtn.hidden = false;
+    actionDeleteBtn.hidden = false;
+    actionBar.hidden = false;
+    return;
+  }
+  if (selection?.kind === 'node') {
+    const node = store.getNode(selection.id);
+    const isIo = !!node && (node.type === 'input' || node.type === 'output');
+    actionEditBtn.hidden = true;
+    actionRenameBtn.hidden = !isIo;
+    actionDeleteBtn.hidden = false;
+    actionBar.hidden = false;
+    return;
+  }
+  if (selection?.kind === 'wire') {
+    actionEditBtn.hidden = true;
+    actionRenameBtn.hidden = true;
+    actionDeleteBtn.hidden = false;
+    actionBar.hidden = false;
+    return;
+  }
+  actionBar.hidden = true;
+}
+
 function setSelection(next: Selection): void {
   selection = next;
-  deleteBtn.hidden = next === null;
+  // Seleção no canvas e na paleta são mutuamente exclusivas: selecionar no canvas
+  // limpa o foco de chip na paleta.
+  if (next) {
+    selectedChipDef = null;
+    palette.querySelectorAll('button.chip-btn.selected').forEach((b) => b.classList.remove('selected'));
+  }
+  updateActionBar();
 }
 
 function deleteSelection(): void {
@@ -146,6 +186,23 @@ const library = new ChipLibrary();
 // IndexedDB de forma assíncrona.
 library.onMutate = (defs) => void saveChips(defs);
 const palette = document.querySelector<HTMLElement>('#palette')!;
+const paletteList = document.querySelector<HTMLDivElement>('#palette-list')!;
+const scrollUpBtn = document.querySelector<HTMLButtonElement>('#palette-scroll-up')!;
+const scrollDownBtn = document.querySelector<HTMLButtonElement>('#palette-scroll-down')!;
+
+/** Passo de rolagem (px) ao tocar os controles ▲/▼ da barra de componentes. */
+const PALETTE_SCROLL_STEP = 100;
+
+/** Exibe os controles de scroll apenas quando a lista de componentes transborda. */
+function updatePaletteScroll(): void {
+  const overflow = paletteList.scrollHeight > paletteList.clientHeight + 1;
+  scrollUpBtn.hidden = !overflow;
+  scrollDownBtn.hidden = !overflow;
+}
+
+scrollUpBtn.addEventListener('click', () => paletteList.scrollBy({ top: -PALETTE_SCROLL_STEP }));
+scrollDownBtn.addEventListener('click', () => paletteList.scrollBy({ top: PALETTE_SCROLL_STEP }));
+window.addEventListener('resize', updatePaletteScroll);
 
 /** Resolve a topologia interna de um nó `chip` para a simulação recursiva. */
 const resolveChip: ChipResolver = (node) =>
@@ -274,42 +331,23 @@ function attachPaletteDrag(btn: HTMLElement, item: PaletteItem, onTap?: () => vo
 
 // --- Seleção e edição de chip na paleta ----------------------------------
 
-const editChipBtn = document.querySelector<HTMLButtonElement>('#edit-chip')!;
-/** Definição do chip selecionado na paleta (cujo "Editar" está visível), ou `null`. */
+/** Definição do chip selecionado na paleta, ou `null`. */
 let selectedChipDef: ChipDefinition | null = null;
-/** Último toque simples sobre um botão de chip, para detectar duplo clique/toque. */
-let lastChipTap: { defId: string; time: number } | null = null;
 
-/** Marca o botão `btn` como selecionado e revela "Editar"; limpa os demais. */
+/** Marca o botão `btn` como o chip selecionado; limpa os demais e a seleção do canvas. */
 function selectChip(def: ChipDefinition, btn: HTMLElement): void {
+  setSelection(null); // canvas e paleta são mutuamente exclusivos
   selectedChipDef = def;
   palette.querySelectorAll('button.chip-btn.selected').forEach((b) => b.classList.remove('selected'));
   btn.classList.add('selected');
-  editChipBtn.hidden = false;
+  updateActionBar();
 }
 
-/** Limpa a seleção de chip na paleta e esconde "Editar". */
+/** Limpa a seleção de chip na paleta. */
 function clearChipSelection(): void {
   selectedChipDef = null;
   palette.querySelectorAll('button.chip-btn.selected').forEach((b) => b.classList.remove('selected'));
-  editChipBtn.hidden = true;
-}
-
-/**
- * Toque/clique simples num botão de chip: o primeiro seleciona (revela "Editar");
- * um segundo toque rápido no mesmo chip abre a renomeação.
- */
-function onChipTap(def: ChipDefinition, btn: HTMLElement): void {
-  const now = performance.now();
-  const isDouble =
-    lastChipTap !== null && lastChipTap.defId === def.id && now - lastChipTap.time <= DOUBLE_TAP_MS;
-  if (isDouble) {
-    lastChipTap = null;
-    openChipNameEdit(def, btn);
-    return;
-  }
-  lastChipTap = { defId: def.id, time: now };
-  selectChip(def, btn);
+  updateActionBar();
 }
 
 /** Confirma a renomeação in-place de um chip; ignora nome vazio/duplicado. */
@@ -335,7 +373,7 @@ function openChipNameEdit(def: ChipDefinition, btn: HTMLElement): void {
 
 /** Reconstrói os botões de chip na paleta a partir da biblioteca. */
 function refreshPalette(): void {
-  palette.querySelectorAll('button.chip-btn').forEach((b) => b.remove());
+  paletteList.querySelectorAll('button.chip-btn').forEach((b) => b.remove());
   clearChipSelection();
   for (const def of library.list()) {
     const btn = document.createElement('button');
@@ -343,15 +381,17 @@ function refreshPalette(): void {
     btn.className = 'chip-btn';
     btn.dataset.chipId = def.id;
     btn.textContent = def.name;
-    attachPaletteDrag(btn, { kind: 'chip', def }, () => onChipTap(def, btn));
-    palette.insertBefore(btn, editChipBtn);
+    // Clique/toque simples seleciona o chip (revela a barra de ações); o arrasto
+    // cria uma instância no canvas.
+    attachPaletteDrag(btn, { kind: 'chip', def }, () => selectChip(def, btn));
+    paletteList.appendChild(btn);
   }
+  updatePaletteScroll();
 }
 
-document.querySelectorAll<HTMLButtonElement>('#palette button[data-add]').forEach((btn) => {
+document.querySelectorAll<HTMLButtonElement>('button[data-add]').forEach((btn) => {
   attachPaletteDrag(btn, { kind: 'primitive', type: btn.dataset.add as PrimitiveType });
 });
-deleteBtn.addEventListener('click', deleteSelection);
 
 // --- Fluxo "Make": empacota o espaço em um chip e abre a edição do nome ------
 
@@ -451,11 +491,40 @@ function finishEdit(): void {
   exitEdit();
 }
 
-editChipBtn.addEventListener('click', () => {
-  if (selectedChipDef) openChipForEdit(selectedChipDef);
-});
 finishEditBtn.addEventListener('click', finishEdit);
 cancelEditBtn.addEventListener('click', exitEdit);
+
+// --- Ações da barra contextual (Edit / Rename / Delete) ------------------
+
+/** Remove da biblioteca o chip selecionado na paleta. */
+function deleteSelectedChip(): void {
+  if (!selectedChipDef) return;
+  library.remove(selectedChipDef.id);
+  // Instâncias já colocadas que referenciem este chip ficam inertes (o netlist
+  // ignora chips sem definição); a limpeza de instâncias órfãs fica fora desta track.
+  refreshPalette(); // limpa a seleção e atualiza a barra
+}
+
+actionEditBtn.addEventListener('click', () => {
+  if (selectedChipDef) openChipForEdit(selectedChipDef);
+});
+actionRenameBtn.addEventListener('click', () => {
+  if (selectedChipDef) {
+    const btn = palette.querySelector<HTMLButtonElement>(
+      `button.chip-btn[data-chip-id="${selectedChipDef.id}"]`,
+    );
+    if (btn) openChipNameEdit(selectedChipDef, btn);
+    return;
+  }
+  if (selection?.kind === 'node') {
+    const node = store.getNode(selection.id);
+    if (node && (node.type === 'input' || node.type === 'output')) openRenameOverlay(node);
+  }
+});
+actionDeleteBtn.addEventListener('click', () => {
+  if (selectedChipDef) deleteSelectedChip();
+  else deleteSelection();
+});
 
 // --- Renomear entrada/saída (duplo clique / toque duplo) -----------------
 
@@ -736,37 +805,10 @@ function endPointer(e: PointerEvent): void {
       // clique e tira a seleção, deixando o componente "assentado" no grid.
       playDrop();
       setSelection(null);
-    } else {
-      const now = performance.now();
-      const isDouble =
-        lastTap !== null &&
-        lastTap.nodeId === dragNodeId &&
-        now - lastTap.time <= DOUBLE_TAP_MS &&
-        Math.hypot(up.x - lastTap.pos.x, up.y - lastTap.pos.y) <= DOUBLE_TAP_DIST;
-      if (isDouble) {
-        // Duplo toque sobre entrada/saída: abre a edição in-place do rótulo. A
-        // intenção é editar, não ciclar — então desfaz o avanço de estado que o 1º
-        // toque tenha aplicado a um input já selecionado. Como o ciclo tem três
-        // estados (OFF→ON→CLK→OFF), dois avanços equivalem a recuar um.
-        const wasCycled = lastTap?.cycled ?? false;
-        lastTap = null;
-        const node = store.getNode(dragNodeId);
-        if (node && (node.type === 'input' || node.type === 'output')) {
-          if (wasCycled && node.type === 'input') {
-            store.cycleInputState(node.id);
-            store.cycleInputState(node.id);
-          }
-          openRenameOverlay(node);
-        }
-      } else {
-        // Toque simples sobre um input já selecionado avança seu estado no ciclo.
-        let cycled = false;
-        if (toggleCandidateId) {
-          store.cycleInputState(toggleCandidateId);
-          cycled = true;
-        }
-        lastTap = { time: now, pos: up, nodeId: dragNodeId, cycled };
-      }
+    } else if (toggleCandidateId) {
+      // Toque simples sobre um input já selecionado avança seu estado no ciclo
+      // (OFF → ON → CLK → OFF). Renomear agora é feito pela barra de ações.
+      store.cycleInputState(toggleCandidateId);
     }
   }
 
@@ -903,11 +945,38 @@ function render(): void {
   requestAnimationFrame(render);
 }
 
-// --- Limpar banco (afordância temporária de desenvolvimento) -------------
-// Sempre visível, inclusive no deploy, para facilitar testes em outros
-// dispositivos. TODO: ocultar/gated quando a feature amadurecer.
+// --- Menu de comandos (≡) ------------------------------------------------
+
+const menuBtn = document.querySelector<HTMLButtonElement>('#menu-btn')!;
+const commandsMenu = document.querySelector<HTMLDivElement>('#commands-menu')!;
+
+function setMenuOpen(open: boolean): void {
+  commandsMenu.hidden = !open;
+}
+
+menuBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  setMenuOpen(commandsMenu.hidden);
+});
+// Clicar fora do menu o fecha.
+document.addEventListener('click', (e) => {
+  if (commandsMenu.hidden) return;
+  const target = e.target as Node;
+  if (!commandsMenu.contains(target) && target !== menuBtn) setMenuOpen(false);
+});
+
+// Import/Export: placeholders nesta track (a serialização JSON virá em outra).
+document.querySelector<HTMLButtonElement>('#cmd-import')!.addEventListener('click', () => {
+  setMenuOpen(false);
+});
+document.querySelector<HTMLButtonElement>('#cmd-export')!.addEventListener('click', () => {
+  setMenuOpen(false);
+});
+
+// Limpar banco — afordância temporária de desenvolvimento, agora dentro do menu.
 const clearDbBtn = document.querySelector<HTMLButtonElement>('#clear-db')!;
 clearDbBtn.addEventListener('click', async () => {
+  setMenuOpen(false);
   if (!confirm(t('clearDb.confirm'))) return;
   await clearChips();
   location.reload();
@@ -915,7 +984,7 @@ clearDbBtn.addEventListener('click', async () => {
 
 // --- Painel "Sobre" / boas-vindas ----------------------------------------
 
-const aboutBtn = document.querySelector<HTMLButtonElement>('#about-btn')!;
+const aboutMenuItem = document.querySelector<HTMLButtonElement>('#cmd-about')!;
 const aboutOverlay = document.querySelector<HTMLDivElement>('#about-overlay')!;
 const aboutPanel = document.querySelector<HTMLDivElement>('#about-panel')!;
 const aboutClose = document.querySelector<HTMLButtonElement>('#about-close')!;
@@ -940,7 +1009,10 @@ function closeAbout(): void {
   aboutOverlay.hidden = true;
 }
 
-aboutBtn.addEventListener('click', () => openAbout('about'));
+aboutMenuItem.addEventListener('click', () => {
+  setMenuOpen(false);
+  openAbout('about');
+});
 // O botão primário sempre fecha; em modo boas-vindas, também inicia o tutorial.
 aboutClose.addEventListener('click', () => {
   const startTut = aboutMode === 'welcome';
@@ -1034,6 +1106,7 @@ tutorialExit.addEventListener('click', exitTutorial);
 
 window.addEventListener('resize', resize);
 resize();
+updatePaletteScroll();
 requestAnimationFrame(render);
 
 // Restaura a biblioteca de chips persistida e repovoa a paleta. Assíncrono: o
