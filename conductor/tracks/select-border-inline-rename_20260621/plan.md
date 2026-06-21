@@ -45,14 +45,14 @@ Fazer o editor de nome do chip ocupar a área do próprio botão.
 
 ### Tasks
 
-- [ ] Task 2.1: Generalizar `openInlineEditor()` (`src/main.ts:619`) para aceitar,
+- [x] Task 2.1: Generalizar `openInlineEditor()` (`src/main.ts:619`) para aceitar,
       além de `left/top/transform`, uma geometria opcional de "caixa" (largura e
       altura alvo) que faça o input ocupar a área do componente em vez do
       auto-size por `size`.
-- [ ] Task 2.2: Reescrever `openChipNameEdit()` (`main.ts:427`) para posicionar o
+- [x] Task 2.2: Reescrever `openChipNameEdit()` (`main.ts:427`) para posicionar o
       overlay exatamente sobre o botão do chip (usando `getBoundingClientRect()`:
       mesma `left/top/width/height`), sem o deslocamento `translate(-50%, 8px)`.
-- [ ] Task 2.3: Ajustar o estilo do `#rename-overlay`/`#rename-input`
+- [x] Task 2.3: Ajustar o estilo do `#rename-overlay`/`#rename-input`
       (`src/style.css:426-459`) para, no modo "sobre o componente", o input
       preencher a caixa (sem o padding/gap do overlay flutuante empurrarem o
       campo para fora da área do botão).

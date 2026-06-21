@@ -423,14 +423,15 @@ function commitChipRename(def: ChipDefinition, raw: string): void {
   refreshPalette();
 }
 
-/** Abre a edição in-place do nome de um chip, logo abaixo do seu botão na paleta. */
+/** Abre a edição in-place do nome de um chip, sobre o próprio botão na paleta. */
 function openChipNameEdit(def: ChipDefinition, btn: HTMLElement): void {
   const rect = btn.getBoundingClientRect();
   openInlineEditor({
     value: def.name,
-    left: rect.left + rect.width / 2,
-    top: rect.bottom,
-    transform: 'translate(-50%, 8px)',
+    left: rect.left,
+    top: rect.top,
+    transform: 'none',
+    box: { width: rect.width, height: rect.height },
     onCommit: (value) => commitChipRename(def, value),
   });
 }
@@ -616,17 +617,31 @@ function autoSizeInlineEditor(): void {
   renameInput.size = Math.max(renameInput.value.length, INLINE_EDITOR_MIN_CHARS);
 }
 
-/** Abre o editor in-place em (left, top) da tela, com o `transform` de ancoragem. */
+/**
+ * Abre o editor in-place em (left, top) da tela, com o `transform` de ancoragem.
+ * Se `box` for informado, o editor ocupa exatamente essa área (modo "sobre o
+ * componente"); caso contrário, dimensiona-se pelo conteúdo via `size`.
+ */
 function openInlineEditor(opts: {
   value: string;
   left: number;
   top: number;
   transform: string;
   onCommit: (value: string) => void;
+  box?: { width: number; height: number };
 }): void {
   inlineCommit = opts.onCommit;
   renameInput.value = opts.value;
-  autoSizeInlineEditor();
+  if (opts.box) {
+    renameOverlay.classList.add('inplace');
+    renameOverlay.style.width = `${opts.box.width}px`;
+    renameOverlay.style.height = `${opts.box.height}px`;
+  } else {
+    renameOverlay.classList.remove('inplace');
+    renameOverlay.style.width = '';
+    renameOverlay.style.height = '';
+    autoSizeInlineEditor();
+  }
   renameOverlay.style.left = `${opts.left}px`;
   renameOverlay.style.top = `${opts.top}px`;
   renameOverlay.style.transform = opts.transform;
@@ -671,7 +686,10 @@ function openRenameOverlay(node: CircuitNode): void {
   });
 }
 
-renameInput.addEventListener('input', autoSizeInlineEditor);
+renameInput.addEventListener('input', () => {
+  // No modo "sobre o componente" a largura é fixa (100% da caixa); não auto-dimensiona.
+  if (!renameOverlay.classList.contains('inplace')) autoSizeInlineEditor();
+});
 renameInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') commitInlineEditor();
   else if (e.key === 'Escape') closeInlineEditor();

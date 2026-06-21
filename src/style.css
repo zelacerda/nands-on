@@ -461,6 +461,24 @@ body {
   text-align: center;
 }
 
+/* Modo "sobre o componente": o editor ocupa exatamente a área do próprio alvo
+   (botão do chip na paleta ou nó de I/O no canvas), sem a moldura do overlay
+   flutuante — a edição acontece no lugar do componente, não num campo extra. */
+#rename-overlay.inplace {
+  padding: 0;
+  gap: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+#rename-overlay.inplace #rename-input {
+  width: 100%;
+  height: 100%;
+  /* Borda laranja ecoa o estado de seleção, deixando claro que é o alvo em edição. */
+  border-color: #e0af68;
+}
+
 /* Overlay + painel "Sobre" / boas-vindas. */
 #about-overlay {
   position: fixed;
