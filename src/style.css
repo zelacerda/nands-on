@@ -144,7 +144,7 @@ body {
   padding: 8px 12px;
   cursor: pointer;
   /* Alvo de toque confortável em mobile. */
-  min-width: 96px;
+  min-width: 108px;
   min-height: 40px;
   /* Nomes longos de chip quebram em várias linhas (como o rótulo no canvas). */
   white-space: normal;
@@ -174,12 +174,14 @@ body {
   background: #444f70;
 }
 
-/* Itens reordenáveis: alça à esquerda + rótulo. */
+/* Itens reordenáveis: alça colada à esquerda + rótulo com mais espaço. */
 #palette button.logic-btn,
 #palette button.chip-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  /* Padding esquerdo menor aproxima a alça da borda e libera largura ao nome. */
+  padding-left: 6px;
   text-align: left;
 }
 
