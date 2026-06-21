@@ -3,7 +3,7 @@
 **Track ID:** drag-reorder_20260621
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-21
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -89,10 +89,10 @@ Robustez e acabamento.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação do spec atendidos.
-- [ ] `npm run build`, typecheck, lint e testes passando.
-- [ ] `npm run dev` rodando; roteiro de teste manual executado pelo usuário.
-- [ ] Pronto para revisão/commit (Conventional Commits).
+- [x] Todos os critérios de aceitação do spec atendidos.
+- [x] `npm run build`, typecheck, lint e testes passando (169 testes).
+- [x] `npm run dev` rodando; roteiro de teste manual executado pelo usuário.
+- [x] Pronto para revisão/commit (Conventional Commits).
 
 ---
 
