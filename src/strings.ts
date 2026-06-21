@@ -55,16 +55,10 @@ export const STRINGS = {
     'Connect components by dragging from one pin to another — signals flow along the wires.',
   'help.feature.toggle':
     'Tap an input to select it, then tap again to cycle its state: OFF → ON → CLK (an auto-pulsing clock).',
-  'help.feature.simulate':
-    'The circuit simulates in real time: outputs update instantly as you wire and toggle inputs.',
   'help.feature.make':
     'Click "Make" to package your circuit into a reusable chip, then drop copies of it from the palette.',
-  'help.feature.edit':
-    'Select a component to Edit, Rename, or Delete it — double-tap a label to rename it in place.',
   'help.feature.persist':
     'Your chips are saved locally in your browser — no account, backend, or install needed.',
-  'help.feature.tutorial':
-    'New here? Open "About" and start the interactive tutorial to build a NOT gate from a NAND.',
   'help.close': 'Got it',
 
   // Barra de ações contextual (componente/nó/fio selecionado)
