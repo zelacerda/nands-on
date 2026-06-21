@@ -28,14 +28,14 @@ export const STRINGS = {
   'about.intro':
     'Build digital logic hands-on: start from a single NAND gate, package your circuits into reusable chips, and work your way up to a CPU — all in the browser.',
   'about.creditsTitle': 'Credits',
-  'about.author': 'Created by Zé Lacerda.',
+  'about.author': 'Created by Zé Lacerda',
   'about.inspiredBy': 'Inspired by',
   'about.dlsLink': "Sebastian Lague's Digital-Logic-Sim",
-  'about.repoLink': 'Source on GitHub',
+  'about.repoLink': 'source on GitHub',
   // Atribuição CC-BY dos ícones (coolicons via SVG Repo) — exigida pela licença.
   'about.iconsBy': 'Vectors and icons by',
   'about.iconsAuthor': 'Krystonschwarze',
-  'about.iconsLicenseVia': 'in CC Attribution License via',
+  'about.iconsLicenseVia': 'in CC BY via',
   'about.iconsRepo': 'SVG Repo',
   'about.dontShowAgain': "Don't show this at start-up",
   'about.close': 'Close',
