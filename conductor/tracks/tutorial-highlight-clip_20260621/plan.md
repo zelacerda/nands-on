@@ -49,8 +49,8 @@ overlay, e adicionar o reposicionamento por frame.
 
 ### Tasks
 
-- [ ] Task 3.1: Conferir os demais passos com destaque (IN no passo 0, OUT no passo correspondente) e o caso de alvo ausente/oculto.
-- [ ] Task 3.2: Revisar o diff (self-review) e ajustar comentários em PT-BR conforme o estilo do arquivo.
+- [x] Task 3.1: Conferir os demais passos com destaque (IN no passo 0, OUT no passo correspondente) e o caso de alvo ausente/oculto.
+- [x] Task 3.2: Revisar o diff (self-review) e ajustar comentários em PT-BR conforme o estilo do arquivo.
 
 ### Verification
 

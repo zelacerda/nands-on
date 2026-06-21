@@ -1187,6 +1187,8 @@ function positionTutorialHighlight(): void {
   tutorialHighlight.style.top = `${rect.top}px`;
   tutorialHighlight.style.width = `${rect.width}px`;
   tutorialHighlight.style.height = `${rect.height}px`;
+  // Herda o raio do alvo para o halo casar com a forma (círculo do I/O vs chip).
+  tutorialHighlight.style.borderRadius = getComputedStyle(target).borderRadius;
   tutorialHighlight.hidden = false;
 }
 
