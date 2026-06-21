@@ -1,0 +1,16 @@
+{
+  "id": "tutorial-highlight-clip_20260621",
+  "title": "Corrigir Highlight Recortado no Tutorial",
+  "type": "bug",
+  "status": "complete",
+  "created": "2026-06-21T00:00:00Z",
+  "updated": "2026-06-21T00:00:00Z",
+  "phases": {
+    "total": 3,
+    "completed": 3
+  },
+  "tasks": {
+    "total": 9,
+    "completed": 9
+  }
+}

@@ -637,8 +637,18 @@ body {
   background: #3f4651;
 }
 
-/* Destaque do alvo do passo atual (ex.: botão da paleta). */
-.tutorial-highlight {
+/* Destaque do alvo do passo atual (ex.: botão da paleta). Um overlay flutuante,
+   posicionado por JS sobre o alvo (via getBoundingClientRect). Fica na raiz do
+   DOM e usa position: fixed para não ser recortado por containers roláveis
+   (ex.: a lista da paleta com overflow), garantindo que o contorno envolva o
+   elemento inteiro. */
+#tutorial-highlight {
+  position: fixed;
+  /* Não intercepta cliques/toques: o usuário interage com o alvo por baixo. */
+  pointer-events: none;
+  /* Acima da UI, abaixo do callout do tutorial. */
+  z-index: 17;
+  border-radius: 6px;
   outline: 2px solid #ffd23f;
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(255, 210, 63, 0.3);

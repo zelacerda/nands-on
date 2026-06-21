@@ -1151,16 +1151,45 @@ const tutorialCallout = document.querySelector<HTMLDivElement>('#tutorial-callou
 const tutorialProgress = document.querySelector<HTMLDivElement>('#tutorial-progress')!;
 const tutorialText = document.querySelector<HTMLParagraphElement>('#tutorial-text')!;
 const tutorialExit = document.querySelector<HTMLButtonElement>('#tutorial-exit')!;
+const tutorialHighlight = document.querySelector<HTMLDivElement>('#tutorial-highlight')!;
 
 let tutorialState: TutorialState = { active: false, index: 0 };
 let tutorialStepStart: StepStartSnapshot = captureStepStart([], 0);
+/** Elemento-alvo do destaque do passo atual (null quando não há destaque). */
+let tutorialHighlightTarget: HTMLElement | null = null;
 
-/** Aplica (ou limpa) o destaque visual do alvo do passo atual. */
+/** Define (ou limpa) o alvo do destaque do passo atual e reposiciona o overlay. */
 function setTutorialHighlight(selector?: string): void {
-  document
-    .querySelectorAll('.tutorial-highlight')
-    .forEach((el) => el.classList.remove('tutorial-highlight'));
-  if (selector) document.querySelector(selector)?.classList.add('tutorial-highlight');
+  tutorialHighlightTarget = selector
+    ? document.querySelector<HTMLElement>(selector)
+    : null;
+  positionTutorialHighlight();
+}
+
+/**
+ * Posiciona o overlay de destaque sobre o alvo atual a partir do seu
+ * getBoundingClientRect (coordenadas de viewport, casando com position: fixed).
+ * Oculta o overlay quando não há alvo ou quando o alvo está fora de tela.
+ */
+function positionTutorialHighlight(): void {
+  const target = tutorialHighlightTarget;
+  if (!target) {
+    tutorialHighlight.hidden = true;
+    return;
+  }
+  const rect = target.getBoundingClientRect();
+  // Alvo sem dimensões (oculto/display:none): nada a destacar.
+  if (rect.width === 0 && rect.height === 0) {
+    tutorialHighlight.hidden = true;
+    return;
+  }
+  tutorialHighlight.style.left = `${rect.left}px`;
+  tutorialHighlight.style.top = `${rect.top}px`;
+  tutorialHighlight.style.width = `${rect.width}px`;
+  tutorialHighlight.style.height = `${rect.height}px`;
+  // Herda o raio do alvo para o halo casar com a forma (círculo do I/O vs chip).
+  tutorialHighlight.style.borderRadius = getComputedStyle(target).borderRadius;
+  tutorialHighlight.hidden = false;
 }
 
 /** Atualiza o callout para refletir o passo atual (ou a tela de conclusão). */
@@ -1212,6 +1241,8 @@ function updateTutorial(): void {
     tutorialStepStart = captureStepStart(store.listNodes(), library.list().length);
     renderTutorialStep();
   }
+  // Acompanha o alvo a cada frame (scroll da paleta, resize, mudanças de layout).
+  positionTutorialHighlight();
 }
 
 tutorialExit.addEventListener('click', exitTutorial);
