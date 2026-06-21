@@ -20,5 +20,6 @@
 | [x] | snap-to-grid_20260614 | Snap to Grid com Conectores nos Cruzamentos | 2026-06-14 | 2026-06-14 |
 | [x] | orthogonal-wires_20260614 | Roteamento Ortogonal de Fios | 2026-06-14 | 2026-06-14 |
 | [x] | ui-redesign_20260614 | Reorganização da UI do Editor | 2026-06-14 | 2026-06-14 |
+| [~] | area-select_20260621 | Seleção por Área e Pan com Botão do Meio/Direito | 2026-06-21 | 2026-06-21 |
 
 <!-- Tracks registrados por /conductor:new-track -->
