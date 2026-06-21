@@ -263,7 +263,7 @@ body {
   height: 40px;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   cursor: pointer;
 }
 
@@ -386,8 +386,8 @@ body {
 }
 
 .menu-item .icon svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 }
 
 .menu-item:hover {
@@ -401,7 +401,8 @@ body {
   background: #3a3f4a;
 }
 
-/* Barra de ações contextual (inferior-centro): EDIT / RENAME / DELETE. */
+/* Ações contextuais (inferior-centro): EDIT / RENAME / DELETE como botões
+   circulares soltos, sem caixa de fundo. */
 #action-bar {
   position: fixed;
   bottom: 16px;
@@ -409,12 +410,6 @@ body {
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
-  padding: 6px;
-  background: rgba(39, 43, 51, 0.92);
-  border: 1px solid #3a3f4a;
-  border-radius: 10px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
   z-index: 14;
 }
 
@@ -433,6 +428,7 @@ body {
   background: #353b45;
   border: 1px solid #4a525e;
   border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   cursor: pointer;
 }
 
