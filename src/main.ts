@@ -412,13 +412,24 @@ function attachPaletteDrag(btn: HTMLElement, item: PaletteItem, onTap?: () => vo
 
 // --- Reordenação da paleta por arrastar (alça) ---------------------------
 
+/** Espaçamento vertical entre itens da paleta (igual ao `gap` do `#palette-list`). */
+const PALETTE_GAP = 8;
+
 /** Estado do arrasto de reordenação em andamento, ou `null`. */
 let paletteReorder: {
   pointerId: number;
-  fromIndex: number;
-  /** Ordem no início do arrasto; cada movimento recalcula a partir dela. */
-  base: string[];
   btn: HTMLElement;
+  /** Índice do item arrastado entre os reordenáveis (ordem original). */
+  fromIndex: number;
+  /** `clientY` no início do gesto, para o item seguir o ponteiro. */
+  startY: number;
+  /** "Pegada" do item arrastado (altura + gap): o quanto os vizinhos deslocam. */
+  footprint: number;
+  /** Itens reordenáveis na ordem original e seus retângulos (alvo estável). */
+  items: HTMLElement[];
+  rects: DOMRect[];
+  /** Índice de destino atual (posição entre os demais itens). */
+  target: number;
 } | null = null;
 
 /** Botões reordenáveis (NAND + chips) na ordem atual do DOM. */
@@ -441,49 +452,84 @@ function applyDomOrder(keys: readonly string[]): void {
 }
 
 /**
- * Índice de destino do item arrastado conforme a posição vertical do ponteiro:
- * conta quantos outros itens têm o centro acima do ponteiro.
+ * Índice de destino conforme a posição vertical do ponteiro, medido contra os
+ * retângulos ORIGINAIS (capturados no início): conta quantos outros itens têm o
+ * centro acima do ponteiro. Usar posições originais mantém o alvo estável mesmo
+ * enquanto os vizinhos deslizam, evitando oscilação.
  */
-function reorderTargetIndex(clientY: number, dragging: HTMLElement): number {
+function reorderTarget(clientY: number, drag: NonNullable<typeof paletteReorder>): number {
   let index = 0;
-  for (const btn of reorderableButtons()) {
-    if (btn === dragging) continue;
-    const rect = btn.getBoundingClientRect();
-    if (clientY > rect.top + rect.height / 2) index++;
-  }
+  drag.items.forEach((_btn, i) => {
+    if (i === drag.fromIndex) return;
+    const r = drag.rects[i]!;
+    if (clientY > r.top + r.height / 2) index++;
+  });
   return index;
 }
 
+/** Posiciona os vizinhos para abrir espaço no destino e o item arrastado sob o ponteiro. */
+function paintReorder(clientY: number, drag: NonNullable<typeof paletteReorder>): void {
+  drag.btn.style.transform = `translateY(${clientY - drag.startY}px)`;
+  drag.items.forEach((btn, i) => {
+    if (i === drag.fromIndex) return;
+    const othersIndex = i < drag.fromIndex ? i : i - 1;
+    let shift = 0;
+    if (i > drag.fromIndex && othersIndex < drag.target) shift = -drag.footprint;
+    else if (i < drag.fromIndex && othersIndex >= drag.target) shift = drag.footprint;
+    btn.style.transform = shift ? `translateY(${shift}px)` : '';
+  });
+}
+
+/** Limpa os transforms aplicados durante o arrasto. */
+function clearReorderStyles(items: HTMLElement[]): void {
+  for (const btn of items) btn.style.transform = '';
+}
+
 /**
- * Liga a alça de um item da paleta ao arrasto de reordenação. O gesto na alça é
- * isolado (`stopPropagation`) para não acionar o arrasto-para-criar do corpo.
+ * Liga a alça de um item da paleta ao arrasto de reordenação. O item arrastado
+ * segue o ponteiro e os vizinhos deslizam (transição CSS) para abrir espaço; a
+ * ordem só é gravada no `pointerup`. O gesto na alça é isolado (`stopPropagation`)
+ * para não acionar o arrasto-para-criar do corpo.
  */
 function attachReorderDrag(handle: HTMLElement, btn: HTMLElement): void {
   handle.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     e.preventDefault();
     if (paletteReorder) return;
-    const base = [...paletteOrder];
-    paletteReorder = { pointerId: e.pointerId, fromIndex: base.indexOf(buttonKey(btn)), base, btn };
+    const items = reorderableButtons();
+    const fromIndex = items.indexOf(btn);
+    if (fromIndex === -1) return;
+    paletteReorder = {
+      pointerId: e.pointerId,
+      btn,
+      fromIndex,
+      startY: e.clientY,
+      footprint: btn.offsetHeight + PALETTE_GAP,
+      items,
+      rects: items.map((b) => b.getBoundingClientRect()),
+      target: fromIndex,
+    };
     handle.setPointerCapture(e.pointerId);
+    paletteList.classList.add('reordering-active');
     btn.classList.add('reordering');
   });
   handle.addEventListener('pointermove', (e) => {
     if (paletteReorder?.pointerId !== e.pointerId) return;
-    const target = reorderTargetIndex(e.clientY, btn);
-    applyDomOrder(moveItem(paletteReorder.base, paletteReorder.fromIndex, target));
+    paletteReorder.target = reorderTarget(e.clientY, paletteReorder);
+    paintReorder(e.clientY, paletteReorder);
   });
   const finish = (e: PointerEvent, commit: boolean): void => {
-    if (paletteReorder?.pointerId !== e.pointerId) return;
+    const drag = paletteReorder;
+    if (drag?.pointerId !== e.pointerId) return;
     if (handle.hasPointerCapture(e.pointerId)) handle.releasePointerCapture(e.pointerId);
-    btn.classList.remove('reordering');
     paletteReorder = null;
+    paletteList.classList.remove('reordering-active');
+    btn.classList.remove('reordering');
+    clearReorderStyles(drag.items);
     if (commit) {
-      // A nova ordem é lida da disposição atual do DOM e persistida.
-      paletteOrder = reorderableButtons().map(buttonKey);
+      paletteOrder = moveItem(drag.items.map(buttonKey), drag.fromIndex, drag.target);
       savePaletteOrder(paletteOrder);
-    } else {
-      applyDomOrder(paletteOrder); // cancela: restaura a ordem persistida
+      applyDomOrder(paletteOrder);
     }
   };
   handle.addEventListener('pointerup', (e) => {

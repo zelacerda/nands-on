@@ -207,10 +207,19 @@ body {
   height: 16px;
 }
 
-/* Item em reordenação: destaque sutil enquanto arrastado. */
+/* Durante a reordenação, os vizinhos deslizam suavemente para abrir espaço. */
+#palette-list.reordering-active button {
+  transition: transform 0.15s ease;
+}
+
+/* Item arrastado: segue o ponteiro (sem transição), flutua acima e ganha relevo. */
 #palette-list button.reordering {
-  opacity: 0.55;
+  transition: none;
+  position: relative;
+  z-index: 5;
   border-color: #e0af68;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  cursor: grabbing;
 }
 
 /* Chip selecionado na paleta: borda laranja coincidindo com a aresta do botão.
