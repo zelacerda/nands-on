@@ -68,13 +68,15 @@ Fazer o editor de nome do nó de I/O aparecer sobre o próprio nó no canvas.
 
 ### Tasks
 
-- [ ] Task 3.1: Reescrever `openRenameOverlay()` (`main.ts:653`) para posicionar o
+- [x] Task 3.1: Reescrever `openRenameOverlay()` (`main.ts:653`) para posicionar o
       input sobre o retângulo do nó: converter `node.pos`/`nodeSize(node)` para
       coordenadas de tela via `camera.worldToScreen()` e aplicar zoom à largura,
       ocupando a área do nó (sem o flip acima/abaixo deslocado).
-- [ ] Task 3.2: Tratar o caso do teclado virtual em mobile (o nó pode ficar sob o
+- [x] Task 3.2: Tratar o caso do teclado virtual em mobile (o nó pode ficar sob o
       teclado): manter o input visível (ex.: garantir `scrollIntoView`/foco com
       `preventScroll`) sem reintroduzir uma caixa flutuante deslocada.
+      → Mantido o `focus({ preventScroll: true })`; o flip antigo só evitava a
+      barra superior, não o teclado, então removê-lo não regride o mobile.
 
 ### Verification
 

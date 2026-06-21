@@ -664,24 +664,28 @@ function commitInlineEditor(): void {
   commit?.(value);
 }
 
-/** Abre a edição in-place do rótulo de um nó I/O, sobre o próprio nó. */
+/** Largura/altura mínima (px de tela) do editor sobre um nó, para o texto caber
+ *  legível mesmo em nós pequenos (I/O tem só 40×40 no mundo). */
+const INLINE_EDITOR_MIN_BOX = { w: 96, h: 36 };
+
+/** Abre a edição in-place do rótulo de um nó I/O, centrada sobre o próprio nó. */
 function openRenameOverlay(node: CircuitNode): void {
   const { w, h } = nodeSize(node);
   const rect = canvas!.getBoundingClientRect();
-  // Por padrão flutua acima do nó; se houver pouco espaço no topo, cai abaixo
-  // para não sair da tela (útil em mobile com o teclado virtual).
-  const above = camera.worldToScreen({ x: node.pos.x + w / 2, y: node.pos.y });
-  const flipBelow = above.y < 72;
-  const anchor = flipBelow
-    ? camera.worldToScreen({ x: node.pos.x + w / 2, y: node.pos.y + h })
-    : above;
+  // Centraliza o editor no centro do nó (o rótulo do nó também é centrado),
+  // ocupando a área do nó com um mínimo legível para nós pequenos.
+  const center = camera.worldToScreen({ x: node.pos.x + w / 2, y: node.pos.y + h / 2 });
   // Pré-preenche com o nome atual ou, se ainda não renomeado, com o padrão
   // (IN/OUT) para deixar claro que é o rótulo a editar.
   openInlineEditor({
     value: node.name ?? defaultIoLabel(node),
-    left: rect.left + anchor.x,
-    top: rect.top + anchor.y,
-    transform: flipBelow ? 'translate(-50%, 20%)' : 'translate(-50%, -120%)',
+    left: rect.left + center.x,
+    top: rect.top + center.y,
+    transform: 'translate(-50%, -50%)',
+    box: {
+      width: Math.max(w * camera.zoom, INLINE_EDITOR_MIN_BOX.w),
+      height: Math.max(h * camera.zoom, INLINE_EDITOR_MIN_BOX.h),
+    },
     onCommit: (value) => store.setNodeName(node.id, value),
   });
 }
