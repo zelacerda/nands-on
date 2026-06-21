@@ -101,7 +101,7 @@ Integrar o novo modelo e a geometria à máquina de estados de input em `main.ts
 
 - [x] Todos os critérios de aceitação atendidos
 - [x] Testes passando (`npm test`)
-- [ ] Verificação manual no browser (mouse e touch/emulação) no fechamento do track
+- [x] Verificação manual no browser (mouse e touch/emulação) no fechamento do track
 - [x] Pronto para revisão
 
 ---
