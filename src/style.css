@@ -598,6 +598,83 @@ body {
   background: #aede7a;
 }
 
+/* Painel "Help" — resumo das funcionalidades; reusa o visual do "About". */
+#help-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 20;
+}
+
+#help-overlay[hidden] {
+  display: none;
+}
+
+#help-panel {
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  color: #d8dee9;
+  background: #272b33;
+  border: 1px solid #3a3f4a;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+#help-title {
+  margin-bottom: 12px;
+  font:
+    800 22px system-ui,
+    sans-serif;
+  color: #7aa2f7;
+  letter-spacing: 0.5px;
+}
+
+.help-intro {
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #aeb6c2;
+}
+
+.help-list {
+  margin: 0 0 20px;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.help-list li {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#help-close {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px;
+  font:
+    700 14px system-ui,
+    sans-serif;
+  color: #1a1d23;
+  background: #9ece6a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#help-close:hover {
+  background: #aede7a;
+}
+
 /* Callout do tutorial — caixa não-bloqueante centrada no topo. */
 #tutorial-callout {
   position: fixed;

@@ -111,6 +111,31 @@
       </div>
     </div>
 
+    <!-- Painel "Help" — resumo das principais funcionalidades. -->
+    <div id="help-overlay" hidden>
+      <div
+        id="help-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="help-title"
+        data-i18n-attr="aria-label:a11y.help"
+      >
+        <h1 id="help-title" data-i18n="help.title"></h1>
+        <p class="help-intro" data-i18n="help.intro"></p>
+        <ul class="help-list">
+          <li data-i18n="help.feature.palette"></li>
+          <li data-i18n="help.feature.wire"></li>
+          <li data-i18n="help.feature.toggle"></li>
+          <li data-i18n="help.feature.simulate"></li>
+          <li data-i18n="help.feature.make"></li>
+          <li data-i18n="help.feature.edit"></li>
+          <li data-i18n="help.feature.persist"></li>
+          <li data-i18n="help.feature.tutorial"></li>
+        </ul>
+        <button type="button" id="help-close" data-i18n="help.close"></button>
+      </div>
+    </div>
+
     <!-- Destaque do tutorial: overlay flutuante posicionado sobre o alvo do passo.
          Vive na raiz do DOM para não ser recortado por containers roláveis. -->
     <div id="tutorial-highlight" hidden aria-hidden="true"></div>

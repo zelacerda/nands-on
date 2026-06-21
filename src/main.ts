@@ -1167,6 +1167,35 @@ window.addEventListener('keydown', (e) => {
 // Primeiro acesso (sem a flag de dispensa): abre as boas-vindas automaticamente.
 if (shouldAutoShowWelcome(isWelcomeDismissed())) openAbout('welcome');
 
+// --- Painel "Help" (resumo das funcionalidades) --------------------------
+
+const helpMenuItem = document.querySelector<HTMLButtonElement>('#cmd-help')!;
+const helpOverlay = document.querySelector<HTMLDivElement>('#help-overlay')!;
+const helpPanel = document.querySelector<HTMLDivElement>('#help-panel')!;
+const helpClose = document.querySelector<HTMLButtonElement>('#help-close')!;
+
+function openHelp(): void {
+  helpOverlay.hidden = false;
+}
+
+function closeHelp(): void {
+  helpOverlay.hidden = true;
+}
+
+helpMenuItem.addEventListener('click', () => {
+  setMenuOpen(false);
+  openHelp();
+});
+helpClose.addEventListener('click', closeHelp);
+// Clique no fundo (fora do painel) fecha o Help.
+helpOverlay.addEventListener('click', (e) => {
+  if (!helpPanel.contains(e.target as Node)) closeHelp();
+});
+// Esc fecha o Help quando aberto.
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !helpOverlay.hidden) closeHelp();
+});
+
 // --- Tutorial (walkthrough) ----------------------------------------------
 
 const tutorialCallout = document.querySelector<HTMLDivElement>('#tutorial-callout')!;

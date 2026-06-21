@@ -53,18 +53,18 @@ abrir/fechar em `src/main.ts`.
 
 ### Tasks
 
-- [ ] Task 3.1: Em `index.html`, adicionar `#help-overlay` + `#help-panel` (`role="dialog"`,
+- [x] Task 3.1: Em `index.html`, adicionar `#help-overlay` + `#help-panel` (`role="dialog"`,
       `aria-modal`, `aria-labelledby`), com título, conteúdo (placeholder de bullets) e
       botão `#help-close`, espelhando a estrutura do `#about-panel`.
-- [ ] Task 3.2: Em `src/main.ts`, capturar os elementos do Help e implementar
+- [x] Task 3.2: Em `src/main.ts`, capturar os elementos do Help e implementar
       `openHelp()`/`closeHelp()` (definindo `hidden`).
-- [ ] Task 3.3: Conectar os eventos: clique em `#cmd-help` abre o Help e fecha o menu;
+- [x] Task 3.3: Conectar os eventos: clique em `#cmd-help` abre o Help e fecha o menu;
       botão de fechar, clique no overlay e tecla Escape fecham o Help.
-- [ ] Task 3.4: Garantir que Help e About não abram simultaneamente / não conflitem.
+- [x] Task 3.4: Garantir que Help e About não abram simultaneamente / não conflitem.
 
 ### Verification
 
-- [ ] Abrir/fechar o Help funciona pelos três meios (botão, overlay, Escape) sem afetar o
+- [x] Abrir/fechar o Help funciona pelos três meios (botão, overlay, Escape) sem afetar o
       About nem o menu.
 
 ## Phase 4: Conteúdo do Help + polimento
@@ -74,16 +74,16 @@ estilos/acessibilidade.
 
 ### Tasks
 
-- [ ] Task 4.1: Rascunhar o conteúdo do Help (bullets concisos: paleta/arrastar componentes,
+- [x] Task 4.1: Rascunhar o conteúdo do Help (bullets concisos: paleta/arrastar componentes,
       conectar pinos, alternar entradas e clock, criar/editar chips com "Make", simulação em
       tempo real, persistência local, tutorial interativo) e ligar via `data-i18n`.
-- [ ] Task 4.2: Ajustar CSS do `#help-panel`/conteúdo (reuso de estilos do About quando
+- [x] Task 4.2: Ajustar CSS do `#help-panel`/conteúdo (reuso de estilos do About quando
       possível; espaçamento dos bullets) e revisar responsividade em tela pequena.
-- [ ] Task 4.3: Revisar acessibilidade (foco, labels) e consistência visual com o About.
+- [x] Task 4.3: Revisar acessibilidade (foco, labels) e consistência visual com o About.
 
 ### Verification
 
-- [ ] Conteúdo legível e bem formatado; visual consistente com o restante da UI.
+- [x] Conteúdo legível e bem formatado; visual consistente com o restante da UI.
 
 ## Final Verification
 
