@@ -75,7 +75,7 @@ export const STRINGS = {
   'editBar.editing': 'Editing: {name}',
 
   // Limpar banco local
-  'clearDb': 'Clear DB',
+  'clearDb': '⚠️ Clear DB',
   'clearDb.confirm': 'Clear the local database? All saved chips will be removed.',
 
   // Validação de nome de chip
