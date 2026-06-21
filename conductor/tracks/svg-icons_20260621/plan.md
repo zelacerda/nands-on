@@ -74,18 +74,18 @@ Aplicar ícone nos botões dos modais e creditar os autores no About.
 
 ### Tasks
 
-- [ ] Task 4.1: Botões primários do About (Close/Start Tutorial) e do Help (Got it)
+- [x] Task 4.1: Botões primários do About (Close/Start Tutorial) e do Help (Got it)
       exibem `check-big` + texto; ajustar a troca de rótulo em `openAbout` (modo
       welcome/about) para preservar o ícone.
-- [ ] Task 4.2: Adicionar chaves de atribuição em `src/strings.ts` e um `<p>` no About
+- [x] Task 4.2: Adicionar chaves de atribuição em `src/strings.ts` e um `<p>` no About
       (espelhando o padrão "Inspired by <a>…</a>") com o texto "Vectors and icons by
       Krystonschwarze in CC Attribution License via SVG Repo" e os links.
-- [ ] Task 4.3: Polimento — revisar tamanhos/alinhamento dos ícones em todas as áreas,
+- [x] Task 4.3: Polimento — revisar tamanhos/alinhamento dos ícones em todas as áreas,
       consistência visual e acessibilidade (foco, `aria-label`), inclusive em tela pequena.
 
 ### Verification
 
-- [ ] Modais com ícone nos CTAs; atribuição CC-BY visível e com links corretos no About.
+- [x] Modais com ícone nos CTAs; atribuição CC-BY visível e com links corretos no About.
 
 ## Final Verification
 

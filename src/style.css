@@ -615,6 +615,10 @@ body {
 }
 
 #about-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   min-height: 44px;
   padding: 10px;
@@ -626,6 +630,13 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+}
+
+/* Atribuição CC-BY dos ícones — discreta, abaixo dos créditos. */
+#about-panel p.about-icons-credit {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #aeb6c2;
 }
 
 #about-close:hover {
@@ -692,6 +703,10 @@ body {
 }
 
 #help-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   min-height: 44px;
   padding: 10px;

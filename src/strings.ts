@@ -32,6 +32,11 @@ export const STRINGS = {
   'about.inspiredBy': 'Inspired by',
   'about.dlsLink': "Sebastian Lague's Digital-Logic-Sim",
   'about.repoLink': 'Source on GitHub',
+  // Atribuição CC-BY dos ícones (coolicons via SVG Repo) — exigida pela licença.
+  'about.iconsBy': 'Vectors and icons by',
+  'about.iconsAuthor': 'Krystonschwarze',
+  'about.iconsLicenseVia': 'in CC Attribution License via',
+  'about.iconsRepo': 'SVG Repo',
   'about.dontShowAgain': "Don't show this at start-up",
   'about.close': 'Close',
 

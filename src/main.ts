@@ -1125,6 +1125,7 @@ const aboutMenuItem = document.querySelector<HTMLButtonElement>('#cmd-about')!;
 const aboutOverlay = document.querySelector<HTMLDivElement>('#about-overlay')!;
 const aboutPanel = document.querySelector<HTMLDivElement>('#about-panel')!;
 const aboutClose = document.querySelector<HTMLButtonElement>('#about-close')!;
+const aboutCloseLabel = aboutClose.querySelector<HTMLSpanElement>('.about-close-label')!;
 const aboutDontShow = document.querySelector<HTMLInputElement>('#about-dont-show')!;
 
 /** Modo do painel: "about" (aberto pelo "?") ou "welcome" (auto no 1º acesso). */
@@ -1135,7 +1136,8 @@ function openAbout(mode: 'about' | 'welcome' = 'about'): void {
   // O checkbox reflete a preferência atual ao abrir.
   aboutDontShow.checked = isWelcomeDismissed();
   // No 1º acesso, o botão primário convida a iniciar o tutorial; via "?", só fecha.
-  aboutClose.textContent = mode === 'welcome' ? t('tutorial.start') : t('about.close');
+  // Escreve no rótulo (span), preservando o ícone injetado no botão.
+  aboutCloseLabel.textContent = mode === 'welcome' ? t('tutorial.start') : t('about.close');
   aboutOverlay.hidden = false;
 }
 
