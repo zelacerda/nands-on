@@ -20,7 +20,6 @@ export const STRINGS = {
   'a11y.about': 'About NANDS-ON',
   'a11y.menu': 'Commands menu',
   'a11y.help': 'Help — NANDS-ON features',
-  'a11y.dragHandle': 'Drag to reorder',
 
   // Marca e painel "Sobre" / boas-vindas
   'app.name': 'NANDS-ON',

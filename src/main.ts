@@ -546,7 +546,7 @@ function createChipButton(def: ChipDefinition): HTMLButtonElement {
   const handle = document.createElement('span');
   handle.className = 'drag-handle';
   handle.dataset.icon = 'drag-vertical';
-  handle.setAttribute('aria-label', t('a11y.dragHandle'));
+  handle.setAttribute('aria-hidden', 'true');
 
   const label = document.createElement('span');
   label.className = 'palette-label';

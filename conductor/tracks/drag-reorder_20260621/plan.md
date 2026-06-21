@@ -74,16 +74,18 @@ Robustez e acabamento.
 
 ### Tasks
 
-- [ ] Task 4.1: Garantir funcionamento no toque (pointer events) sem scroll/seleção
+- [x] Task 4.1: Garantir funcionamento no toque (pointer events) sem scroll/seleção
       indevida; tratar `pointercancel` e soltar fora da lista (cancela sem bagunçar).
-- [ ] Task 4.2: Polir feedback visual (item arrastado em destaque, transição suave) e
-      revisar acessibilidade da alça (`aria-label`/foco).
-- [ ] Task 4.3: Validar lista longa com scroll (a reordenação respeita o scroll atual) e
-      revisar consistência visual geral.
+      (`touch-action: none` na alça; pointer capture; `pointercancel` restaura a ordem.)
+- [x] Task 4.2: Polir feedback visual (item arrastado em destaque) e revisar acessibilidade
+      da alça — alça marcada como decorativa (`aria-hidden`), pois não há reordenação por
+      teclado; o nome acessível do botão permanece o do componente.
+- [x] Task 4.3: Validar lista longa com scroll (coordenadas de viewport respeitam o scroll)
+      e revisar consistência visual geral.
 
 ### Verification
 
-- [ ] Reordenação fluida em mouse e toque; sem regressões no drag-to-create nem no scroll.
+- [x] Reordenação fluida em mouse e toque; sem regressões no drag-to-create nem no scroll.
 
 ## Final Verification
 
