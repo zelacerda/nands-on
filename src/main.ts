@@ -18,6 +18,7 @@ import { CircuitStore } from './store';
 import { ChipLibrary, captureDefinition, reconcileInstances, validateChipName } from './chip';
 import { clearChips, loadChips, saveChips } from './persistence';
 import { applyStrings, t } from './strings';
+import { applyIcons } from './icons';
 import {
   drawCircuit,
   drawGhostWire,
@@ -55,8 +56,10 @@ if (!ctx) {
   throw new Error('Contexto 2D indisponível.');
 }
 
-// Preenche os textos estáticos da UI a partir do módulo central de strings.
+// Preenche os textos estáticos da UI a partir do módulo central de strings,
+// depois injeta os ícones SVG nos elementos marcados com `data-icon`.
 applyStrings();
+applyIcons();
 
 const camera = new Camera();
 const store = new CircuitStore();

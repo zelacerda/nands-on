@@ -24,5 +24,6 @@
 | [x] | tutorial-highlight-clip_20260621 | Corrigir Highlight Recortado no Tutorial | 2026-06-21 | 2026-06-21 |
 | [x] | select-border-inline-rename_20260621 | Borda de Seleção Alinhada e Renomeação In-Place | 2026-06-21 | 2026-06-21 |
 | [x] | help-menu_20260621 | Opção "Help" no Menu e Separadores de Grupo | 2026-06-21 | 2026-06-21 |
+| [~] | svg-icons_20260621 | Ícones SVG (coolicons) nos Botões e Menu | 2026-06-21 | 2026-06-21 |
 
 <!-- Tracks registrados por /conductor:new-track -->

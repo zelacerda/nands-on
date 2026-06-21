@@ -1,0 +1,4 @@
+Cole aqui o texto da licença CC-BY que acompanha o pacote de ícones
+(ou o link oficial, ex.: https://creativecommons.org/licenses/by/4.0/legalcode).
+
+Substitua este conteúdo pelo arquivo de licença original distribuído com os ícones.

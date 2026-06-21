@@ -275,6 +275,23 @@ body {
   background: #3f4651;
 }
 
+/* Ícones SVG (coolicons) — injetados inline via data-icon. Herdam a cor do
+   contexto (stroke: currentColor) e o tamanho é controlado por `em`, escalando
+   com a fonte do botão. Contextos específicos ajustam o tamanho quando preciso. */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.icon svg {
+  display: block;
+  width: 1.25em;
+  height: 1.25em;
+  stroke: currentColor;
+}
+
 /* Menu de comandos (≡), no topo-direita. */
 #menu-btn {
   position: fixed;
