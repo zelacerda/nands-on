@@ -42,15 +42,17 @@
         <button type="button" id="palette-scroll-down" class="palette-scroll" hidden aria-hidden="true">
           ▼
         </button>
-        <button type="button" id="make" hidden data-i18n="make"></button>
+        <button type="button" id="make" hidden data-icon="add-plus">
+          <span class="make-label" data-i18n="make"></span>
+        </button>
       </nav>
     </div>
 
     <!-- Barra de edição de chip (modo edição), no topo-centro. -->
     <div id="edit-bar" hidden>
       <span id="edit-label"></span>
-      <button type="button" id="finish-edit" data-i18n="editBar.finish"></button>
-      <button type="button" id="cancel-edit" data-i18n="editBar.cancel"></button>
+      <button type="button" id="finish-edit" data-icon="check-big" data-i18n-attr="aria-label:editBar.finish"></button>
+      <button type="button" id="cancel-edit" data-icon="close-md" data-i18n-attr="aria-label:editBar.cancel"></button>
     </div>
 
     <!-- Menu de comandos (≡), no topo-direita. Ícone hamburger, só ícone. -->
@@ -86,9 +88,9 @@
 
     <!-- Barra de ações contextual (inferior-centro): aparece com item selecionado. -->
     <div id="action-bar" hidden>
-      <button type="button" id="action-edit" hidden data-i18n="action.edit"></button>
-      <button type="button" id="action-rename" hidden data-i18n="action.rename"></button>
-      <button type="button" id="action-delete" hidden data-i18n="action.delete"></button>
+      <button type="button" id="action-edit" hidden data-icon="edit-pencil" data-i18n-attr="aria-label:action.edit"></button>
+      <button type="button" id="action-rename" hidden data-icon="text" data-i18n-attr="aria-label:action.rename"></button>
+      <button type="button" id="action-delete" hidden data-icon="trash" data-i18n-attr="aria-label:action.delete"></button>
     </div>
 
     <!-- Painel "Sobre" — também exibido como boas-vindas no primeiro acesso. -->

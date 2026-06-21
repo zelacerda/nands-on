@@ -56,17 +56,17 @@ Migrar os controles contextuais e o botão Make.
 
 ### Tasks
 
-- [ ] Task 3.1: Barra de ações — Edit/Rename/Delete viram só ícone (`edit-pencil-01`,
+- [x] Task 3.1: Barra de ações — Edit/Rename/Delete viram só ícone (`edit-pencil-01`,
       `text`, `trash-full`) com `aria-label` (`data-i18n-attr`), em botões **circulares**
       (CSS: largura=altura, `border-radius:50%`, ícone centralizado).
-- [ ] Task 3.2: Barra de edição — Save/Cancel viram só ícone (`check-big`, `close-md`) com
+- [x] Task 3.2: Barra de edição — Save/Cancel viram só ícone (`check-big`, `close-md`) com
       `aria-label`, mantendo o formato atual.
-- [ ] Task 3.3: Botão Make passa a exibir `add-plus` + rótulo (estrutura ícone + `<span
+- [x] Task 3.3: Botão Make passa a exibir `add-plus` + rótulo (estrutura ícone + `<span
       data-i18n="make">`).
 
 ### Verification
 
-- [ ] Barra de ações circular e funcional; Save/Cancel e Make com ícones corretos.
+- [x] Barra de ações circular e funcional; Save/Cancel e Make com ícones corretos.
 
 ## Phase 4: Modais e atribuição CC-BY
 
