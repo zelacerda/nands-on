@@ -19,6 +19,7 @@ export const STRINGS = {
   'a11y.renameInput': 'Input or output name',
   'a11y.about': 'About NANDS-ON',
   'a11y.menu': 'Commands menu',
+  'a11y.help': 'Help — NANDS-ON features',
 
   // Marca e painel "Sobre" / boas-vindas
   'app.name': 'NANDS-ON',
@@ -40,9 +41,31 @@ export const STRINGS = {
 
   // Menu de comandos (≡)
   'menu.title': 'COMMANDS',
+  'menu.help': 'Help',
   'menu.import': 'Import',
   'menu.export': 'Export',
   'menu.about': 'About',
+
+  // Painel "Help" — resumo das principais funcionalidades
+  'help.title': 'Quick Help',
+  'help.intro': 'A quick tour of what you can do in NANDS-ON:',
+  'help.feature.palette':
+    'Drag the IN, OUT, and chip buttons from the palette onto the canvas to place them.',
+  'help.feature.wire':
+    'Connect components by dragging from one pin to another — signals flow along the wires.',
+  'help.feature.toggle':
+    'Tap an input to select it, then tap again to cycle its state: OFF → ON → CLK (an auto-pulsing clock).',
+  'help.feature.simulate':
+    'The circuit simulates in real time: outputs update instantly as you wire and toggle inputs.',
+  'help.feature.make':
+    'Click "Make" to package your circuit into a reusable chip, then drop copies of it from the palette.',
+  'help.feature.edit':
+    'Select a component to Edit, Rename, or Delete it — double-tap a label to rename it in place.',
+  'help.feature.persist':
+    'Your chips are saved locally in your browser — no account, backend, or install needed.',
+  'help.feature.tutorial':
+    'New here? Open "About" and start the interactive tutorial to build a NOT gate from a NAND.',
+  'help.close': 'Got it',
 
   // Barra de ações contextual (componente/nó/fio selecionado)
   'action.edit': 'Edit',
