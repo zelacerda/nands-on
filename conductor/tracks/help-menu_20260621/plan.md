@@ -3,7 +3,7 @@
 **Track ID:** help-menu_20260621
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-21
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -87,10 +87,10 @@ estilos/acessibilidade.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação do spec atendidos.
-- [ ] `npm run dev` rodando; roteiro de teste manual executado pelo usuário.
-- [ ] Conteúdo do Help revisado e aprovado pelo usuário.
-- [ ] Pronto para revisão/commit (Conventional Commits).
+- [x] Todos os critérios de aceitação do spec atendidos.
+- [x] `npm run dev` rodando; roteiro de teste manual executado pelo usuário.
+- [x] Conteúdo do Help revisado e aprovado pelo usuário.
+- [x] Pronto para revisão/commit (Conventional Commits).
 
 ---
 

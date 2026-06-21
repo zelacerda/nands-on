@@ -2,9 +2,9 @@
   "id": "help-menu_20260621",
   "title": "Opção \"Help\" no Menu e Separadores de Grupo",
   "type": "feature",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-06-21T00:00:00Z",
-  "updated": "2026-06-21T12:00:00Z",
+  "updated": "2026-06-21T18:00:00Z",
   "current_phase": 4,
   "current_task": "4.3",
   "phases": {

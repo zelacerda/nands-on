@@ -33,7 +33,7 @@ Hub de navegação para o contexto do projeto.
 - [Seleção por Área e Pan com Botão do Meio/Direito](./tracks/area-select_20260621/index.md) — `area-select_20260621` (complete)
 - [Corrigir Highlight Recortado no Tutorial](./tracks/tutorial-highlight-clip_20260621/index.md) — `tutorial-highlight-clip_20260621` (complete)
 - [Borda de Seleção Alinhada e Renomeação In-Place](./tracks/select-border-inline-rename_20260621/index.md) — `select-border-inline-rename_20260621` (complete)
-- [Opção "Help" no Menu e Separadores de Grupo](./tracks/help-menu_20260621/index.md) — `help-menu_20260621` (pending)
+- [Opção "Help" no Menu e Separadores de Grupo](./tracks/help-menu_20260621/index.md) — `help-menu_20260621` (complete)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
