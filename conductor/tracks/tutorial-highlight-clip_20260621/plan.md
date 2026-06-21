@@ -36,10 +36,10 @@ overlay, e adicionar o reposicionamento por frame.
 
 ### Tasks
 
-- [ ] Task 2.1: Em `src/main.ts`, trocar `setTutorialHighlight(selector?)` para resolver o alvo via `querySelector` e armazená-lo em estado (ex.: `tutorialHighlightTarget`), mostrando/ocultando o overlay conforme houver alvo.
-- [ ] Task 2.2: Criar `positionTutorialHighlight()` que, havendo alvo visível, lê `getBoundingClientRect()` e ajusta `top/left/width/height` do overlay (compensando o `outline-offset` para envolver o elemento); oculta o overlay se não houver alvo.
-- [ ] Task 2.3: Chamar `positionTutorialHighlight()` dentro de `updateTutorial()` (ou no render loop) para acompanhar scroll/resize/layout a cada frame.
-- [ ] Task 2.4: Garantir que `exitTutorial()` e a tela de conclusão (`renderTutorialStep` sem passo) limpam o alvo e ocultam o overlay.
+- [x] Task 2.1: Em `src/main.ts`, trocar `setTutorialHighlight(selector?)` para resolver o alvo via `querySelector` e armazená-lo em estado (ex.: `tutorialHighlightTarget`), mostrando/ocultando o overlay conforme houver alvo.
+- [x] Task 2.2: Criar `positionTutorialHighlight()` que, havendo alvo visível, lê `getBoundingClientRect()` e ajusta `top/left/width/height` do overlay (compensando o `outline-offset` para envolver o elemento); oculta o overlay se não houver alvo.
+- [x] Task 2.3: Chamar `positionTutorialHighlight()` dentro de `updateTutorial()` (ou no render loop) para acompanhar scroll/resize/layout a cada frame.
+- [x] Task 2.4: Garantir que `exitTutorial()` e a tela de conclusão (`renderTutorialStep` sem passo) limpam o alvo e ocultam o overlay.
 
 ### Verification
 
