@@ -36,15 +36,15 @@ grupo, com o CSS correspondente.
 
 ### Tasks
 
-- [ ] Task 2.1: Em `index.html`, adicionar `<button id="cmd-help" class="menu-item"
+- [x] Task 2.1: Em `index.html`, adicionar `<button id="cmd-help" class="menu-item"
       role="menuitem" data-i18n="menu.help">` como primeiro item (antes de Import).
-- [ ] Task 2.2: Em `index.html`, adicionar `<div class="menu-divider">` entre os grupos:
+- [x] Task 2.2: Em `index.html`, adicionar `<div class="menu-divider">` entre os grupos:
       após Help e após Clear DB (deixando About isolado no último grupo).
-- [ ] Task 2.3: Em `src/style.css`, adicionar a classe `.menu-divider` (linha fina).
+- [x] Task 2.3: Em `src/style.css`, adicionar a classe `.menu-divider` (linha fina).
 
 ### Verification
 
-- [ ] O menu exibe Help no topo e 3 grupos visualmente separados por linha fina.
+- [x] O menu exibe Help no topo e 3 grupos visualmente separados por linha fina.
 
 ## Phase 3: Modal de Help (markup + lógica)
 

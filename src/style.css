@@ -355,6 +355,13 @@ body {
   background: #3f4651;
 }
 
+/* Separador entre grupos do menu: linha fina. */
+.menu-divider {
+  height: 1px;
+  margin: 2px 4px;
+  background: #3a3f4a;
+}
+
 /* Item destacado (laranja) — Limpar banco, afordância temporária de dev. */
 .menu-item-danger {
   color: #1a1d23;
