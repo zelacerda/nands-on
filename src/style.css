@@ -302,12 +302,6 @@ body {
   justify-content: center;
   width: 44px;
   height: 44px;
-  /* Compensa o desalinhamento óptico do glifo "☰": o padding inferior sobe o
-     símbolo (~3px) dentro da centralização flex. */
-  padding-bottom: 6px;
-  font:
-    700 20px system-ui,
-    sans-serif;
   line-height: 1;
   color: #d8dee9;
   background: rgba(39, 43, 51, 0.9);
@@ -316,6 +310,11 @@ body {
   cursor: pointer;
   backdrop-filter: blur(4px);
   z-index: 17;
+}
+
+#menu-btn .icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 #menu-btn:hover {
@@ -355,6 +354,9 @@ body {
 }
 
 .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font:
     600 13px system-ui,
     sans-serif;
@@ -366,6 +368,11 @@ body {
   padding: 10px 12px;
   min-height: 40px;
   cursor: pointer;
+}
+
+.menu-item .icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .menu-item:hover {

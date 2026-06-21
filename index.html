@@ -53,20 +53,35 @@
       <button type="button" id="cancel-edit" data-i18n="editBar.cancel"></button>
     </div>
 
-    <!-- Menu de comandos (≡), no topo-direita. -->
-    <button type="button" id="menu-btn" data-i18n-attr="aria-label:a11y.menu">☰</button>
+    <!-- Menu de comandos (≡), no topo-direita. Ícone hamburger, só ícone. -->
+    <button
+      type="button"
+      id="menu-btn"
+      data-icon="hamburger"
+      data-i18n-attr="aria-label:a11y.menu"
+    ></button>
     <div id="commands-menu" hidden role="menu" aria-label="Commands">
       <div class="menu-title" data-i18n="menu.title"></div>
       <!-- Ajuda: resumo das principais funcionalidades, primeiro item do menu. -->
-      <button type="button" id="cmd-help" class="menu-item" role="menuitem" data-i18n="menu.help"></button>
+      <button type="button" id="cmd-help" class="menu-item" role="menuitem" data-icon="help">
+        <span class="menu-item-label" data-i18n="menu.help"></span>
+      </button>
       <div class="menu-divider" role="separator"></div>
       <!-- Import/Export: placeholders nesta track (sem serialização ainda). -->
-      <button type="button" id="cmd-import" class="menu-item" role="menuitem" data-i18n="menu.import"></button>
-      <button type="button" id="cmd-export" class="menu-item" role="menuitem" data-i18n="menu.export"></button>
+      <button type="button" id="cmd-import" class="menu-item" role="menuitem" data-icon="file-upload">
+        <span class="menu-item-label" data-i18n="menu.import"></span>
+      </button>
+      <button type="button" id="cmd-export" class="menu-item" role="menuitem" data-icon="file-download">
+        <span class="menu-item-label" data-i18n="menu.export"></span>
+      </button>
       <!-- Limpar banco: afordância temporária de desenvolvimento. -->
-      <button type="button" id="clear-db" class="menu-item" role="menuitem" data-i18n="clearDb"></button>
+      <button type="button" id="clear-db" class="menu-item" role="menuitem" data-icon="warning">
+        <span class="menu-item-label" data-i18n="clearDb"></span>
+      </button>
       <div class="menu-divider" role="separator"></div>
-      <button type="button" id="cmd-about" class="menu-item" role="menuitem" data-i18n="menu.about"></button>
+      <button type="button" id="cmd-about" class="menu-item" role="menuitem" data-icon="info">
+        <span class="menu-item-label" data-i18n="menu.about"></span>
+      </button>
     </div>
 
     <!-- Barra de ações contextual (inferior-centro): aparece com item selecionado. -->

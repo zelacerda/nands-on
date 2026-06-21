@@ -38,17 +38,17 @@ Migrar o botão ☰ e os itens do menu para ícones.
 
 ### Tasks
 
-- [ ] Task 2.1: Botão `#menu-btn` passa a exibir o ícone `hamburger-lg` (só ícone),
+- [x] Task 2.1: Botão `#menu-btn` passa a exibir o ícone `hamburger-lg` (só ícone),
       mantendo o `aria-label` via `data-i18n-attr`.
-- [ ] Task 2.2: Reestruturar os itens do menu (Help/Import/Export/Clear DB/About) com
+- [x] Task 2.2: Reestruturar os itens do menu (Help/Import/Export/Clear DB/About) com
       `<span>` de ícone + `<span data-i18n>` de rótulo; injetar os ícones (`help`,
       `file-upload`, `file-download`, `triangle-warning`, `info`).
-- [ ] Task 2.3: Remover o emoji ⚠️ do texto de `clearDb` em `src/strings.ts` (agora vem do
+- [x] Task 2.3: Remover o emoji ⚠️ do texto de `clearDb` em `src/strings.ts` (agora vem do
       ícone) e ajustar CSS dos itens para alinhar ícone + rótulo.
 
 ### Verification
 
-- [ ] Menu abre com ☰ em ícone e todos os itens com ícone + rótulo alinhados.
+- [x] Menu abre com ☰ em ícone e todos os itens com ícone + rótulo alinhados.
 
 ## Phase 3: Barra de ações (circular), barra de edição e Make
 
