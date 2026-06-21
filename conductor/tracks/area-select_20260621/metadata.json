@@ -1,0 +1,18 @@
+{
+  "id": "area-select_20260621",
+  "title": "Seleção por Área e Pan com Botão do Meio/Direito",
+  "type": "feature",
+  "status": "complete",
+  "created": "2026-06-21T00:00:00Z",
+  "updated": "2026-06-21T00:00:00Z",
+  "current_phase": 4,
+  "current_task": "4.3",
+  "phases": {
+    "total": 4,
+    "completed": 4
+  },
+  "tasks": {
+    "total": 14,
+    "completed": 14
+  }
+}

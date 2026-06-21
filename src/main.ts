@@ -1,6 +1,6 @@
 import './style.css';
 import { Camera, type Vec2 } from './camera';
-import { drawGrid, snapNodePos, snapScalar } from './grid';
+import { drawGrid, snapNodePos, snapScalar, snapToGrid } from './grid';
 import {
   NODE_SIZE,
   type ChipDefinition,
@@ -21,10 +21,12 @@ import { applyStrings, t } from './strings';
 import {
   drawCircuit,
   drawGhostWire,
+  drawMarquee,
   drawNode,
   drawNodeHighlight,
   drawWireHighlight,
 } from './render';
+import { nodesInRect, rectFromCorners } from './marquee';
 import { hitNode, hitPin, hitWire, hitWireBar } from './hittest';
 import { wirePath } from './wire';
 import { type ChipResolver, type SignalState } from './simulator';
@@ -73,18 +75,29 @@ function resize(): void {
 
 // --- Estado de interação -------------------------------------------------
 
-type Mode = 'idle' | 'pan' | 'dragNode' | 'wire' | 'pinch' | 'dragWaypoint';
-type Selection = { kind: 'node' | 'wire'; id: string } | null;
+type Mode = 'idle' | 'pan' | 'dragNode' | 'wire' | 'pinch' | 'dragWaypoint' | 'marquee';
 
 let mode: Mode = 'idle';
-let selection: Selection = null;
+/**
+ * Nós selecionados (multi-seleção via retângulo ou clique). Mutuamente exclusiva
+ * com {@link selectedWire}: selecionar nós limpa o fio e vice-versa.
+ */
+const selectedNodes = new Set<string>();
+/** Fio selecionado (seleção única), ou `null`. */
+let selectedWire: string | null = null;
 
 /** Ponteiros ativos (id → posição de tela), para pan e pinça. */
 const pointers = new Map<number, Vec2>();
 
 let lastPointer: Vec2 = { x: 0, y: 0 }; // tela (ponteiro único)
 let dragNodeId: string | null = null;
-let dragOffset: Vec2 = { x: 0, y: 0 }; // mundo: ponteiro − pos do nó
+/** Posição inicial (mundo) do ponteiro ao começar a arrastar um grupo de nós. */
+let groupDragStart: Vec2 = { x: 0, y: 0 };
+/** Posições iniciais (mundo) dos nós do grupo em arraste, por id. */
+let groupStartPos = new Map<string, Vec2>();
+/** Cantos (mundo) do retângulo de seleção enquanto `mode === 'marquee'`. */
+let marqueeStart: Vec2 = { x: 0, y: 0 };
+let marqueeEnd: Vec2 = { x: 0, y: 0 };
 let wireStart: PinRef | null = null;
 let ghostEnd: Vec2 = { x: 0, y: 0 }; // mundo
 let ghostValid = false;
@@ -142,16 +155,18 @@ function updateActionBar(): void {
     actionBar.hidden = false;
     return;
   }
-  if (selection?.kind === 'node') {
-    const node = store.getNode(selection.id);
-    const isIo = !!node && (node.type === 'input' || node.type === 'output');
+  if (selectedNodes.size > 0) {
+    // "Rename" só faz sentido para um único nó de I/O; com vários selecionados
+    // (ou um nó que não seja I/O) o botão fica oculto.
+    const single = selectedNodes.size === 1 ? store.getNode(firstSelectedNode()!) : undefined;
+    const isIo = !!single && (single.type === 'input' || single.type === 'output');
     actionEditBtn.hidden = true;
     actionRenameBtn.hidden = !isIo;
     actionDeleteBtn.hidden = false;
     actionBar.hidden = false;
     return;
   }
-  if (selection?.kind === 'wire') {
+  if (selectedWire) {
     actionEditBtn.hidden = true;
     actionRenameBtn.hidden = true;
     actionDeleteBtn.hidden = false;
@@ -161,22 +176,71 @@ function updateActionBar(): void {
   actionBar.hidden = true;
 }
 
-function setSelection(next: Selection): void {
-  selection = next;
-  // Seleção no canvas e na paleta são mutuamente exclusivas: selecionar no canvas
-  // limpa o foco de chip na paleta.
-  if (next) {
-    selectedChipDef = null;
-    palette.querySelectorAll('button.chip-btn.selected').forEach((b) => b.classList.remove('selected'));
-  }
+/** Conta os elementos selecionados (nós + eventual fio). */
+function selectionCount(): number {
+  return selectedNodes.size + (selectedWire ? 1 : 0);
+}
+
+/** Primeiro id do conjunto de nós selecionados, ou `null` se vazio. */
+function firstSelectedNode(): string | null {
+  for (const id of selectedNodes) return id;
+  return null;
+}
+
+/**
+ * Seleção no canvas e na paleta são mutuamente exclusivas: ao selecionar algo no
+ * canvas, limpa o foco de chip na paleta.
+ */
+function clearPaletteFocusForCanvas(): void {
+  selectedChipDef = null;
+  palette.querySelectorAll('button.chip-btn.selected').forEach((b) => b.classList.remove('selected'));
+}
+
+/** Limpa toda a seleção do canvas (nós e fio). */
+function clearSelection(): void {
+  selectedNodes.clear();
+  selectedWire = null;
   updateActionBar();
 }
 
+/** Define a seleção como um único nó (limpa fio e demais nós). */
+function selectSingleNode(id: string): void {
+  selectedNodes.clear();
+  selectedNodes.add(id);
+  selectedWire = null;
+  clearPaletteFocusForCanvas();
+  updateActionBar();
+}
+
+/** Define o conjunto de nós selecionados (limpa fio). */
+function selectNodeSet(ids: Iterable<string>): void {
+  selectedNodes.clear();
+  for (const id of ids) selectedNodes.add(id);
+  selectedWire = null;
+  if (selectedNodes.size > 0) clearPaletteFocusForCanvas();
+  updateActionBar();
+}
+
+/** Define a seleção como um único fio (limpa os nós). */
+function selectWire(id: string): void {
+  selectedNodes.clear();
+  selectedWire = id;
+  clearPaletteFocusForCanvas();
+  updateActionBar();
+}
+
+/** Remove todos os elementos selecionados (nós em grupo ou o fio). */
 function deleteSelection(): void {
-  if (!selection) return;
-  if (selection.kind === 'node') store.removeNode(selection.id);
-  else store.removeWire(selection.id);
-  setSelection(null);
+  if (selectedNodes.size > 0) {
+    // Remover um nó já apaga em cascata os fios conectados (store.removeNode).
+    for (const id of selectedNodes) store.removeNode(id);
+    clearSelection();
+    return;
+  }
+  if (selectedWire) {
+    store.removeWire(selectedWire);
+    clearSelection();
+  }
 }
 
 // --- Paleta --------------------------------------------------------------
@@ -336,7 +400,7 @@ let selectedChipDef: ChipDefinition | null = null;
 
 /** Marca o botão `btn` como o chip selecionado; limpa os demais e a seleção do canvas. */
 function selectChip(def: ChipDefinition, btn: HTMLElement): void {
-  setSelection(null); // canvas e paleta são mutuamente exclusivos
+  clearSelection(); // canvas e paleta são mutuamente exclusivos
   selectedChipDef = def;
   palette.querySelectorAll('button.chip-btn.selected').forEach((b) => b.classList.remove('selected'));
   btn.classList.add('selected');
@@ -432,7 +496,7 @@ makeBtn.addEventListener('click', () => {
   // Esvazia o espaço de trabalho: o conteúdo virou a definição do chip (na paleta).
   // Nenhuma instância é recriada — o usuário arrasta o chip da paleta quando quiser.
   store.clear();
-  setSelection(null);
+  clearSelection();
   // Abre a edição in-place do nome no botão recém-criado, para o usuário nomeá-lo.
   const btn = palette.querySelector<HTMLButtonElement>(`button.chip-btn[data-chip-id="${def.id}"]`);
   if (btn) openChipNameEdit(def, btn);
@@ -456,7 +520,7 @@ function openChipForEdit(def: ChipDefinition): void {
   if (editing) return;
   editing = { defId: def.id, name: def.name, snapshot: structuredClone(store.toJSON()) };
   store.loadState(def.internal);
-  setSelection(null);
+  clearSelection();
   clearChipSelection();
   editLabel.textContent = t('editBar.editing', { name: def.name });
   editBar.hidden = false;
@@ -468,7 +532,7 @@ function exitEdit(): void {
   store.loadState(editing.snapshot);
   editing = null;
   editBar.hidden = true;
-  setSelection(null);
+  clearSelection();
 }
 
 /**
@@ -516,8 +580,8 @@ actionRenameBtn.addEventListener('click', () => {
     if (btn) openChipNameEdit(selectedChipDef, btn);
     return;
   }
-  if (selection?.kind === 'node') {
-    const node = store.getNode(selection.id);
+  if (selectedNodes.size === 1) {
+    const node = store.getNode(firstSelectedNode()!);
     if (node && (node.type === 'input' || node.type === 'output')) openRenameOverlay(node);
   }
 });
@@ -639,6 +703,25 @@ function updatePinch(): void {
   pinchPrev = curr;
 }
 
+/**
+ * Prepara o arraste em grupo: registra a posição inicial (mundo) do ponteiro e
+ * de cada nó selecionado, além do caso (Z/S) dos fios conectados a qualquer nó
+ * do grupo (para resetar o ajuste manual da barra se o caminho inverter).
+ */
+function beginGroupDrag(world: Vec2): void {
+  groupDragStart = world;
+  groupStartPos = new Map();
+  dragNodeWireShapes = new Map();
+  for (const id of selectedNodes) {
+    const n = store.getNode(id);
+    if (n) groupStartPos.set(id, { x: n.pos.x, y: n.pos.y });
+    for (const w of wiresOfNode(id)) {
+      const s = wireShape(w);
+      if (s) dragNodeWireShapes.set(w.id, s);
+    }
+  }
+}
+
 // --- Ponteiro: decide o modo a partir do que foi atingido ----------------
 
 canvas.addEventListener('pointerdown', (e) => {
@@ -647,14 +730,22 @@ canvas.addEventListener('pointerdown', (e) => {
   canvas.setPointerCapture(e.pointerId);
   // Interagir com o canvas tira o foco do chip selecionado na paleta.
   clearChipSelection();
+  lastPointer = screen;
 
   if (pointers.size >= 2) {
     beginPinch();
     return;
   }
 
+  // Pan com o botão do meio (1) ou direito (2) do mouse: não interage com
+  // elementos nem altera a seleção. O toque continua usando dois dedos (pinça).
+  if (e.pointerType !== 'touch' && (e.button === 1 || e.button === 2)) {
+    e.preventDefault(); // suprime o auto-scroll do botão do meio
+    mode = 'pan';
+    return;
+  }
+
   const world = camera.screenToWorld(screen);
-  lastPointer = screen;
   const tol = worldTol(hitPx(e.pointerType));
 
   const pin = hitPin(store, world, tol);
@@ -671,18 +762,15 @@ canvas.addEventListener('pointerdown', (e) => {
     mode = 'dragNode';
     dragNodeId = nodeId;
     const node = store.getNode(nodeId)!;
-    dragOffset = { x: world.x - node.pos.x, y: world.y - node.pos.y };
-    // Captura o caso (Z/S) dos fios conectados, para resetar o ajuste se inverter.
-    dragNodeWireShapes = new Map();
-    for (const w of wiresOfNode(nodeId)) {
-      const s = wireShape(w);
-      if (s) dragNodeWireShapes.set(w.id, s);
-    }
-    // Clicar num input já selecionado (sem arrastar) alterna seu estado; clicar
-    // num input ainda não selecionado apenas o seleciona (comportamento atual).
-    const wasSelected = selection?.kind === 'node' && selection.id === nodeId;
-    toggleCandidateId = wasSelected && node.type === 'input' ? nodeId : null;
-    setSelection({ kind: 'node', id: nodeId });
+    const wasSelected = selectedNodes.has(nodeId);
+    // Toque simples sobre um input previamente selecionado *sozinho* alterna seu
+    // estado; não se aplica quando ele faz parte de uma multi-seleção.
+    toggleCandidateId =
+      wasSelected && selectedNodes.size === 1 && node.type === 'input' ? nodeId : null;
+    // Arrastar um nó que já pertence à seleção move o grupo inteiro; arrastar um
+    // nó fora da seleção primeiro o torna a seleção única.
+    if (!wasSelected) selectSingleNode(nodeId);
+    beginGroupDrag(world);
     return;
   }
 
@@ -691,19 +779,23 @@ canvas.addEventListener('pointerdown', (e) => {
   if (bar) {
     dragBar = bar;
     mode = 'dragWaypoint';
-    setSelection({ kind: 'wire', id: bar.wireId });
+    selectWire(bar.wireId);
     return;
   }
 
   const wireId = hitWire(store, world, worldTol(hitPx(e.pointerType)));
   if (wireId) {
-    setSelection({ kind: 'wire', id: wireId });
+    selectWire(wireId);
     mode = 'idle';
     return;
   }
 
-  setSelection(null);
-  mode = 'pan';
+  // Área vazia (botão esquerdo do mouse ou um dedo): inicia o retângulo de
+  // seleção. A seleção só é definida ao soltar; um clique sem arrasto a limpa.
+  clearSelection();
+  marqueeStart = world;
+  marqueeEnd = world;
+  mode = 'marquee';
 });
 
 /** Caso (Z/S) atual de um fio, ou `null` se algum pino sumiu. */
@@ -726,7 +818,9 @@ function updateHoverCursor(world: Vec2): void {
   else {
     const bar = hitWireBar(store, world, worldTol(8));
     if (bar) canvas!.style.cursor = bar.axis === 'x' ? 'ew-resize' : 'ns-resize';
-    else canvas!.style.cursor = 'grab';
+    // Área vazia: arraste com o botão esquerdo desenha o retângulo de seleção
+    // (o pan ficou no botão do meio/direito), então o cursor padrão é a seta.
+    else canvas!.style.cursor = 'default';
   }
 }
 
@@ -744,24 +838,29 @@ canvas.addEventListener('pointermove', (e) => {
     camera.panBy(screen.x - lastPointer.x, screen.y - lastPointer.y);
     lastPointer = screen;
   } else if (mode === 'dragNode' && dragNodeId) {
-    const node = store.getNode(dragNodeId);
-    if (node) {
-      node.pos.x = world.x - dragOffset.x;
-      node.pos.y = world.y - dragOffset.y;
-      const snapped = snapNodePos(node);
-      node.pos.x = snapped.x;
-      node.pos.y = snapped.y;
-      // Se um fio conectado inverteu de caso (Z↔S), reseta seu ajuste manual.
-      for (const [wid, oldShape] of dragNodeWireShapes) {
-        const w = store.listWires().find((x) => x.id === wid);
-        if (!w) continue;
-        const cur = wireShape(w);
-        if (cur && cur !== oldShape) {
-          w.barOffset = undefined;
-          dragNodeWireShapes.set(wid, cur);
-        }
+    // Translação rígida do grupo: o delta do ponteiro é snapado à grade e somado
+    // à posição inicial de cada nó. Como os nós já estavam alinhados, o grupo
+    // permanece no grid e suas posições relativas são preservadas.
+    const delta = snapToGrid({ x: world.x - groupDragStart.x, y: world.y - groupDragStart.y });
+    for (const [id, start] of groupStartPos) {
+      const node = store.getNode(id);
+      if (!node) continue;
+      node.pos.x = start.x + delta.x;
+      node.pos.y = start.y + delta.y;
+    }
+    // Se um fio conectado a qualquer nó do grupo inverteu de caso (Z↔S), reseta
+    // seu ajuste manual de barra.
+    for (const [wid, oldShape] of dragNodeWireShapes) {
+      const w = store.listWires().find((x) => x.id === wid);
+      if (!w) continue;
+      const cur = wireShape(w);
+      if (cur && cur !== oldShape) {
+        w.barOffset = undefined;
+        dragNodeWireShapes.set(wid, cur);
       }
     }
+  } else if (mode === 'marquee') {
+    marqueeEnd = world;
   } else if (mode === 'dragWaypoint' && dragBar) {
     const w = store.listWires().find((x) => x.id === dragBar!.wireId);
     const from = w && store.pinPos(w.from);
@@ -801,15 +900,23 @@ function endPointer(e: PointerEvent): void {
     const up = pointerScreen(e);
     // Só conta como toque (não arrasto) se o ponteiro mal se moveu.
     if (isDrag(lastPointer, up)) {
-      // Soltou um componente após reposicioná-lo (já snapado à grade): toca o
-      // clique e tira a seleção, deixando o componente "assentado" no grid.
       playDrop();
-      setSelection(null);
+      // Mover um nó único "assenta" e limpa a seleção (comportamento atual);
+      // mover um grupo preserva a seleção para ações subsequentes (mover de novo,
+      // excluir em conjunto).
+      if (selectedNodes.size <= 1) clearSelection();
     } else if (toggleCandidateId) {
       // Toque simples sobre um input já selecionado avança seu estado no ciclo
       // (OFF → ON → CLK → OFF). Renomear agora é feito pela barra de ações.
       store.cycleInputState(toggleCandidateId);
     }
+  } else if (mode === 'marquee') {
+    const up = pointerScreen(e);
+    if (isDrag(lastPointer, up)) {
+      // Arraste real: seleciona os nós contidos no retângulo.
+      selectNodeSet(nodesInRect(store.listNodes(), rectFromCorners(marqueeStart, marqueeEnd)));
+    }
+    // Clique sem arrasto em área vazia já limpou a seleção no pointerdown.
   }
 
   pointers.delete(e.pointerId);
@@ -851,7 +958,7 @@ window.addEventListener('keydown', (e) => {
   // edita o texto — não deve excluir o nó/fio selecionado.
   const target = e.target as HTMLElement | null;
   if (target && (target.tagName === 'INPUT' || target.isContentEditable)) return;
-  if ((e.key === 'Delete' || e.key === 'Backspace') && selection) {
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectionCount() > 0) {
     e.preventDefault();
     deleteSelection();
   }
@@ -895,10 +1002,10 @@ function render(): void {
 
   drawGrid(ctx!, camera, viewWidth, viewHeight);
 
-  // Realce do nó selecionado é desenhado antes do circuito, para que os
+  // Realce dos nós selecionados é desenhado antes do circuito, para que os
   // conectores (pinos) e o corpo fiquem por cima da borda de seleção.
-  if (selection?.kind === 'node') {
-    const node = store.getNode(selection.id);
+  for (const id of selectedNodes) {
+    const node = store.getNode(id);
     if (node) drawNodeHighlight(ctx!, camera, node);
   }
 
@@ -916,11 +1023,16 @@ function render(): void {
   }
 
   // Realce de fio selecionado fica por cima do circuito.
-  if (selection?.kind === 'wire') {
-    const wire = store.listWires().find((w) => w.id === selection!.id);
+  if (selectedWire) {
+    const wire = store.listWires().find((w) => w.id === selectedWire);
     const from = wire && store.pinPos(wire.from);
     const to = wire && store.pinPos(wire.to);
     if (from && to) drawWireHighlight(ctx!, camera, from, to, wire!.barOffset);
+  }
+
+  // Retângulo de seleção durante o arraste em área vazia.
+  if (mode === 'marquee') {
+    drawMarquee(ctx!, camera, marqueeStart, marqueeEnd);
   }
 
   // Ghost do componente sendo arrastado da paleta para o canvas.
@@ -1073,7 +1185,7 @@ function startTutorial(): void {
   // Começa de um espaço limpo, para os predicados refletirem só o que o usuário
   // fizer durante o tutorial.
   store.clear();
-  setSelection(null);
+  clearSelection();
   tutorialState = { active: true, index: 0 };
   tutorialStepStart = captureStepStart(store.listNodes(), library.list().length);
   renderTutorialStep();
