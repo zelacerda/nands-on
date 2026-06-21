@@ -30,6 +30,19 @@ revisão por terceiros.
 track completo, não a cada fase ou tarefa. Durante o desenvolvimento, o progresso flui sem
 checkpoints obrigatórios intermediários.
 
+### Como conduzir a verificação manual
+
+A verificação visual/interativa é feita **pelo usuário**, não pelo agente. Ao chegar na
+fase de teste de um track:
+
+1. **Suba o dev server** (`npm run dev`, em background) e informe a URL local.
+2. **Não tente dirigir o navegador sozinho** — a extensão do Chrome (Claude in Chrome)
+   **não está disponível** neste ambiente. Não use as ferramentas `mcp__claude-in-chrome__*`.
+3. **Oriente o usuário** com um roteiro de testes manuais claro: o que abrir, quais passos
+   executar e qual o comportamento esperado para cada critério de aceitação do `spec.md`.
+4. Mantenha o dev server rodando até o usuário concluir a verificação (salvo pedido em
+   contrário).
+
 ## Ciclo de Vida da Tarefa
 
 1. **Pendente** — tarefa definida no plano do track.
