@@ -19,6 +19,7 @@ import { ChipLibrary, captureDefinition, reconcileInstances, validateChipName } 
 import { clearChips, loadChips, saveChips } from './persistence';
 import { applyStrings, t } from './strings';
 import { applyIcons } from './icons';
+import { NAND_KEY, loadPaletteOrder, reconcileOrder, savePaletteOrder } from './paletteOrder';
 import {
   drawCircuit,
   drawGhostWire,
@@ -254,8 +255,15 @@ const library = new ChipLibrary();
 library.onMutate = (defs) => void saveChips(defs);
 const palette = document.querySelector<HTMLElement>('#palette')!;
 const paletteList = document.querySelector<HTMLDivElement>('#palette-list')!;
+const nandBtn = paletteList.querySelector<HTMLButtonElement>('button[data-add="nand"]')!;
 const scrollUpBtn = document.querySelector<HTMLButtonElement>('#palette-scroll-up')!;
 const scrollDownBtn = document.querySelector<HTMLButtonElement>('#palette-scroll-down')!;
+
+/**
+ * Ordem de exibição dos itens reordenáveis da paleta (NAND + ids de chips).
+ * Carregada de `localStorage` e reconciliada com a biblioteca a cada render.
+ */
+let paletteOrder: string[] = loadPaletteOrder();
 
 /** Passo de rolagem (px) ao tocar os controles ▲/▼ da barra de componentes. */
 const PALETTE_SCROLL_STEP = 100;
@@ -439,20 +447,44 @@ function openChipNameEdit(def: ChipDefinition, btn: HTMLElement): void {
   });
 }
 
-/** Reconstrói os botões de chip na paleta a partir da biblioteca. */
+/** Cria o botão de um chip na paleta (arrasto-para-criar + seleção no toque). */
+function createChipButton(def: ChipDefinition): HTMLButtonElement {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'chip-btn';
+  btn.dataset.chipId = def.id;
+  btn.textContent = def.name;
+  // Clique/toque simples seleciona o chip (revela a barra de ações); o arrasto
+  // pelo corpo cria uma instância no canvas.
+  attachPaletteDrag(btn, { kind: 'chip', def }, () => selectChip(def, btn));
+  return btn;
+}
+
+/**
+ * Reconstrói a lista da paleta (NAND + chips) na ordem persistida. A ordem é
+ * reconciliada com a biblioteca a cada render — chips novos entram no fim e os
+ * removidos saem — e re-salva, mantendo `localStorage` em dia sem hooks extras.
+ */
 function refreshPalette(): void {
   paletteList.querySelectorAll('button.chip-btn').forEach((b) => b.remove());
   clearChipSelection();
-  for (const def of library.list()) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'chip-btn';
-    btn.dataset.chipId = def.id;
-    btn.textContent = def.name;
-    // Clique/toque simples seleciona o chip (revela a barra de ações); o arrasto
-    // cria uma instância no canvas.
-    attachPaletteDrag(btn, { kind: 'chip', def }, () => selectChip(def, btn));
-    paletteList.appendChild(btn);
+
+  const defs = library.list();
+  paletteOrder = reconcileOrder(
+    paletteOrder,
+    defs.map((d) => d.id),
+  );
+  savePaletteOrder(paletteOrder);
+
+  const defById = new Map(defs.map((d) => [d.id, d]));
+  // `appendChild` move o NAND (elemento existente) e insere os chips na ordem.
+  for (const key of paletteOrder) {
+    if (key === NAND_KEY) {
+      paletteList.appendChild(nandBtn);
+    } else {
+      const def = defById.get(key);
+      if (def) paletteList.appendChild(createChipButton(def));
+    }
   }
   updatePaletteScroll();
 }

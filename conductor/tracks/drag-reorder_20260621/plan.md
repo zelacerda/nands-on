@@ -38,15 +38,16 @@ Aplicar a ordem persistida ao montar a lista.
 
 ### Tasks
 
-- [ ] Task 2.1: `refreshPalette()` passa a renderizar NAND + chips conforme a
+- [x] Task 2.1: `refreshPalette()` passa a renderizar NAND + chips conforme a
       `paletteOrder` reconciliada (carregada no boot), em vez da ordem crua de
       `library.list()`.
-- [ ] Task 2.2: Sincronizar mutações: ao criar/remover chip, atualizar e persistir a
+- [x] Task 2.2: Sincronizar mutações: ao criar/remover chip, atualizar e persistir a
       `paletteOrder` de forma consistente com o fluxo `onMutate`/`saveChips` existente.
+      (Reconciliação + save embutidos no `refreshPalette`, chamado após cada mutação.)
 
 ### Verification
 
-- [ ] Chips e NAND aparecem na ordem persistida; criar/remover chip mantém a lista coerente.
+- [x] Chips e NAND aparecem na ordem persistida; criar/remover chip mantém a lista coerente.
 
 ## Phase 3: Alça e mecânica de arrasto
 
