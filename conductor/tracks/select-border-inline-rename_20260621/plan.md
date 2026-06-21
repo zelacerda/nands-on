@@ -26,12 +26,12 @@ com a borda do botão.
 
 ### Tasks
 
-- [ ] Task 1.1: Em `src/style.css` (regra `#palette button.chip-btn.selected`,
+- [x] Task 1.1: Em `src/style.css` (regra `#palette button.chip-btn.selected`,
       linhas ~177-181), substituir o `box-shadow` translúcido difuso por um
       indicador laranja sólido alinhado à aresta do botão (ex.: `box-shadow:
       0 0 0 2px #e0af68` nítido, ou `outline`/`border` equivalente), mantendo o
       `border-radius` do botão e sem encolher visualmente o contorno.
-- [ ] Task 1.2: Garantir que o estado selecionado não cause deslocamento de
+- [x] Task 1.2: Garantir que o estado selecionado não cause deslocamento de
       layout (usar `box-shadow`/`outline`, que não afetam o fluxo; se mexer na
       espessura de `border`, compensar para não empurrar vizinhos).
 
