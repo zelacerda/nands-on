@@ -3,7 +3,7 @@
 **Track ID:** svg-icons_20260621
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-21
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -89,10 +89,10 @@ Aplicar ícone nos botões dos modais e creditar os autores no About.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação do spec atendidos.
-- [ ] `npm run build`, typecheck e lint passando.
-- [ ] `npm run dev` rodando; roteiro de teste manual executado pelo usuário.
-- [ ] Pronto para revisão/commit (Conventional Commits).
+- [x] Todos os critérios de aceitação do spec atendidos.
+- [x] `npm run build`, typecheck e lint passando (154 testes ok).
+- [x] `npm run dev` rodando; roteiro de teste manual executado pelo usuário.
+- [x] Pronto para revisão/commit (Conventional Commits).
 
 ---
 
