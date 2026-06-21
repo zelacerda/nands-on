@@ -3,7 +3,7 @@
 **Track ID:** select-border-inline-rename_20260621
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-21
-**Status:** [ ] Pending
+**Status:** [x] Complete
 
 ## Overview
 
@@ -87,10 +87,10 @@ Fazer o editor de nome do nó de I/O aparecer sobre o próprio nó no canvas.
 
 ### Tasks
 
-- [ ] Task 4.1: Rodar build/typecheck e revisar o próprio diff.
-- [ ] Task 4.2: Subir o dev server (`npm run dev`) e fornecer roteiro de teste
-      manual cobrindo AC1–AC6 do `spec.md`.
+- [x] Task 4.1: Rodar build/typecheck e revisar o próprio diff.
+- [x] Task 4.2: Subir o dev server (`npm run dev`) e fornecer roteiro de teste
+      manual cobrindo AC1–AC6 do `spec.md`. → verificação manual aprovada.
 
 ### Verification
 
-- [ ] Todos os critérios de aceitação (AC1–AC6) validados manualmente pelo usuário.
+- [x] Todos os critérios de aceitação (AC1–AC6) validados manualmente pelo usuário.

@@ -2,18 +2,18 @@
   "id": "select-border-inline-rename_20260621",
   "title": "Borda de Seleção Alinhada e Renomeação In-Place",
   "type": "improvement",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-06-21T00:00:00Z",
   "updated": "2026-06-21T00:00:00Z",
-  "current_phase": 1,
-  "current_task": "1.1",
+  "current_phase": 4,
+  "current_task": "4.2",
   "phases": {
     "total": 4,
-    "completed": 0
+    "completed": 4
   },
   "tasks": {
     "total": 9,
-    "completed": 0
+    "completed": 9
   },
   "commits": []
 }
