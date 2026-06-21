@@ -441,6 +441,33 @@ export function drawWireHighlight(
 }
 
 /**
+ * Desenha o retângulo de seleção (marquee) durante o arraste, dados dois cantos
+ * em coordenadas de mundo. Preenchimento translúcido com borda tracejada, na cor
+ * de seleção.
+ */
+export function drawMarquee(
+  ctx: CanvasRenderingContext2D,
+  cam: Camera,
+  cornerA: Vec2,
+  cornerB: Vec2,
+): void {
+  const a = cam.worldToScreen(cornerA);
+  const b = cam.worldToScreen(cornerB);
+  const x = Math.min(a.x, b.x);
+  const y = Math.min(a.y, b.y);
+  const w = Math.abs(a.x - b.x);
+  const h = Math.abs(a.y - b.y);
+  ctx.save();
+  ctx.fillStyle = 'rgba(122, 162, 247, 0.12)';
+  ctx.strokeStyle = COLOR_SELECT;
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 3]);
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeRect(x, y, w, h);
+  ctx.restore();
+}
+
+/**
  * Desenha o "fio fantasma" durante o arrasto de criação de conexão, já com o
  * traçado ortogonal padrão. `from`/`to` em mundo; `valid` controla a cor
  * (verde válido / vermelho inválido).
