@@ -45,7 +45,7 @@ export const STRINGS = {
   'palette.output': 'OUT',
 
   // Menu de comandos (≡)
-  'menu.title': 'COMMANDS',
+  'menu.title': 'MENU',
   'menu.help': 'Help',
   'menu.import': 'Import',
   'menu.export': 'Export',
