@@ -21,6 +21,6 @@
 | [x] | orthogonal-wires_20260614 | Roteamento Ortogonal de Fios | 2026-06-14 | 2026-06-14 |
 | [x] | ui-redesign_20260614 | Reorganização da UI do Editor | 2026-06-14 | 2026-06-14 |
 | [x] | area-select_20260621 | Seleção por Área e Pan com Botão do Meio/Direito | 2026-06-21 | 2026-06-21 |
-| [~] | tutorial-highlight-clip_20260621 | Corrigir Highlight Recortado no Tutorial | 2026-06-21 | 2026-06-21 |
+| [x] | tutorial-highlight-clip_20260621 | Corrigir Highlight Recortado no Tutorial | 2026-06-21 | 2026-06-21 |
 
 <!-- Tracks registrados por /conductor:new-track -->

@@ -31,7 +31,7 @@ Hub de navegação para o contexto do projeto.
 - [Roteamento Ortogonal de Fios](./tracks/orthogonal-wires_20260614/index.md) — `orthogonal-wires_20260614` (complete)
 - [Reorganização da UI do Editor](./tracks/ui-redesign_20260614/index.md) — `ui-redesign_20260614` (complete)
 - [Seleção por Área e Pan com Botão do Meio/Direito](./tracks/area-select_20260621/index.md) — `area-select_20260621` (complete)
-- [Corrigir Highlight Recortado no Tutorial](./tracks/tutorial-highlight-clip_20260621/index.md) — `tutorial-highlight-clip_20260621` (pending)
+- [Corrigir Highlight Recortado no Tutorial](./tracks/tutorial-highlight-clip_20260621/index.md) — `tutorial-highlight-clip_20260621` (complete)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
