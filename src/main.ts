@@ -19,7 +19,13 @@ import { ChipLibrary, captureDefinition, reconcileInstances, validateChipName } 
 import { clearChips, loadChips, saveChips } from './persistence';
 import { applyStrings, t } from './strings';
 import { applyIcons } from './icons';
-import { NAND_KEY, loadPaletteOrder, reconcileOrder, savePaletteOrder } from './paletteOrder';
+import {
+  NAND_KEY,
+  loadPaletteOrder,
+  moveItem,
+  reconcileOrder,
+  savePaletteOrder,
+} from './paletteOrder';
 import {
   drawCircuit,
   drawGhostWire,
@@ -404,6 +410,89 @@ function attachPaletteDrag(btn: HTMLElement, item: PaletteItem, onTap?: () => vo
   });
 }
 
+// --- Reordenação da paleta por arrastar (alça) ---------------------------
+
+/** Estado do arrasto de reordenação em andamento, ou `null`. */
+let paletteReorder: {
+  pointerId: number;
+  fromIndex: number;
+  /** Ordem no início do arrasto; cada movimento recalcula a partir dela. */
+  base: string[];
+  btn: HTMLElement;
+} | null = null;
+
+/** Botões reordenáveis (NAND + chips) na ordem atual do DOM. */
+function reorderableButtons(): HTMLElement[] {
+  return [...paletteList.querySelectorAll<HTMLElement>(':scope > button')];
+}
+
+/** Chave de ordem de um botão da paleta (NAND_KEY ou id do chip). */
+function buttonKey(btn: HTMLElement): string {
+  return btn.dataset.add === 'nand' ? NAND_KEY : btn.dataset.chipId!;
+}
+
+/** Reordena os botões existentes no DOM para refletir `keys` (sem recriá-los). */
+function applyDomOrder(keys: readonly string[]): void {
+  const byKey = new Map(reorderableButtons().map((b) => [buttonKey(b), b] as const));
+  for (const key of keys) {
+    const btn = byKey.get(key);
+    if (btn) paletteList.appendChild(btn);
+  }
+}
+
+/**
+ * Índice de destino do item arrastado conforme a posição vertical do ponteiro:
+ * conta quantos outros itens têm o centro acima do ponteiro.
+ */
+function reorderTargetIndex(clientY: number, dragging: HTMLElement): number {
+  let index = 0;
+  for (const btn of reorderableButtons()) {
+    if (btn === dragging) continue;
+    const rect = btn.getBoundingClientRect();
+    if (clientY > rect.top + rect.height / 2) index++;
+  }
+  return index;
+}
+
+/**
+ * Liga a alça de um item da paleta ao arrasto de reordenação. O gesto na alça é
+ * isolado (`stopPropagation`) para não acionar o arrasto-para-criar do corpo.
+ */
+function attachReorderDrag(handle: HTMLElement, btn: HTMLElement): void {
+  handle.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (paletteReorder) return;
+    const base = [...paletteOrder];
+    paletteReorder = { pointerId: e.pointerId, fromIndex: base.indexOf(buttonKey(btn)), base, btn };
+    handle.setPointerCapture(e.pointerId);
+    btn.classList.add('reordering');
+  });
+  handle.addEventListener('pointermove', (e) => {
+    if (paletteReorder?.pointerId !== e.pointerId) return;
+    const target = reorderTargetIndex(e.clientY, btn);
+    applyDomOrder(moveItem(paletteReorder.base, paletteReorder.fromIndex, target));
+  });
+  const finish = (e: PointerEvent, commit: boolean): void => {
+    if (paletteReorder?.pointerId !== e.pointerId) return;
+    if (handle.hasPointerCapture(e.pointerId)) handle.releasePointerCapture(e.pointerId);
+    btn.classList.remove('reordering');
+    paletteReorder = null;
+    if (commit) {
+      // A nova ordem é lida da disposição atual do DOM e persistida.
+      paletteOrder = reorderableButtons().map(buttonKey);
+      savePaletteOrder(paletteOrder);
+    } else {
+      applyDomOrder(paletteOrder); // cancela: restaura a ordem persistida
+    }
+  };
+  handle.addEventListener('pointerup', (e) => {
+    e.stopPropagation();
+    finish(e, true);
+  });
+  handle.addEventListener('pointercancel', (e) => finish(e, false));
+}
+
 // --- Seleção e edição de chip na paleta ----------------------------------
 
 /** Definição do chip selecionado na paleta, ou `null`. */
@@ -447,13 +536,26 @@ function openChipNameEdit(def: ChipDefinition, btn: HTMLElement): void {
   });
 }
 
-/** Cria o botão de um chip na paleta (arrasto-para-criar + seleção no toque). */
+/** Cria o botão de um chip na paleta (alça de reordenar + arrasto-para-criar + seleção). */
 function createChipButton(def: ChipDefinition): HTMLButtonElement {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'chip-btn';
   btn.dataset.chipId = def.id;
-  btn.textContent = def.name;
+
+  const handle = document.createElement('span');
+  handle.className = 'drag-handle';
+  handle.dataset.icon = 'drag-vertical';
+  handle.setAttribute('aria-label', t('a11y.dragHandle'));
+
+  const label = document.createElement('span');
+  label.className = 'palette-label';
+  label.textContent = def.name;
+
+  btn.append(handle, label);
+  applyIcons(btn); // injeta o SVG da alça no [data-icon]
+  attachReorderDrag(handle, btn);
+
   // Clique/toque simples seleciona o chip (revela a barra de ações); o arrasto
   // pelo corpo cria uma instância no canvas.
   attachPaletteDrag(btn, { kind: 'chip', def }, () => selectChip(def, btn));
@@ -492,6 +594,10 @@ function refreshPalette(): void {
 document.querySelectorAll<HTMLButtonElement>('button[data-add]').forEach((btn) => {
   attachPaletteDrag(btn, { kind: 'primitive', type: btn.dataset.add as PrimitiveType });
 });
+
+// O NAND participa da reordenação pela sua alça (botão estático no HTML).
+const nandHandle = nandBtn.querySelector<HTMLElement>('.drag-handle');
+if (nandHandle) attachReorderDrag(nandHandle, nandBtn);
 
 // --- Fluxo "Make": empacota o espaço em um chip e abre a edição do nome ------
 

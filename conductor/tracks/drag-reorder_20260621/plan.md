@@ -55,17 +55,17 @@ UI da alça e reordenação por pointer events.
 
 ### Tasks
 
-- [ ] Task 3.1: Adicionar a alça (`data-icon="drag-vertical"`) ao NAND e a cada botão de
+- [x] Task 3.1: Adicionar a alça (`data-icon="drag-vertical"`) ao NAND e a cada botão de
       chip, com CSS (posição, cursor, `touch-action: none`) e alinhamento com o rótulo.
-- [ ] Task 3.2: Iniciar o arrasto de reordenação no `pointerdown` da alça com
+- [x] Task 3.2: Iniciar o arrasto de reordenação no `pointerdown` da alça com
       `stopPropagation` (para não acionar o drag-to-create do corpo) e pointer capture.
-- [ ] Task 3.3: Durante o `pointermove`, calcular o índice de destino pela posição vertical
+- [x] Task 3.3: Durante o `pointermove`, calcular o índice de destino pela posição vertical
       e refletir no DOM (reordenação ao vivo / indicador de inserção); no `pointerup`,
       gravar a nova ordem (`paletteOrder` + persistência) e re-renderizar.
 
 ### Verification
 
-- [ ] Arrastar pela alça reordena e persiste; arrastar pelo corpo ainda cria instância no
+- [x] Arrastar pela alça reordena e persiste; arrastar pelo corpo ainda cria instância no
       canvas; clique/edição inalterados.
 
 ## Phase 4: Toque, feedback e edge cases
