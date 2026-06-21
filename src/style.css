@@ -174,10 +174,13 @@ body {
   background: #444f70;
 }
 
-/* Chip selecionado na paleta: anel de destaque. */
+/* Chip selecionado na paleta: borda laranja coincidindo com a aresta do botão.
+   Como o box-sizing é border-box, engrossar a borda para 2px cresce para dentro:
+   o contorno fica flush com a borda externa do componente (mesmo border-radius),
+   sem halo difuso e sem deslocar os botões vizinhos. */
 #palette button.chip-btn.selected {
   border-color: #e0af68;
-  box-shadow: 0 0 0 2px rgba(224, 175, 104, 0.45);
+  border-width: 2px;
 }
 
 /* Controles de scroll (▲/▼): só visíveis quando a lista transborda. */
@@ -456,6 +459,24 @@ body {
      modo que o campo cresça/encolha centralizado ao redor do alvo. */
   width: auto;
   text-align: center;
+}
+
+/* Modo "sobre o componente": o editor ocupa exatamente a área do próprio alvo
+   (botão do chip na paleta ou nó de I/O no canvas), sem a moldura do overlay
+   flutuante — a edição acontece no lugar do componente, não num campo extra. */
+#rename-overlay.inplace {
+  padding: 0;
+  gap: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+#rename-overlay.inplace #rename-input {
+  width: 100%;
+  height: 100%;
+  /* Borda laranja ecoa o estado de seleção, deixando claro que é o alvo em edição. */
+  border-color: #e0af68;
 }
 
 /* Overlay + painel "Sobre" / boas-vindas. */
