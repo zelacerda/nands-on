@@ -22,5 +22,6 @@
 | [x] | ui-redesign_20260614 | Reorganização da UI do Editor | 2026-06-14 | 2026-06-14 |
 | [x] | area-select_20260621 | Seleção por Área e Pan com Botão do Meio/Direito | 2026-06-21 | 2026-06-21 |
 | [x] | tutorial-highlight-clip_20260621 | Corrigir Highlight Recortado no Tutorial | 2026-06-21 | 2026-06-21 |
+| [~] | select-border-inline-rename_20260621 | Borda de Seleção Alinhada e Renomeação In-Place | 2026-06-21 | 2026-06-21 |
 
 <!-- Tracks registrados por /conductor:new-track -->
