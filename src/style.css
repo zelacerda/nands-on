@@ -48,8 +48,8 @@ body {
   align-items: stretch;
   gap: 12px;
   /* Largura fixa: nomes longos de chip quebram em várias linhas em vez de
-     esticar a barra. */
-  width: 120px;
+     esticar a barra. Acomoda a alça de reordenar sem apertar o nome. */
+  width: 140px;
   max-height: calc(100vh - 24px);
 }
 
