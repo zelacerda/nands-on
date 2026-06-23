@@ -106,4 +106,49 @@ describe('CircuitStore', () => {
       expect(restored.listWires()[0]!.barOffset).toBe(32);
     });
   });
+
+  describe('estado do input (tap OFF↔ON, long press CLK)', () => {
+    it('cycleInputState alterna apenas entre OFF e ON', () => {
+      const store = new CircuitStore();
+      const inp = store.addNode('input', { x: 0, y: 0 });
+      expect(inp.value ?? false).toBe(false); // OFF
+
+      store.cycleInputState(inp.id);
+      expect(store.getNode(inp.id)!.value).toBe(true); // ON
+      expect(store.getNode(inp.id)!.clock ?? false).toBe(false);
+
+      store.cycleInputState(inp.id);
+      expect(store.getNode(inp.id)!.value).toBe(false); // OFF
+      expect(store.getNode(inp.id)!.clock ?? false).toBe(false);
+    });
+
+    it('setInputClock ativa o modo CLK e zera o value', () => {
+      const store = new CircuitStore();
+      const inp = store.addNode('input', { x: 0, y: 0 });
+      store.cycleInputState(inp.id); // ON
+
+      store.setInputClock(inp.id);
+      expect(store.getNode(inp.id)!.clock).toBe(true);
+      expect(store.getNode(inp.id)!.value).toBe(false);
+    });
+
+    it('um tap em CLK desliga o clock e alterna o valor (vai para ON)', () => {
+      const store = new CircuitStore();
+      const inp = store.addNode('input', { x: 0, y: 0 });
+      store.setInputClock(inp.id); // CLK
+
+      store.cycleInputState(inp.id);
+      expect(store.getNode(inp.id)!.clock).toBe(false);
+      expect(store.getNode(inp.id)!.value).toBe(true); // ON
+    });
+
+    it('cycleInputState e setInputClock são no-op para nós que não são input', () => {
+      const store = new CircuitStore();
+      const nand = store.addNode('nand', { x: 0, y: 0 });
+      store.cycleInputState(nand.id);
+      store.setInputClock(nand.id);
+      expect(store.getNode(nand.id)!.value).toBeUndefined();
+      expect(store.getNode(nand.id)!.clock).toBeUndefined();
+    });
+  });
 });

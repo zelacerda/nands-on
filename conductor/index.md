@@ -36,6 +36,7 @@ Hub de navegação para o contexto do projeto.
 - [Opção "Help" no Menu e Separadores de Grupo](./tracks/help-menu_20260621/index.md) — `help-menu_20260621` (complete)
 - [Ícones SVG (coolicons) nos Botões e Menu](./tracks/svg-icons_20260621/index.md) — `svg-icons_20260621` (complete)
 - [Reordenar Componentes da Paleta por Arrastar](./tracks/drag-reorder_20260621/index.md) — `drag-reorder_20260621` (complete)
+- [Estado de CLK por Long Press](./tracks/clk-longpress_20260622/index.md) — `clk-longpress_20260622` (pending)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 

@@ -1,0 +1,19 @@
+{
+  "id": "clk-longpress_20260622",
+  "title": "Estado de CLK por Long Press",
+  "type": "chore",
+  "status": "in_progress",
+  "created": "2026-06-22T00:00:00Z",
+  "updated": "2026-06-22T12:00:00Z",
+  "current_phase": 1,
+  "current_task": "1.1",
+  "phases": {
+    "total": 3,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 9,
+    "completed": 0
+  },
+  "commits": []
+}

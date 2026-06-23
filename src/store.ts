@@ -125,25 +125,29 @@ export class CircuitStore {
   }
 
   /**
-   * Avança o estado de um nó `input` no ciclo OFF → ON → CLK → OFF: desligado,
-   * ligado (estático) e modo clock (oscila com o tempo). No-op para outros tipos.
-   * No modo CLK o `value` estático é zerado — a saída passa a derivar do tempo.
+   * Alterna o estado estático de um nó `input` entre OFF e ON. Se a entrada
+   * estiver em modo CLK, o toque sai do clock e alterna o `value` (que estava
+   * zerado pelo CLK) — passando, portanto, para ON. O modo CLK é ativado à parte,
+   * por `setInputClock` (acionado via long press). No-op para outros tipos.
    */
   cycleInputState(nodeId: string): void {
     const node = this.nodes.get(nodeId);
     if (!node || node.type !== 'input') return;
-    if (node.clock) {
-      // CLK → OFF
-      node.clock = false;
-      node.value = false;
-    } else if (node.value) {
-      // ON → CLK
-      node.value = false;
-      node.clock = true;
-    } else {
-      // OFF → ON
-      node.value = true;
-    }
+    // Sair do CLK ao tocar; em seguida alterna o valor estático (OFF ↔ ON).
+    node.clock = false;
+    node.value = !node.value;
+  }
+
+  /**
+   * Ativa o modo CLK de um nó `input`: a saída passa a oscilar com o tempo
+   * (`clockValue`), ignorando o `value` estático, que é zerado. Idempotente para
+   * entradas já em clock. No-op para outros tipos.
+   */
+  setInputClock(nodeId: string): void {
+    const node = this.nodes.get(nodeId);
+    if (!node || node.type !== 'input') return;
+    node.clock = true;
+    node.value = false;
   }
 
   /** Define o estado booleano de um nó `input`. No-op para outros tipos. */
