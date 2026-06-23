@@ -63,16 +63,16 @@ isoladamente.
 
 ### Tasks
 
-- [ ] Task 3.1: Atualizar strings em `src/strings.ts`:
+- [x] Task 3.1: Atualizar strings em `src/strings.ts`:
       - `help.feature.palette` deixa de citar arrastar IN/OUT da paleta.
       - `tutorial.step.addInput` / `tutorial.step.addOutput` passam a descrever
         arrastar um pino para o vazio.
-- [ ] Task 3.2: Reordenar/ajustar os steps em `src/tutorial.ts`
+- [x] Task 3.2: Reordenar/ajustar os steps em `src/tutorial.ts`
       (`NOT_TUTORIAL_STEPS`): colocar o NAND antes, e os steps de IN/OUT passam a
       arrastar pinos do NAND para o vazio. Ajustar `highlightSelector` (os pinos
       não têm seletor DOM — usar destaque apropriado ou nenhum) e manter os
       `isComplete` baseados em `countType(... 'input'/'output')`.
-- [ ] Task 3.3: Revisar o painel Help (`index.html`, lista de features) para
+- [x] Task 3.3: Revisar o painel Help (`index.html`, lista de features) para
       refletir o novo gesto.
 
 ### Verification
