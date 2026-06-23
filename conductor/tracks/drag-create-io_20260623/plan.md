@@ -46,12 +46,12 @@ isoladamente.
 
 ### Tasks
 
-- [ ] Task 2.1: Remover o `#io-box` e os botões `data-add="input"`/`data-add="output"`
+- [x] Task 2.1: Remover o `#io-box` e os botões `data-add="input"`/`data-add="output"`
       de `index.html` (linhas ~29-32).
-- [ ] Task 2.2: Conferir a inicialização em `src/main.ts` (~655-657) — o
+- [x] Task 2.2: Conferir a inicialização em `src/main.ts` (~655-657) — o
       `querySelectorAll('button[data-add]')` deve continuar funcionando para o NAND
       e chips; remover código morto se houver dependência específica de input/output.
-- [ ] Task 2.3: Verificar referências de CSS/estilo ao `#io-box` e limpar o que
+- [x] Task 2.3: Verificar referências de CSS/estilo ao `#io-box` e limpar o que
       ficar órfão.
 
 ### Verification
