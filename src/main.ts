@@ -122,10 +122,25 @@ let dragBar: { wireId: string; axis: 'x' | 'y' } | null = null;
 let dragNodeWireShapes: Map<string, 'Z' | 'S'> = new Map();
 /**
  * Nó `input` que já estava selecionado ao iniciar este gesto. Se o ponteiro
- * subir sem caracterizar arrasto, o clique avança o estado do input no ciclo
- * (OFF → ON → CLK → OFF) em vez de apenas movê-lo/selecioná-lo.
+ * subir sem caracterizar arrasto, um toque (tap) alterna seu estado entre
+ * OFF e ON; um long press sobre ele ativa o modo CLK.
  */
 let toggleCandidateId: string | null = null;
+
+/** Duração (ms) de pressionar-e-segurar para caracterizar um long press. */
+const LONG_PRESS_MS = 500;
+/** Timer do long press em andamento (ativa o CLK ao disparar), ou `null`. */
+let longPressTimer: number | null = null;
+/** Marca que o long press já disparou neste gesto, suprimindo o toggle no pointerup. */
+let longPressFired = false;
+
+/** Cancela um long press pendente, se houver. */
+function cancelLongPress(): void {
+  if (longPressTimer !== null) {
+    clearTimeout(longPressTimer);
+    longPressTimer = null;
+  }
+}
 
 /** Folga de acerto, em px de tela, maior para toque. */
 function hitPx(pointerType: string): number {
@@ -942,6 +957,7 @@ canvas.addEventListener('pointerdown', (e) => {
   lastPointer = screen;
 
   if (pointers.size >= 2) {
+    cancelLongPress();
     beginPinch();
     return;
   }
@@ -976,6 +992,17 @@ canvas.addEventListener('pointerdown', (e) => {
     // estado; não se aplica quando ele faz parte de uma multi-seleção.
     toggleCandidateId =
       wasSelected && selectedNodes.size === 1 && node.type === 'input' ? nodeId : null;
+    // Long press sobre um input já selecionado *sozinho* ativa o modo CLK. O timer
+    // é cancelado se o gesto virar arrasto (pointermove) ou terminar antes (tap).
+    longPressFired = false;
+    if (toggleCandidateId) {
+      const id = toggleCandidateId;
+      longPressTimer = window.setTimeout(() => {
+        longPressTimer = null;
+        longPressFired = true;
+        store.setInputClock(id);
+      }, LONG_PRESS_MS);
+    }
     // Arrastar um nó que já pertence à seleção move o grupo inteiro; arrastar um
     // nó fora da seleção primeiro o torna a seleção única.
     if (!wasSelected) selectSingleNode(nodeId);
@@ -1038,6 +1065,9 @@ canvas.addEventListener('pointermove', (e) => {
   if (pointers.has(e.pointerId)) pointers.set(e.pointerId, screen);
   const world = camera.screenToWorld(screen);
 
+  // Mover além do limiar de arrasto descaracteriza o long press (vira arrasto do nó).
+  if (longPressTimer !== null && isDrag(lastPointer, screen)) cancelLongPress();
+
   if (mode === 'pinch') {
     updatePinch();
     return;
@@ -1089,6 +1119,10 @@ canvas.addEventListener('pointermove', (e) => {
 });
 
 function endPointer(e: PointerEvent): void {
+  // O ponteiro subiu/cancelou: encerra qualquer long press pendente. Se já disparou,
+  // o flag `longPressFired` suprime o toggle de tap abaixo.
+  cancelLongPress();
+
   // Libera a captura do ponteiro antes de qualquer foco programático: no touch, o
   // teclado virtual só abre se o canvas não estiver mais capturando este ponteiro.
   if (canvas!.hasPointerCapture(e.pointerId)) {
@@ -1114,9 +1148,9 @@ function endPointer(e: PointerEvent): void {
       // mover um grupo preserva a seleção para ações subsequentes (mover de novo,
       // excluir em conjunto).
       if (selectedNodes.size <= 1) clearSelection();
-    } else if (toggleCandidateId) {
-      // Toque simples sobre um input já selecionado avança seu estado no ciclo
-      // (OFF → ON → CLK → OFF). Renomear agora é feito pela barra de ações.
+    } else if (toggleCandidateId && !longPressFired) {
+      // Toque simples sobre um input já selecionado alterna OFF ↔ ON (e sai do CLK,
+      // se estiver). O long press, quando dispara, já ativou o CLK e suprime o tap.
       store.cycleInputState(toggleCandidateId);
     }
   } else if (mode === 'marquee') {
@@ -1139,6 +1173,7 @@ function endPointer(e: PointerEvent): void {
     dragNodeId = null;
     wireStart = null;
     toggleCandidateId = null;
+    longPressFired = false;
     dragBar = null;
     dragNodeWireShapes = new Map();
   }

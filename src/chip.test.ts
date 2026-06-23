@@ -53,8 +53,7 @@ describe('captureDefinition', () => {
     const b = store.addNode('input', { x: 0, y: 80 });
     store.addNode('output', { x: 200, y: 0 });
     store.setNodeValue(a.id, true); // ON
-    store.cycleInputState(b.id); // OFF → ON
-    store.cycleInputState(b.id); // ON → CLK
+    store.setInputClock(b.id); // CLK
     const def = captureDefinition(store.toJSON(), 'C');
     for (const n of def.internal.nodes.filter((n) => n.type === 'input')) {
       expect(n.value ?? false).toBe(false);

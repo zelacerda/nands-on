@@ -383,8 +383,7 @@ describe('simulate — clock', () => {
   it('uma entrada em modo clock oscila a saída conforme o instante `now`', () => {
     const store = new CircuitStore();
     const clk = store.addNode('input', { x: 0, y: 0 });
-    store.cycleInputState(clk.id); // OFF → ON
-    store.cycleInputState(clk.id); // ON → CLK
+    store.setInputClock(clk.id); // ativa o modo CLK (antes era via ciclo de tap)
     const out = store.addNode('output', { x: 100, y: 0 });
     store.addWire({ nodeId: clk.id, pinId: 'out' }, { nodeId: out.id, pinId: 'in' });
 
@@ -405,8 +404,7 @@ describe('simulate — clock', () => {
     // um pino de entrada externo comum — deixa de oscilar como fonte interna.
     const inner = new CircuitStore();
     const clk = inner.addNode('input', { x: 0, y: 0 });
-    inner.cycleInputState(clk.id); // OFF → ON
-    inner.cycleInputState(clk.id); // ON → CLK
+    inner.setInputClock(clk.id); // CLK
     const o = inner.addNode('output', { x: 100, y: 0 });
     inner.addWire({ nodeId: clk.id, pinId: 'out' }, { nodeId: o.id, pinId: 'in' });
     const chipDef = captureDefinition(inner.toJSON(), 'WAS_CLK');
