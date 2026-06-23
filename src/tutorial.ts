@@ -95,22 +95,18 @@ function inputStateChanged(ctx: TutorialContext): boolean {
 /** Sequência de passos do tutorial do NOT. */
 export const NOT_TUTORIAL_STEPS: TutorialStep[] = [
   {
-    id: 'add-input',
-    textKey: 'tutorial.step.addInput',
-    highlightSelector: '#io-box button[data-add="input"]',
-    isComplete: (ctx) => countType(ctx.nodes, 'input') >= 1,
-  },
-  {
+    // O NAND vem primeiro: IN/OUT agora nascem do arraste de um pino de
+    // componente para o vazio, então é preciso ter o NAND no canvas antes.
     id: 'add-nand',
     textKey: 'tutorial.step.addNand',
     highlightSelector: '#palette button[data-add="nand"]',
     isComplete: (ctx) => countType(ctx.nodes, 'nand') >= 1,
   },
   {
-    id: 'add-output',
-    textKey: 'tutorial.step.addOutput',
-    highlightSelector: '#io-box button[data-add="output"]',
-    isComplete: (ctx) => countType(ctx.nodes, 'output') >= 1,
+    // Arrastar o pino de entrada do NAND para o vazio cria um IN já conectado.
+    id: 'add-input',
+    textKey: 'tutorial.step.addInput',
+    isComplete: (ctx) => countType(ctx.nodes, 'input') >= 1,
   },
   {
     id: 'wire-input',
@@ -118,8 +114,10 @@ export const NOT_TUTORIAL_STEPS: TutorialStep[] = [
     isComplete: (ctx) => inputDrivesBothNandInputs(ctx.nodes, ctx.wires),
   },
   {
-    id: 'wire-output',
-    textKey: 'tutorial.step.wireOutput',
+    // Arrastar o pino de saída do NAND cria um OUT e já o conecta — por isso o
+    // passo se completa com a saída ligada (não há passo separado de fiação).
+    id: 'add-output',
+    textKey: 'tutorial.step.addOutput',
     isComplete: (ctx) => nandDrivesOutput(ctx.nodes, ctx.wires),
   },
   {

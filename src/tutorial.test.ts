@@ -83,29 +83,30 @@ describe('tutorial — walkthrough completo', () => {
       return state.index;
     };
 
-    const inp = store.addNode('input', { x: 0, y: 0 });
-    expect(act(() => {})).toBe(1); // entrada já adicionada acima
-
+    // 1) Adiciona o NAND (agora o primeiro passo — IN/OUT nascem dos pinos dele).
     const nand = store.addNode('nand', { x: 100, y: 0 });
-    expect(act(() => {})).toBe(2);
+    expect(act(() => {})).toBe(1);
 
-    const out = store.addNode('output', { x: 220, y: 0 });
-    expect(act(() => {})).toBe(3);
-
+    // 2) Arrasta o pino de entrada do NAND para o vazio: cria um IN já ligado a in0.
+    const inp = store.addNode('input', { x: 0, y: 0 });
     expect(
-      act(() => {
-        store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in0' });
-        store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in1' });
-      }),
-    ).toBe(4);
+      act(() => store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in0' })),
+    ).toBe(2);
 
+    // 3) Liga o mesmo IN ao outro pino do NAND (in1), para uma entrada dirigir as duas.
+    expect(
+      act(() => store.addWire({ nodeId: inp.id, pinId: 'out' }, { nodeId: nand.id, pinId: 'in1' })),
+    ).toBe(3);
+
+    // 4) Arrasta o pino de saída do NAND: cria um OUT e já o conecta (passo único).
+    const out = store.addNode('output', { x: 220, y: 0 });
     expect(
       act(() => store.addWire({ nodeId: nand.id, pinId: 'out' }, { nodeId: out.id, pinId: 'in' })),
-    ).toBe(5);
+    ).toBe(4);
 
-    expect(act(() => store.cycleInputState(inp.id))).toBe(6); // toggle
-    expect(act(() => store.setNodeName(inp.id, 'A'))).toBe(7); // rename
-    expect(act(() => library.add(captureDefinition(store.toJSON(), 'NOT')))).toBe(8); // make
+    expect(act(() => store.cycleInputState(inp.id))).toBe(5); // toggle
+    expect(act(() => store.setNodeName(inp.id, 'A'))).toBe(6); // rename
+    expect(act(() => library.add(captureDefinition(store.toJSON(), 'NOT')))).toBe(7); // make
 
     expect(isFinished(NOT_TUTORIAL_STEPS, state)).toBe(true);
     expect(currentStep(NOT_TUTORIAL_STEPS, state)).toBeUndefined();
@@ -115,7 +116,7 @@ describe('tutorial — walkthrough completo', () => {
     const store = new CircuitStore();
     const library = new ChipLibrary();
     const state: TutorialState = { active: true, index: 0 };
-    // Nada foi adicionado: o passo 0 (add-input) não completa.
+    // Nada foi adicionado: o passo 0 (add-nand) não completa.
     const next = advanceIfComplete(NOT_TUTORIAL_STEPS, state, makeCtx(store, library));
     expect(next.index).toBe(0);
   });

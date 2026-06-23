@@ -55,7 +55,9 @@ export const STRINGS = {
   'help.title': 'Quick Help',
   'help.intro': 'A quick tour of what you can do in NANDS-ON:',
   'help.feature.palette':
-    'Drag the IN, OUT, and chip buttons from the palette onto the canvas to place them.',
+    'Drag the NAND and your saved chips from the palette onto the canvas to place them.',
+  'help.feature.io':
+    "Create an input or output by dragging a component's pin into empty space — it wires up automatically and inherits the pin's label.",
   'help.feature.wire':
     'Connect components by dragging from one pin to another — signals flow along the wires.',
   'help.feature.toggle':
@@ -96,12 +98,13 @@ export const STRINGS = {
   'tutorial.doneTitle': 'Nicely done!',
 
   // Tutorial: passos
-  'tutorial.step.addInput': 'Drag the round IN button onto the canvas to place an input.',
-  'tutorial.step.addNand': 'Now drag the NAND button onto the canvas — our only building block.',
-  'tutorial.step.addOutput': 'Drag the round OUT button onto the canvas to place an output.',
+  'tutorial.step.addNand': 'Drag the NAND button onto the canvas — our only building block.',
+  'tutorial.step.addInput':
+    "Drag the NAND's top input pin into empty space to create an input — it connects automatically.",
   'tutorial.step.wireInput':
-    'Wire the input to BOTH inputs of the NAND: drag from the input pin to each NAND input pin.',
-  'tutorial.step.wireOutput': 'Now wire the NAND output pin to the output.',
+    "Now drag from that input's pin to the NAND's other input pin, so one input drives BOTH.",
+  'tutorial.step.addOutput':
+    "Drag the NAND's output pin into empty space to create an output — it connects automatically.",
   'tutorial.step.toggle':
     'Tap the input to select it, then tap again to toggle it OFF ↔ ON. Watch the output show the opposite — congrats, you just made a NOT gate! (Tip: long-press an input to turn it into an auto-pulsing clock.)',
   'tutorial.step.rename':
