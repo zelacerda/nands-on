@@ -149,6 +149,22 @@ export function pinLabel(node: CircuitNode, pin: Pin): string | undefined {
 }
 
 /**
+ * Decide o nó de I/O a criar ao arrastar um pino de um componente para o espaço
+ * vazio. Um pino de **entrada** (`in`) vira uma entrada (`input`/IN) que alimenta
+ * o componente; um pino de **saída** (`out`) vira uma saída (`output`/OUT) que o
+ * componente alimenta. O novo nó herda o rótulo do pino de origem como nome; se o
+ * pino não tiver rótulo, `name` fica indefinido (cai no padrão `IN`/`OUT`).
+ */
+export function ioNodeForPin(
+  node: CircuitNode,
+  pin: Pin,
+): { type: Extract<PrimitiveType, 'input' | 'output'>; name?: string } {
+  const type = pin.kind === 'in' ? 'input' : 'output';
+  const name = pinLabel(node, pin);
+  return name ? { type, name } : { type };
+}
+
+/**
  * Dimensão de uma caixa de chip. A largura é fixa ({@link CHIP_WIDTH}) — nomes
  * extensos são truncados na renderização — e a altura segue
  * {@link bodyHeight} (`max(nIn, nOut) * 32`), garantindo pinos em cruzamentos da

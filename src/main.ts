@@ -12,6 +12,7 @@ import {
   chipInstancePins,
   chipSize,
   createPins,
+  ioNodeForPin,
   nodeSize,
 } from './model';
 import { CircuitStore } from './store';
@@ -319,6 +320,37 @@ function addNodeAt(type: PrimitiveType, world: Vec2): void {
 /** Cria uma instância de chip centrada no ponto de mundo `world`, alinhada à grade. */
 function addChipInstanceAt(def: ChipDefinition, world: Vec2): void {
   snapNode(store.addChipInstance(def, centeredTopLeft(world, chipSize(def.inputCount, def.outputCount))));
+}
+
+/**
+ * Cria um IN/OUT a partir do arraste de um pino de componente solto no espaço
+ * vazio (`source` = pino de origem; `world` = ponto de soltura). O tipo e o nome
+ * herdado vêm de {@link ioNodeForPin}. Arrastar de uma entrada já conectada é um
+ * gesto inválido (uma conexão por entrada) e não cria nada. Retorna `true` se um
+ * nó foi criado e conectado.
+ */
+function createIoFromPinDrag(source: PinRef, world: Vec2): boolean {
+  const node = store.getNode(source.nodeId);
+  const pin = store.getPin(source);
+  if (!node || !pin) return false;
+  // Entrada já ocupada: nada a fazer (regra de uma conexão por entrada).
+  if (pin.kind === 'in' && store.isInputOccupied(source)) return false;
+
+  const { type, name } = ioNodeForPin(node, pin);
+  const io = store.addNode(type, centeredTopLeft(world, NODE_SIZE[type]));
+  snapNode(io);
+  if (name) store.setNodeName(io.id, name);
+
+  const ioPin: PinRef = { nodeId: io.id, pinId: type === 'input' ? 'out' : 'in' };
+  const res = validateConnection(store, source, ioPin);
+  if (!res.ok) {
+    // Não deveria ocorrer (acabamos de criar o pino), mas desfaz por segurança.
+    store.removeNode(io.id);
+    return false;
+  }
+  store.addWire(res.from, res.to);
+  playConnect();
+  return true;
 }
 
 /** Componente que um botão da paleta cria: uma primitiva ou uma instância de chip. */
@@ -1138,6 +1170,9 @@ function endPointer(e: PointerEvent): void {
         store.addWire(res.from, res.to);
         playConnect();
       }
+    } else {
+      // Soltou no vazio: cria um IN/OUT herdando o rótulo do pino de origem.
+      createIoFromPinDrag(wireStart, world);
     }
   } else if (mode === 'dragNode' && dragNodeId) {
     const up = pointerScreen(e);
