@@ -23,14 +23,9 @@
   <body>
     <canvas id="editor" data-i18n-attr="aria-label:a11y.editor"></canvas>
 
-    <!-- Dock esquerdo: caixa de I/O + barra vertical de componentes. -->
+    <!-- Dock esquerdo: barra vertical de componentes. IN/OUT não ficam na paleta;
+         são criados arrastando um pino de componente para o espaço vazio. -->
     <div id="left-dock">
-      <!-- Caixa dedicada de entradas/saídas (botões circulares). -->
-      <div id="io-box">
-        <button type="button" data-add="input" data-i18n="palette.input"></button>
-        <button type="button" data-add="output" data-i18n="palette.output"></button>
-      </div>
-
       <!-- Barra vertical de componentes: lista rolável + "Make" ancorado embaixo. -->
       <nav id="palette" data-i18n-attr="aria-label:a11y.palette">
         <button type="button" id="palette-scroll-up" class="palette-scroll" hidden aria-hidden="true">

@@ -53,54 +53,6 @@ body {
   max-height: calc(100vh - 24px);
 }
 
-/* Caixa dedicada de I/O (IN/OUT). */
-#io-box {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px;
-  background: rgba(39, 43, 51, 0.9);
-  border: 1px solid #3a3f4a;
-  border-radius: 10px;
-  backdrop-filter: blur(4px);
-}
-
-/* Botões de I/O (IN/OUT): círculos, espelhando a forma desses nós no canvas. A
-   cor da borda reflete o conector exposto — laranja para a entrada (que tem pino
-   de saída) e azul claro para a saída (que tem pino de entrada) — tornando
-   intuitivo o que injeta e o que observa sinal. */
-#io-box button {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border-radius: 50%;
-  font:
-    600 13px system-ui,
-    sans-serif;
-  color: #d8dee9;
-  background: #353b45;
-  border: 1px solid #4a525e;
-  cursor: pointer;
-  /* Permite arrastar o botão para o canvas sem o navegador interpretar como scroll. */
-  touch-action: none;
-}
-
-#io-box button:hover {
-  background: #3f4651;
-}
-
-#io-box button:active {
-  background: #2d333b;
-}
-
-#io-box button[data-add='input'] {
-  border-color: #e0af68;
-}
-
-#io-box button[data-add='output'] {
-  border-color: #7aa2f7;
-}
-
 /* Barra vertical de componentes: lista rolável + controles de scroll + "Make". */
 #palette {
   display: flex;
