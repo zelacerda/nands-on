@@ -15,13 +15,13 @@ Ajustar o modelo de transição de estado da entrada, isolado da camada de gesto
 
 ### Tasks
 
-- [~] Task 1.1: Refatorar `cycleInputState` em `store.ts` para alternar apenas OFF↔ON; se a entrada estiver em CLK, desligar o clock e alternar o valor (sair de CLK via tap).
-- [~] Task 1.2: Adicionar método para ativar o modo CLK de uma entrada (ex.: `setInputClock(nodeId)`), preservando o versionamento de topologia já usado.
-- [ ] Task 1.3: (Se a lógica for crítica) escrever/ajustar testes de unidade cobrindo as transições OFF↔ON, ativar CLK e tap-em-CLK.
+- [x] Task 1.1: Refatorar `cycleInputState` em `store.ts` para alternar apenas OFF↔ON; se a entrada estiver em CLK, desligar o clock e alternar o valor (sair de CLK via tap).
+- [x] Task 1.2: Adicionar método para ativar o modo CLK de uma entrada (ex.: `setInputClock(nodeId)`), preservando o versionamento de topologia já usado.
+- [x] Task 1.3: (Se a lógica for crítica) escrever/ajustar testes de unidade cobrindo as transições OFF↔ON, ativar CLK e tap-em-CLK.
 
 ### Verification
 
-- [ ] As transições de estado se comportam conforme os critérios de aceitação (validado por testes ou inspeção da função).
+- [x] As transições de estado se comportam conforme os critérios de aceitação (validado por testes ou inspeção da função).
 
 ## Phase 2: Gesto de Long Press (main)
 
