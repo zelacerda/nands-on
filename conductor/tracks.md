@@ -26,6 +26,6 @@
 | [x] | help-menu_20260621 | Opção "Help" no Menu e Separadores de Grupo | 2026-06-21 | 2026-06-21 |
 | [x] | svg-icons_20260621 | Ícones SVG (coolicons) nos Botões e Menu | 2026-06-21 | 2026-06-21 |
 | [x] | drag-reorder_20260621 | Reordenar Componentes da Paleta por Arrastar | 2026-06-21 | 2026-06-21 |
-| [~] | clk-longpress_20260622 | Estado de CLK por Long Press | 2026-06-22 | 2026-06-22 |
+| [x] | clk-longpress_20260622 | Estado de CLK por Long Press | 2026-06-22 | 2026-06-22 |
 
 <!-- Tracks registrados por /conductor:new-track -->

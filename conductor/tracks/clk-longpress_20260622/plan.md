@@ -3,7 +3,7 @@
 **Track ID:** clk-longpress_20260622
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-22
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -42,19 +42,19 @@ Detectar o long press no fluxo de pointer e ligá-lo à nova ação de CLK.
 
 ### Tasks
 
-- [~] Task 3.1: Atualizar o texto do tutorial onde menciona ativar o clock, refletindo o long press.
-- [~] Task 3.2: Atualizar o painel de Help/Sobre com a instrução de como ativar o CLK por long press.
+- [x] Task 3.1: Atualizar o texto do tutorial onde menciona ativar o clock, refletindo o long press.
+- [x] Task 3.2: Atualizar o painel de Help/Sobre com a instrução de como ativar o CLK por long press.
 
 ### Verification
 
-- [ ] Tutorial e Help descrevem corretamente a ativação do CLK por long press.
+- [x] Tutorial e Help descrevem corretamente a ativação do CLK por long press.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos.
-- [ ] Testes passando (onde aplicável).
-- [ ] Verificação manual no dev server pelo usuário (roteiro de testes).
-- [ ] Pronto para revisão.
+- [x] Todos os critérios de aceitação atendidos.
+- [x] Testes passando (onde aplicável).
+- [x] Verificação manual no dev server pelo usuário (roteiro de testes).
+- [x] Pronto para revisão.
 
 ---
 

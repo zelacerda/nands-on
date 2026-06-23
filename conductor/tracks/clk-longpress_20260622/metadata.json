@@ -2,18 +2,22 @@
   "id": "clk-longpress_20260622",
   "title": "Estado de CLK por Long Press",
   "type": "chore",
-  "status": "in_progress",
+  "status": "complete",
   "created": "2026-06-22T00:00:00Z",
   "updated": "2026-06-22T12:00:00Z",
-  "current_phase": 1,
-  "current_task": "1.1",
+  "current_phase": 3,
+  "current_task": "3.2",
   "phases": {
     "total": 3,
-    "completed": 0
+    "completed": 3
   },
   "tasks": {
     "total": 9,
-    "completed": 0
+    "completed": 9
   },
-  "commits": []
+  "commits": [
+    "cf56d1a: chore: separa CLK do ciclo de tap; tap alterna OFF↔ON e setInputClock ativa CLK (clk-longpress_20260622)",
+    "feat: ativa CLK por long press; tap alterna OFF↔ON (clk-longpress_20260622)",
+    "docs: tutorial e Help descrevem CLK por long press (clk-longpress_20260622)"
+  ]
 }
