@@ -29,21 +29,21 @@ Detectar o long press no fluxo de pointer e ligá-lo à nova ação de CLK.
 
 ### Tasks
 
-- [~] Task 2.1: No pointerdown sobre entrada candidata, iniciar um timer de long press; cancelar em movimento acima do threshold (`DRAG_THRESHOLD_PX`), em pointerup antes do limiar, ou em cancel.
-- [~] Task 2.2: Ao disparar o long press, chamar `setInputClock` e marcar o gesto como consumido para que o pointerup não execute o toggle de tap.
-- [~] Task 2.3: Manter o tap (pointerup sem arrasto e sem long press) chamando `cycleInputState`.
-- [~] Task 2.4: Garantir o `preventDefault` do menu de contexto (long-press/botão direito) cobrindo o gesto em touch e mouse.
+- [x] Task 2.1: No pointerdown sobre entrada candidata, iniciar um timer de long press; cancelar em movimento acima do threshold (`DRAG_THRESHOLD_PX`), em pointerup antes do limiar, ou em cancel.
+- [x] Task 2.2: Ao disparar o long press, chamar `setInputClock` e marcar o gesto como consumido para que o pointerup não execute o toggle de tap.
+- [x] Task 2.3: Manter o tap (pointerup sem arrasto e sem long press) chamando `cycleInputState`.
+- [x] Task 2.4: Garantir o `preventDefault` do menu de contexto (long-press/botão direito) cobrindo o gesto em touch e mouse.
 
 ### Verification
 
-- [ ] Tap alterna OFF↔ON; long press ativa CLK; tap em CLK desliga e alterna — em mouse e touch, sem menu de contexto.
+- [x] Tap alterna OFF↔ON; long press ativa CLK; tap em CLK desliga e alterna — em mouse e touch, sem menu de contexto.
 
 ## Phase 3: Documentação na UI (tutorial e help)
 
 ### Tasks
 
-- [ ] Task 3.1: Atualizar o texto do tutorial onde menciona ativar o clock, refletindo o long press.
-- [ ] Task 3.2: Atualizar o painel de Help/Sobre com a instrução de como ativar o CLK por long press.
+- [~] Task 3.1: Atualizar o texto do tutorial onde menciona ativar o clock, refletindo o long press.
+- [~] Task 3.2: Atualizar o painel de Help/Sobre com a instrução de como ativar o CLK por long press.
 
 ### Verification
 

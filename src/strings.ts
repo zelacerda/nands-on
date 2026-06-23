@@ -59,7 +59,7 @@ export const STRINGS = {
   'help.feature.wire':
     'Connect components by dragging from one pin to another — signals flow along the wires.',
   'help.feature.toggle':
-    'Tap an input to select it, then tap again to cycle its state: OFF → ON → CLK (an auto-pulsing clock).',
+    'Tap an input to select it, then tap again to toggle it OFF ↔ ON. Long-press an input to turn it into CLK — an auto-pulsing clock.',
   'help.feature.make':
     'Click "Make" to package your circuit into a reusable chip, then drop copies of it from the palette.',
   'help.feature.persist':
@@ -103,7 +103,7 @@ export const STRINGS = {
     'Wire the input to BOTH inputs of the NAND: drag from the input pin to each NAND input pin.',
   'tutorial.step.wireOutput': 'Now wire the NAND output pin to the output.',
   'tutorial.step.toggle':
-    'Tap the input to select it, then tap again to cycle its state: OFF → ON → CLK → OFF. Watch the output show the opposite — congrats, you just made a NOT gate!',
+    'Tap the input to select it, then tap again to toggle it OFF ↔ ON. Watch the output show the opposite — congrats, you just made a NOT gate! (Tip: long-press an input to turn it into an auto-pulsing clock.)',
   'tutorial.step.rename':
     'Select the input (or the output), then tap "Rename" in the bar below — try naming the input "A".',
   'tutorial.step.make': 'Finally, click "Make" to package your NOT into a reusable chip.',
