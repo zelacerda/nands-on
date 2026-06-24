@@ -1326,7 +1326,13 @@ function render(): void {
   if (mode === 'wire' && wireStart) {
     const start = store.pinPos(wireStart);
     if (start) {
-      drawGhostWire(ctx!, camera, start, ghostEnd, ghostValid);
+      // `wirePath` assume `from` = saída (coto sai à direita) e `to` = entrada
+      // (coto entra à esquerda). Ao arrastar de um pino de entrada, orientamos o
+      // fantasma com o ponto livre como origem, para o coto deixar o pino pela
+      // esquerda — coerente com o lado do conector.
+      const fromInput = store.getPin(wireStart)?.kind === 'in';
+      if (fromInput) drawGhostWire(ctx!, camera, ghostEnd, start, ghostValid);
+      else drawGhostWire(ctx!, camera, start, ghostEnd, ghostValid);
     }
   }
 
