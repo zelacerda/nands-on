@@ -3,7 +3,7 @@
 **Track ID:** drag-create-io_20260623
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-23
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -84,21 +84,21 @@ isoladamente.
 
 ### Tasks
 
-- [ ] Task 4.1: Subir o dev server (`npm run dev`, em background) e fornecer a URL.
-- [ ] Task 4.2: Fornecer roteiro de testes manuais cobrindo cada critério de
+- [x] Task 4.1: Subir o dev server (`npm run dev`, em background) e fornecer a URL.
+- [x] Task 4.2: Fornecer roteiro de testes manuais cobrindo cada critério de
       aceitação (gesto mouse + toque, herança de nome, entrada conectada inválida,
       fan-out de saída, tutorial e Help atualizados).
 
 ### Verification
 
-- [ ] Usuário valida manualmente todos os critérios de aceitação.
+- [x] Usuário valida manualmente todos os critérios de aceitação.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos
-- [ ] `npm run build`/typecheck e testes passando
-- [ ] Tutorial e Help atualizados
-- [ ] Pronto para review
+- [x] Todos os critérios de aceitação atendidos
+- [x] `npm run build`/typecheck e testes passando
+- [x] Tutorial e Help atualizados
+- [x] Pronto para review
 
 ---
 

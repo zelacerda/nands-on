@@ -27,5 +27,6 @@
 | [x] | svg-icons_20260621 | Ícones SVG (coolicons) nos Botões e Menu | 2026-06-21 | 2026-06-21 |
 | [x] | drag-reorder_20260621 | Reordenar Componentes da Paleta por Arrastar | 2026-06-21 | 2026-06-21 |
 | [x] | clk-longpress_20260622 | Estado de CLK por Long Press | 2026-06-22 | 2026-06-22 |
+| [x] | drag-create-io_20260623 | Criar IN/OUT por Arraste de Pino | 2026-06-23 | 2026-06-23 |
 
 <!-- Tracks registrados por /conductor:new-track -->

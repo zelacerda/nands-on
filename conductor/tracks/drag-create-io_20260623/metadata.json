@@ -1,0 +1,19 @@
+{
+  "id": "drag-create-io_20260623",
+  "title": "Criar IN/OUT por Arraste de Pino",
+  "type": "feature",
+  "status": "complete",
+  "created": "2026-06-23T00:00:00Z",
+  "updated": "2026-06-23T00:00:00Z",
+  "current_phase": 4,
+  "current_task": "4.2",
+  "phases": {
+    "total": 4,
+    "completed": 4
+  },
+  "tasks": {
+    "total": 13,
+    "completed": 13
+  },
+  "commits": []
+}
