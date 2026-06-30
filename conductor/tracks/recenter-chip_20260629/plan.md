@@ -55,21 +55,41 @@ Conectar o helper ao fluxo de salvamento, atuando sobre a cópia interna.
 
 ### Verification
 
-- [ ] `npm test` (suíte de `chip`) passa, incluindo os novos casos.
-- [ ] `npm run typecheck`/build sem erros de tipo.
+- [x] `npm test` (suíte de `chip`) passa, incluindo os novos casos.
+- [x] `npm run typecheck`/build sem erros de tipo.
 
-## Phase 3: Verificação Manual (fechamento)
+## Phase 3: Câmera Centralizada no Boot
+
+Com as definições salvas em torno de `{0,0}`, o conteúdo só aparece centrado na
+tela se a câmera também olhar para a origem ao carregar. Centralizar o pan na
+origem no boot (não em resizes posteriores do usuário).
+
+### Tasks
+
+- [x] Task 3.1: Adicionar `Camera.centerOn(world, viewWidth, viewHeight)` em
+      `src/camera.ts` (posiciona o ponto de mundo no centro da viewport, sem
+      mudar o zoom) com testes em `src/camera.test.ts`.
+- [x] Task 3.2: No boot (`src/main.ts`), após o `resize()` inicial, chamar
+      `camera.centerOn({ x: 0, y: 0 }, viewWidth, viewHeight)` — apenas no
+      carregamento, sem reposicionar o pan em resizes posteriores.
+
+### Verification
+
+- [x] `npm test` e `npm run typecheck` OK (188 testes).
+
+## Phase 4: Verificação Manual (fechamento)
 
 Validar o comportamento no app, conforme `workflow.md` (verificação só no
 encerramento do track, conduzida pelo usuário).
 
 ### Tasks
 
-- [ ] Task 3.1: Subir o dev server (`npm run dev`, em background) e informar a
+- [ ] Task 4.1: Subir o dev server (`npm run dev`, em background) e informar a
       URL local ao usuário.
-- [ ] Task 3.2: Fornecer roteiro manual: montar um circuito deslocado da origem,
+- [ ] Task 4.2: Fornecer roteiro manual: montar um circuito deslocado da origem,
       salvar como chip, reabrir para edição e confirmar que o conteúdo aparece
-      centrado e alinhado ao grid; salvar novamente e confirmar idempotência.
+      centrado e alinhado ao grid; salvar novamente e confirmar idempotência;
+      recarregar a aplicação e confirmar que o pan inicia centralizado.
 
 ### Verification
 
