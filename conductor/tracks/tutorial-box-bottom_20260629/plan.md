@@ -18,16 +18,16 @@ Mover o callout para a parte inferior, acima do `#action-bar`.
 
 ### Tasks
 
-- [ ] Task 1.1: Em `#tutorial-callout` (`src/style.css`), substituir `top: 16px` por uma
+- [x] Task 1.1: Em `#tutorial-callout` (`src/style.css`), substituir `top: 16px` por uma
       ancoragem ao rodapé com folga segura acima do `#action-bar` (a barra ocupa ~60px:
       `bottom: 16px` + botões de 44px) — ex.: `bottom: 76px`. Manter `left: 50%`,
       `transform: translateX(-50%)`, largura e `z-index` atuais.
-- [ ] Task 1.2: Conferir que o seletor de `[hidden]` e o posicionamento do botão "×"
+- [x] Task 1.2: Conferir que o seletor de `[hidden]` e o posicionamento do botão "×"
       (`#tutorial-exit`, absoluto relativo ao callout) seguem corretos após a mudança.
 
 ### Verification
 
-- [ ] `npm run build` (tsc + vite) sem erros.
+- [x] `npm run build` (tsc + vite) sem erros.
 
 ## Phase 2: Verificação Visual
 
