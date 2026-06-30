@@ -3,7 +3,7 @@
 **Track ID:** import-export_20260629
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-29
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -81,16 +81,16 @@ Polimento das mensagens e verificação manual.
 
 ### Verification
 
-- [ ] Subir o dev server (`npm run dev`, em background) e fornecer roteiro de teste manual
+- [x] Subir o dev server (`npm run dev`, em background) e fornecer roteiro de teste manual
       ao usuário: exportar, recarregar/limpar, importar de volta, e tentar importar um JSON
       de versão inválida e um corrompido.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos.
-- [ ] Testes passando (`npm test`).
-- [ ] Build de tipos limpo.
-- [ ] Pronto para revisão.
+- [x] Todos os critérios de aceitação atendidos.
+- [x] Testes passando (`npm test`).
+- [x] Build de tipos limpo.
+- [x] Pronto para revisão.
 
 ---
 
