@@ -725,7 +725,10 @@ body {
 /* Callout do tutorial — caixa não-bloqueante centrada no topo. */
 #tutorial-callout {
   position: fixed;
-  top: 16px;
+  /* Ancorado no rodapé, logo acima da barra de edição (#action-bar: bottom 16px
+     + botões de 44px ≈ 60px), com folga de 16px — assim não cobre os primeiros
+     chips da paleta em telas verticais de celular. */
+  bottom: 76px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 18;

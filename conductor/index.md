@@ -40,6 +40,7 @@ Hub de navegação para o contexto do projeto.
 - [Criar IN/OUT por Arraste de Pino](./tracks/drag-create-io_20260623/index.md) — `drag-create-io_20260623` (complete)
 - [Recentragem Automática de Chips ao Salvar](./tracks/recenter-chip_20260629/index.md) — `recenter-chip_20260629` (complete)
 - [Importar e Exportar Biblioteca de Chips (JSON)](./tracks/import-export_20260629/index.md) — `import-export_20260629` (complete)
+- [Mover Box do Tutorial para a Parte Inferior](./tracks/tutorial-box-bottom_20260629/index.md) — `tutorial-box-bottom_20260629` (pending)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
