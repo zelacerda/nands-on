@@ -46,6 +46,7 @@ import { playConnect, playDrop } from './audio';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
 import { isWelcomeDismissed, setWelcomeDismissed, shouldAutoShowWelcome } from './welcome';
+import { serializeLibrary } from './transfer';
 import {
   NOT_TUTORIAL_STEPS,
   type TutorialState,
@@ -1362,11 +1363,22 @@ document.addEventListener('click', (e) => {
   if (!commandsMenu.contains(target) && target !== menuBtn) setMenuOpen(false);
 });
 
-// Import/Export: placeholders nesta track (a serialização JSON virá em outra).
-document.querySelector<HTMLButtonElement>('#cmd-import')!.addEventListener('click', () => {
-  setMenuOpen(false);
-});
+// Export: serializa a biblioteca de chips e dispara o download de um .json.
 document.querySelector<HTMLButtonElement>('#cmd-export')!.addEventListener('click', () => {
+  setMenuOpen(false);
+  const json = serializeLibrary(library.list());
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'nands-on-export.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+// Import: placeholder — implementado na Phase 3 desta track.
+document.querySelector<HTMLButtonElement>('#cmd-import')!.addEventListener('click', () => {
   setMenuOpen(false);
 });
 

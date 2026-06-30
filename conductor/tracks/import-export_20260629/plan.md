@@ -40,10 +40,10 @@ Botão **Export** funcional gerando download do arquivo.
 
 ### Tasks
 
-- [ ] Task 2.1: No handler de `#cmd-export` (`main.ts`), serializar a biblioteca atual via
+- [~] Task 2.1: No handler de `#cmd-export` (`main.ts`), serializar a biblioteca atual via
       `serializeLibrary` e disparar download (`Blob` + `<a download>`,
       `nands-on-export.json`), fechando o menu.
-- [ ] Task 2.2: Garantir liberação do `URL.createObjectURL` (revoke) após o download.
+- [~] Task 2.2: Garantir liberação do `URL.createObjectURL` (revoke) após o download.
 
 ### Verification
 
