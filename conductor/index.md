@@ -38,6 +38,7 @@ Hub de navegação para o contexto do projeto.
 - [Reordenar Componentes da Paleta por Arrastar](./tracks/drag-reorder_20260621/index.md) — `drag-reorder_20260621` (complete)
 - [Estado de CLK por Long Press](./tracks/clk-longpress_20260622/index.md) — `clk-longpress_20260622` (complete)
 - [Criar IN/OUT por Arraste de Pino](./tracks/drag-create-io_20260623/index.md) — `drag-create-io_20260623` (complete)
+- [Recentragem Automática de Chips ao Salvar](./tracks/recenter-chip_20260629/index.md) — `recenter-chip_20260629` (pending)
 
 <!-- Preenchido automaticamente por /conductor:new-track -->
 
