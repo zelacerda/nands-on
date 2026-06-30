@@ -1,0 +1,18 @@
+{
+  "id": "import-export_20260629",
+  "title": "Importar e Exportar Biblioteca de Chips (JSON)",
+  "type": "feature",
+  "status": "in_progress",
+  "created": "2026-06-29T00:00:00Z",
+  "updated": "2026-06-29T00:00:00Z",
+  "current_phase": 1,
+  "current_task": "1.1",
+  "phases": {
+    "total": 4,
+    "completed": 0
+  },
+  "tasks": {
+    "total": 10,
+    "completed": 0
+  }
+}
