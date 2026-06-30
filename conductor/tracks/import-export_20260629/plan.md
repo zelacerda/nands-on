@@ -55,17 +55,17 @@ Botão **Import** funcional: seleção de arquivo, validação, substituição e
 
 ### Tasks
 
-- [~] Task 3.1: Adicionar um `<input type="file" accept="application/json">` oculto no
+- [x] Task 3.1: Adicionar um `<input type="file" accept="application/json">` oculto no
       `index.html` (ou criado via JS) e acioná-lo a partir do handler de `#cmd-import`.
-- [~] Task 3.2: Ao selecionar arquivo, ler o conteúdo, chamar `parseLibrary`, e em caso de
-      sucesso **substituir toda a biblioteca**: `clearChips` + `saveChips`, recarregar a
-      `ChipLibrary` e atualizar a paleta (sem exigir reload da página).
-- [~] Task 3.3: Em caso de erro, exibir mensagem clara e **preservar** o estado atual;
+- [x] Task 3.2: Ao selecionar arquivo, ler o conteúdo, chamar `parseLibrary`, e em caso de
+      sucesso **substituir toda a biblioteca**: `saveChips`, recarregar a `ChipLibrary`,
+      limpar o espaço de trabalho (evita instâncias órfãs) e atualizar a paleta (sem reload).
+- [x] Task 3.3: Em caso de erro, exibir mensagem clara e **preservar** o estado atual;
       resetar o `value` do input para permitir reimportar o mesmo arquivo.
 
 ### Verification
 
-- [ ] Build sem erros; menu abre, Import/Export respondem ao clique no desktop.
+- [x] Build sem erros; menu abre, Import/Export respondem ao clique no desktop.
 
 ## Phase 4: Mensagens (i18n), Erros e Verificação Final
 
@@ -73,10 +73,10 @@ Polimento das mensagens e verificação manual.
 
 ### Tasks
 
-- [ ] Task 4.1: Adicionar em `strings.ts` as mensagens de sucesso/erro de import (JSON
+- [x] Task 4.1: Adicionar em `strings.ts` as mensagens de sucesso/erro de import (JSON
       inválido, versão incompatível, estrutura inválida, import concluído) e usá-las nos
       handlers.
-- [ ] Task 4.2: Revisar acessibilidade/toque dos botões e o fechamento do menu após cada
+- [x] Task 4.2: Revisar acessibilidade/toque dos botões e o fechamento do menu após cada
       ação.
 
 ### Verification
