@@ -85,6 +85,14 @@ export const STRINGS = {
   'clearDb': 'Clear DB',
   'clearDb.confirm': 'Clear the local database? All saved chips will be removed.',
 
+  // Importar/Exportar biblioteca de chips
+  'import.success': 'Library imported: {count} chip(s).',
+  'import.error.json': 'Could not import: the file is not valid JSON.',
+  'import.error.format': 'Could not import: this is not a NANDS-ON library file.',
+  'import.error.version': 'Could not import: incompatible file format version.',
+  'import.error.structure': 'Could not import: the file structure is malformed.',
+  'import.error.unknown': 'Could not import the file.',
+
   // Validação de nome de chip
   'validation.emptyName': 'Enter a name for the component.',
   'validation.duplicateName': 'A chip named "{name}" already exists.',

@@ -18,7 +18,7 @@ import {
 import { CircuitStore } from './store';
 import { ChipLibrary, captureDefinition, reconcileInstances, validateChipName } from './chip';
 import { clearChips, loadChips, saveChips } from './persistence';
-import { applyStrings, t } from './strings';
+import { applyStrings, type StringKey, t } from './strings';
 import { applyIcons } from './icons';
 import {
   NAND_KEY,
@@ -46,7 +46,7 @@ import { playConnect, playDrop } from './audio';
 import { type PinchSample, pinchDelta, samplePinch } from './gesture';
 import { centeredTopLeft, isDrag } from './palette';
 import { isWelcomeDismissed, setWelcomeDismissed, shouldAutoShowWelcome } from './welcome';
-import { serializeLibrary } from './transfer';
+import { ImportError, type ImportErrorKind, parseLibrary, serializeLibrary } from './transfer';
 import {
   NOT_TUTORIAL_STEPS,
   type TutorialState,
@@ -1377,9 +1377,42 @@ document.querySelector<HTMLButtonElement>('#cmd-export')!.addEventListener('clic
   URL.revokeObjectURL(url);
 });
 
-// Import: placeholder — implementado na Phase 3 desta track.
+// Import: lê um .json de biblioteca, valida e SUBSTITUI toda a biblioteca atual.
+// O input de arquivo fica oculto e é acionado pelo item de menu.
+const importInput = document.createElement('input');
+importInput.type = 'file';
+importInput.accept = 'application/json';
+importInput.hidden = true;
+document.body.appendChild(importInput);
+
+const importErrorKey = (kind: ImportErrorKind): StringKey =>
+  `import.error.${kind}` as StringKey;
+
 document.querySelector<HTMLButtonElement>('#cmd-import')!.addEventListener('click', () => {
   setMenuOpen(false);
+  importInput.click();
+});
+
+importInput.addEventListener('change', async () => {
+  const file = importInput.files?.[0];
+  // Reseta já para permitir reimportar o mesmo arquivo numa próxima vez.
+  importInput.value = '';
+  if (!file) return;
+  try {
+    const defs = parseLibrary(await file.text());
+    // Substitui tudo: troca a biblioteca em memória, persiste e repovoa a paleta.
+    // O espaço de trabalho é limpo para não deixar instâncias órfãs apontando
+    // para chips que deixaram de existir.
+    library.load(defs);
+    await saveChips(defs);
+    store.clear();
+    clearSelection();
+    refreshPalette();
+    alert(t('import.success', { count: defs.length }));
+  } catch (err) {
+    const kind: ImportErrorKind = err instanceof ImportError ? err.kind : 'structure';
+    alert(t(err instanceof ImportError ? importErrorKey(kind) : 'import.error.unknown'));
+  }
 });
 
 // Limpar banco — afordância temporária de desenvolvimento, agora dentro do menu.

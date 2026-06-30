@@ -40,14 +40,14 @@ Botão **Export** funcional gerando download do arquivo.
 
 ### Tasks
 
-- [~] Task 2.1: No handler de `#cmd-export` (`main.ts`), serializar a biblioteca atual via
+- [x] Task 2.1: No handler de `#cmd-export` (`main.ts`), serializar a biblioteca atual via
       `serializeLibrary` e disparar download (`Blob` + `<a download>`,
       `nands-on-export.json`), fechando o menu.
-- [~] Task 2.2: Garantir liberação do `URL.createObjectURL` (revoke) após o download.
+- [x] Task 2.2: Garantir liberação do `URL.createObjectURL` (revoke) após o download.
 
 ### Verification
 
-- [ ] Build (`npm run build` ou `tsc --noEmit`) sem erros de tipo.
+- [x] Build (`npm run build` ou `tsc --noEmit`) sem erros de tipo.
 
 ## Phase 3: Importar
 
@@ -55,12 +55,12 @@ Botão **Import** funcional: seleção de arquivo, validação, substituição e
 
 ### Tasks
 
-- [ ] Task 3.1: Adicionar um `<input type="file" accept="application/json">` oculto no
+- [~] Task 3.1: Adicionar um `<input type="file" accept="application/json">` oculto no
       `index.html` (ou criado via JS) e acioná-lo a partir do handler de `#cmd-import`.
-- [ ] Task 3.2: Ao selecionar arquivo, ler o conteúdo, chamar `parseLibrary`, e em caso de
+- [~] Task 3.2: Ao selecionar arquivo, ler o conteúdo, chamar `parseLibrary`, e em caso de
       sucesso **substituir toda a biblioteca**: `clearChips` + `saveChips`, recarregar a
       `ChipLibrary` e atualizar a paleta (sem exigir reload da página).
-- [ ] Task 3.3: Em caso de erro, exibir mensagem clara e **preservar** o estado atual;
+- [~] Task 3.3: Em caso de erro, exibir mensagem clara e **preservar** o estado atual;
       resetar o `value` do input para permitir reimportar o mesmo arquivo.
 
 ### Verification
