@@ -1,5 +1,5 @@
 import type { Camera, Vec2 } from './camera';
-import { type CircuitNode, pinWorldPos } from './model';
+import { type CircuitNode, type CircuitState, pinWorldPos } from './model';
 
 /** Espaçamento base do grid, em unidades de mundo. */
 export const GRID_SIZE = 16;
@@ -42,6 +42,40 @@ export function snapNodePos(node: CircuitNode): Vec2 {
     };
   }
   return snapToGrid(node.pos);
+}
+
+/**
+ * Recentraliza um {@link CircuitState} **in place** em torno da origem `{0, 0}`:
+ * translada todas as posições de nós para que o **centro do bounding box** dos
+ * nós caia em (0, 0). O deslocamento é arredondado ao grid ({@link snapScalar}),
+ * de modo que nós já alinhados à malha permaneçam alinhados após a translação.
+ *
+ * Apenas `node.pos` é transladado: os offsets de pino são relativos ao nó e o
+ * `barOffset` dos fios é um deslocamento **relativo** (ver `model.ts`/`wire.ts`),
+ * então uma translação uniforme dos nós recentraliza o circuito inteiro sem
+ * tocar em fios ou pinos, preservando exatamente a topologia relativa.
+ *
+ * No-op se não houver nós, ou se o centro já estiver na origem (idempotente).
+ */
+export function recenterState(state: CircuitState): void {
+  const { nodes } = state;
+  if (nodes.length === 0) return;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const n of nodes) {
+    if (n.pos.x < minX) minX = n.pos.x;
+    if (n.pos.y < minY) minY = n.pos.y;
+    if (n.pos.x > maxX) maxX = n.pos.x;
+    if (n.pos.y > maxY) maxY = n.pos.y;
+  }
+  const dx = -snapScalar((minX + maxX) / 2);
+  const dy = -snapScalar((minY + maxY) / 2);
+  if (dx === 0 && dy === 0) return;
+  for (const n of nodes) {
+    n.pos = { x: n.pos.x + dx, y: n.pos.y + dy };
+  }
 }
 
 /**
