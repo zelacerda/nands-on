@@ -3,7 +3,7 @@
 **Track ID:** tutorial-box-bottom_20260629
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-29
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -35,20 +35,20 @@ Validar o comportamento em telas estreitas/verticais e em desktop.
 
 ### Tasks
 
-- [ ] Task 2.1: Subir o dev server e fornecer roteiro de teste manual: iniciar o tutorial,
+- [x] Task 2.1: Subir o dev server e fornecer roteiro de teste manual: iniciar o tutorial,
       confirmar que o box aparece no rodapé acima do `#action-bar` (com folga), que os
       primeiros chips da paleta ficam livres em viewport vertical de celular, e que o "×" e
       o texto seguem legíveis. Conferir desktop sem regressão.
 
 ### Verification
 
-- [ ] Critérios de aceitação confirmados visualmente pelo usuário.
+- [x] Critérios de aceitação confirmados visualmente pelo usuário.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação atendidos.
-- [ ] Build limpo.
-- [ ] Pronto para revisão.
+- [x] Todos os critérios de aceitação atendidos.
+- [x] Build limpo.
+- [x] Pronto para revisão.
 
 ---
 

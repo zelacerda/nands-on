@@ -1,7 +1,7 @@
 # Track: Mover Box do Tutorial para a Parte Inferior
 
 **ID:** tutorial-box-bottom_20260629
-**Status:** Pending
+**Status:** Complete
 
 ## Documents
 
@@ -10,8 +10,8 @@
 
 ## Progress
 
-- Phases: 0/2 complete
-- Tasks: 0/3 complete
+- Phases: 2/2 complete
+- Tasks: 3/3 complete
 
 ## Quick Links
 
