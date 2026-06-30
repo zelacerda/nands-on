@@ -45,10 +45,10 @@ Conectar o helper ao fluxo de salvamento, atuando sobre a cópia interna.
 
 ### Tasks
 
-- [ ] Task 2.1: Em `captureDefinition` (`src/chip.ts`), após `structuredClone` e
+- [x] Task 2.1: Em `captureDefinition` (`src/chip.ts`), após `structuredClone` e
       o reset das entradas, aplicar a recentragem sobre `internal` (a cópia),
       antes de derivar `inputs`/`outputs`.
-- [ ] Task 2.2: Adicionar/estender testes em `src/chip.test.ts`: a definição
+- [x] Task 2.2: Adicionar/estender testes em `src/chip.test.ts`: a definição
       capturada fica centrada na origem; o `CircuitState` de origem **não** é
       mutado; a ordenação vertical de I/O e os `inputLabels`/`outputLabels`
       permanecem corretos após a recentragem.
