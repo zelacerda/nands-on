@@ -1,4 +1,5 @@
 import { type ChipDefinition, type CircuitState, chipInstancePins } from './model';
+import { recenterState } from './grid';
 import { t } from './strings';
 
 let seq = 0;
@@ -45,6 +46,9 @@ export function captureDefinition(state: CircuitState, name: string, id?: string
       node.clock = false;
     }
   }
+  // Recentraliza a definição em torno da origem para que cada chip fique numa
+  // posição previsível, independente de onde o circuito foi montado no espaço.
+  recenterState(internal);
   const byY = (a: { pos: { y: number } }, b: { pos: { y: number } }) => a.pos.y - b.pos.y;
   const inputs = internal.nodes.filter((n) => n.type === 'input').sort(byY);
   const outputs = internal.nodes.filter((n) => n.type === 'output').sort(byY);

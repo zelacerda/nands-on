@@ -76,6 +76,45 @@ describe('captureDefinition', () => {
     const b = captureDefinition(sampleState(), 'B');
     expect(a.id).not.toBe(b.id);
   });
+
+  it('recentraliza os nós internos em torno da origem ao capturar', () => {
+    // Espaço montado bem longe da origem.
+    const store = new CircuitStore();
+    store.addNode('input', { x: 1008, y: 1008 });
+    store.addNode('nand', { x: 1120, y: 1040 });
+    store.addNode('output', { x: 1248, y: 1072 });
+    const def = captureDefinition(store.toJSON(), 'Centrado');
+    const xs = def.internal.nodes.map((n) => n.pos.x);
+    const ys = def.internal.nodes.map((n) => n.pos.y);
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+    const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+    expect(Math.abs(cx)).toBeLessThanOrEqual(GRID_SIZE / 2);
+    expect(Math.abs(cy)).toBeLessThanOrEqual(GRID_SIZE / 2);
+  });
+
+  it('não muta as posições do estado de origem ao recentrar', () => {
+    const store = new CircuitStore();
+    const a = store.addNode('input', { x: 1008, y: 1008 });
+    store.addNode('output', { x: 1248, y: 1072 });
+    const state = store.toJSON();
+    captureDefinition(state, 'C');
+    expect(state.nodes.find((n) => n.id === a.id)?.pos).toEqual({ x: 1008, y: 1008 });
+  });
+
+  it('preserva contagem e ordenação vertical de I/O mesmo deslocado da origem', () => {
+    const store = new CircuitStore();
+    const b = store.addNode('input', { x: 1000, y: 1080 }); // mais abaixo
+    const a = store.addNode('input', { x: 1000, y: 1010 }); // mais acima
+    const q = store.addNode('output', { x: 1240, y: 1040 });
+    a.name = 'A';
+    b.name = 'B';
+    q.name = 'Q';
+    const def = captureDefinition(store.toJSON(), 'IO');
+    expect(def.inputCount).toBe(2);
+    expect(def.outputCount).toBe(1);
+    expect(def.inputLabels).toEqual(['A', 'B']); // ordem por y preservada
+    expect(def.outputLabels).toEqual(['Q']);
+  });
 });
 
 describe('captureDefinition — rótulos dos pinos', () => {
