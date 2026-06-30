@@ -19,20 +19,20 @@ Lógica central de export/import isolada e testável, sem tocar no DOM.
 
 ### Tasks
 
-- [~] Task 1.1: Criar `src/transfer.ts` com a constante `FORMAT_VERSION = '1.0'`, o tipo do
+- [x] Task 1.1: Criar `src/transfer.ts` com a constante `FORMAT_VERSION = '1.0'`, o tipo do
       envelope (`{ format: 'nands-on'; version: string; chips: ChipDefinition[] }`) e as
       funções `serializeLibrary(chips): string` e `parseLibrary(text): ChipDefinition[]`.
-- [~] Task 1.2: Em `parseLibrary`, validar `JSON.parse` protegido, `format === 'nands-on'`,
+- [x] Task 1.2: Em `parseLibrary`, validar `JSON.parse` protegido, `format === 'nands-on'`,
       `version === FORMAT_VERSION` e a estrutura mínima de cada `ChipDefinition`; lançar
       erros tipados/distintos por causa (JSON inválido, formato/versão incompatível,
       estrutura inconsistente).
-- [~] Task 1.3: Escrever `src/transfer.test.ts` cobrindo round-trip
+- [x] Task 1.3: Escrever `src/transfer.test.ts` cobrindo round-trip
       (serialize → parse), rejeição de versão diferente, format errado, JSON corrompido e
       chips malformados.
 
 ### Verification
 
-- [ ] `npm test` passa, incluindo os novos testes de `transfer`.
+- [x] `npm test` passa, incluindo os novos testes de `transfer`.
 
 ## Phase 2: Exportar
 
