@@ -3,7 +3,7 @@
 **Track ID:** recenter-chip_20260629
 **Spec:** [spec.md](./spec.md)
 **Created:** 2026-06-29
-**Status:** [ ] Not Started
+**Status:** [x] Complete
 
 ## Overview
 
@@ -84,23 +84,23 @@ encerramento do track, conduzida pelo usuário).
 
 ### Tasks
 
-- [ ] Task 4.1: Subir o dev server (`npm run dev`, em background) e informar a
+- [x] Task 4.1: Subir o dev server (`npm run dev`, em background) e informar a
       URL local ao usuário.
-- [ ] Task 4.2: Fornecer roteiro manual: montar um circuito deslocado da origem,
+- [x] Task 4.2: Fornecer roteiro manual: montar um circuito deslocado da origem,
       salvar como chip, reabrir para edição e confirmar que o conteúdo aparece
       centrado e alinhado ao grid; salvar novamente e confirmar idempotência;
       recarregar a aplicação e confirmar que o pan inicia centralizado.
 
 ### Verification
 
-- [ ] Usuário confirma os critérios de aceitação visualmente no app.
+- [x] Usuário confirma os critérios de aceitação visualmente no app.
 
 ## Final Verification
 
-- [ ] Todos os critérios de aceitação do `spec.md` atendidos.
-- [ ] Testes passando (`npm test`) e build/typecheck OK.
-- [ ] Documentação/comentários do helper e de `captureDefinition` atualizados.
-- [ ] Pronto para revisão.
+- [x] Todos os critérios de aceitação do `spec.md` atendidos.
+- [x] Testes passando (`npm test`) e build/typecheck OK.
+- [x] Documentação/comentários do helper e de `captureDefinition` atualizados.
+- [x] Pronto para revisão.
 
 ---
 
