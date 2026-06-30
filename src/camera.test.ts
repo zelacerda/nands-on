@@ -49,4 +49,20 @@ describe('Camera', () => {
     expect(clampZoom(10)).toBe(MAX_ZOOM);
     expect(clampZoom(1)).toBe(1);
   });
+
+  it('centerOn coloca o ponto de mundo no centro da viewport', () => {
+    const cam = new Camera({ x: 0, y: 0 }, 1);
+    cam.centerOn({ x: 0, y: 0 }, 800, 600);
+    // A origem do mundo passa a cair no centro da tela.
+    expect(cam.worldToScreen({ x: 0, y: 0 })).toEqual({ x: 400, y: 300 });
+  });
+
+  it('centerOn respeita o zoom atual sem alterá-lo', () => {
+    const cam = new Camera({ x: 123, y: -7 }, 2);
+    cam.centerOn({ x: 50, y: 20 }, 800, 600);
+    expect(cam.zoom).toBe(2);
+    const c = cam.worldToScreen({ x: 50, y: 20 });
+    expect(c.x).toBeCloseTo(400, 6);
+    expect(c.y).toBeCloseTo(300, 6);
+  });
 });

@@ -47,6 +47,18 @@ export class Camera {
   }
 
   /**
+   * Centraliza a câmera sobre um ponto de mundo, posicionando-o no centro da
+   * viewport (`viewWidth`/`viewHeight` em CSS px). Não altera o zoom. Usado no
+   * boot para que a origem do mundo apareça no centro da tela.
+   */
+  centerOn(world: Vec2, viewWidth: number, viewHeight: number): void {
+    this.pan = {
+      x: viewWidth / 2 - world.x * this.zoom,
+      y: viewHeight / 2 - world.y * this.zoom,
+    };
+  }
+
+  /**
    * Aplica zoom multiplicativo mantendo fixo o ponto de tela `anchor`
    * (tipicamente o cursor ou o centro de uma pinça).
    */

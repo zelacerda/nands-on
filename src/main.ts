@@ -1565,6 +1565,10 @@ tutorialExit.addEventListener('click', exitTutorial);
 
 window.addEventListener('resize', resize);
 resize();
+// No boot, centraliza a câmera na origem do mundo: como as definições de chip
+// são salvas centradas em {0,0}, isso faz o conteúdo aparecer no centro da tela.
+// Só no carregamento — resizes posteriores do usuário não reposicionam o pan.
+camera.centerOn({ x: 0, y: 0 }, viewWidth, viewHeight);
 updatePaletteScroll();
 requestAnimationFrame(render);
 
